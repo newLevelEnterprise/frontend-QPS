@@ -1,0 +1,41 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import AuthLayout from "../ui/layouts/AuthLayout";
+import PageLayout from "../ui/layouts/PageLayout";
+import CadastroPage from "../ui/pages/cadastro";
+import ClientesPages from "../ui/pages/clientes";
+import ForgotPasswordPage from "../ui/pages/ForgotPassword";
+import LoginPage from "../ui/pages/LoginPage";
+import ProdutosPage from "../ui/pages/produto";
+import Sequenciamento from "../ui/pages/Sequenciamento";
+import SignUpPage from "../ui/pages/SignUpPage";
+import AuthGuard from "./AuthGuard";
+
+function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<AuthGuard />}>
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          </Route>
+        </Route>
+
+        <Route element={<AuthGuard isPrivate />}>
+          <Route element={<PageLayout />}>
+            <Route path="/sequenciamento" element={<Sequenciamento />} />
+
+            <Route path="/cadastro" element={<CadastroPage />} />
+            <Route path="/cadastro/cliente" element={<ClientesPages />} />
+            <Route path="/cadastro/produto" element={<ProdutosPage />} />
+
+            <Route path="/*" element={<div className="">Nada encontrado</div>} />
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default Router;
