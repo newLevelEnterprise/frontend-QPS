@@ -15,7 +15,7 @@ function Produtos() {
   const [preenchimento, setPreenchimento] = useState<boolean>(false);
   const [products, setProducts] = useState<IProduto[]>([]);
   const [busca, setBusca] = useState<string>("");
-  const [setup, setSetup] = useState<boolean>(false);
+  const [setup, setSetup] = useState<{nome: string; id: number} | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [produto, setProduto] = useState<
@@ -41,7 +41,6 @@ function Produtos() {
       toast.error("Erro ao remover produto. Tente novamente.");
     } 
   };
-  const adicionarSetup = () => console.log(produtoListaFiltrada);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -93,11 +92,11 @@ function Produtos() {
       </Modal.Root>
 
       {/* Modal para o Setup */}
-      <Modal.Root isVisible={setup}>
+      <Modal.Root isVisible={!!setup}>
         <Modal.Container>
           <Modal.Header
             title="Setup Produto com nome grande"
-            onClose={() => setSetup(false)}
+            onClose={() => setSetup(null)}
           />
           <div className="relative max-w-md mt-4">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -121,10 +120,18 @@ function Produtos() {
             />
           </div>
           <FormSetup
-            produtos={produtoListaFiltrada}
-            setProdutos={setProdutoListaFiltrada}
+            produtos={products.filter(p => p.name !== setup?.nome).map(p => ({
+              ciclo: p.cycle,
+              id: p.id,
+              maior_produto: 0,
+              menor_produto: 0,
+              nomeProdutoOrigem: setup?.nome || '',
+              nomeProdutoDestino: p.name,
+              produto_de: setup?.id || 0,
+              produto_para: p.id,
+              tempo_setup: 0
+            }))}
           />
-          <Modal.Footer onClick={adicionarSetup} />
         </Modal.Container>
       </Modal.Root>
 
@@ -200,7 +207,7 @@ function Produtos() {
                         Editar
                       </button>
                       <button
-                        onClick={() => setSetup(true)}
+                        onClick={() => setSetup({nome: produto.name, id: produto.id})}
                         className="text-blue-600 cursor-pointer hover:text-blue-800 text-sm font-medium transition-colors duration-150"
                       >
                         Setup
