@@ -61,8 +61,6 @@ function Produtos() {
     getProducts();
   }, []);
 
-  
-
   useEffect(() => {
     setProdutoListaFiltrada(products.filter((p) => p.name.includes(busca)));
   }, [busca]);

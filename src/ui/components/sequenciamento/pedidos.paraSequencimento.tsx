@@ -21,9 +21,15 @@ function PedidosParaSequenciamento({
     new Date().toISOString()
   );
   const [maquinasDisponiveis, setMaquinasDisponiveis] = useState<number>(0);
-  const [todosPedidos] = useState<IPedido[]>(allOrders);
+  const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
   const [pedidosFiltrados, setPedidosFiltrados] =
-    useState<IPedido[]>(todosPedidos);
+    useState<IPedido[]>([]);
+
+  useEffect(() => {
+    setTodosPedidos(allOrders);
+    setPedidosFiltrados(allOrders);
+  }, [allOrders]);
+  
 
   useEffect(() => {
     setPedidosFiltrados(
@@ -32,7 +38,12 @@ function PedidosParaSequenciamento({
   }, [busca]);
 
   const handleVoltarPedido = (pedido: IPedido) => {
-    setOrders((prev) => [...prev, pedido]);
+    setOrders((prev) => {
+      const newOrders = [...prev];
+      const index = newOrders.findIndex(p => p.id === pedido.id);
+      newOrders.splice(index, 1);
+      return newOrders;
+    });
   };
 
   const iniciarSequenciamentoFunc = async () => {
@@ -42,6 +53,9 @@ function PedidosParaSequenciamento({
         `/sequenciamento/sequenciamento/solve?sequencing_date=${dataDoPedido}&machine_availability=${maquinasDisponiveis}`,
         todosPedidos.map((p) => p.id)
       );
+
+      setTodosPedidos([]);
+      setPedidosFiltrados([]);
       toast.success("Sequenciamento iniciado com sucesso!");
     } catch (error) {
       console.log(error);
@@ -165,7 +179,7 @@ function PedidosParaSequenciamento({
           </div>
         </div>
         <button
-          disabled={isLoading || todosPedidos.length === 0}
+          disabled={isLoading || todosPedidos.length === 0 || !dataDoPedido || !maquinasDisponiveis}
           onClick={iniciarSequenciamentoFunc}
           className="w-1/2 md:w-full text-sm  cursor-pointer inline-flex items-center justify-center md:text-lg px-2 py-2 bg-green-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-green-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
         >

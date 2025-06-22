@@ -1,31 +1,50 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import type { IPedido } from "../../../types/Pedido";
+import { apiClient } from "../../../utils/apiClient";
 
 interface PedidosDisponiveisProps {
-  allOrders: IPedido[];
   setPedidosSequenciamento: Dispatch<SetStateAction<IPedido[]>>;
 }
 
 function PedidosDisponiveis({
-  allOrders,
   setPedidosSequenciamento,
 }: PedidosDisponiveisProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
-  const [todosPedidos] = useState<IPedido[]>(allOrders);
+  const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
   const [pedidosFiltrados, setPedidosFiltrados] =
-    useState<IPedido[]>(todosPedidos);
+    useState<IPedido[]>([]);
 
   const handleAddPedido = (pedido: IPedido) => {
     setPedidosSequenciamento((prev) => [...prev, pedido]);
   };
 
   useEffect(() => {
+    const getjobs = async () => {
+      setIsLoading(true);
+      try {
+        const { data } = await apiClient.get<IPedido[]>("/jobs");
+        setPedidosFiltrados(data ?? []);
+        setTodosPedidos(data ?? []);
+      } catch (error) {
+        console.error("Erro ao buscar pedidos:", error);
+        setPedidosFiltrados([]);
+        setTodosPedidos([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getjobs();
+  }, []);
+
+  useEffect(() => {
     setPedidosFiltrados(
       todosPedidos.filter((pedido) => pedido.name.includes(busca))
     );
   }, [busca]);
-
+  
   return (
     <div className="w-full md:w-1/2 bg-white rounded-md shadow p-4">
       <h1 className="text-lg md:text-xl text-[#5B85D5] font-bold">
@@ -45,7 +64,16 @@ function PedidosDisponiveis({
       </div>
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[400px] md:h-[470px]">
-        {allOrders.length === 0 ? (
+        {isLoading ? (
+          <div className="w-full h-full flex justify-center items-center">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <p className="mt-2 text-sm text-gray-500">
+                Carregando produtos...
+              </p>
+            </div>
+          </div>
+        ) : todosPedidos.length === 0 ? (
           <div className="w-full h-full flex justify-center items-center">
             <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">
               Nenhum pedido encontrado !
