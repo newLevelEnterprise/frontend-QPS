@@ -7,6 +7,7 @@ import { RiFileList3Line } from "react-icons/ri";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import LogoSidebar from "../../assets/sidebar-logo.png";
+import { useAuth } from "../../hooks/useAuth";
 import LogoutButton from "./LogoutButton";
 
 interface MenuItem {
@@ -58,11 +59,11 @@ export default function Sidebar({
   mobileSidebar,
   onMobileSidebar,
 }: SidebarProps) {
+  const {enterprise_id} = useAuth();
 
   const [expandedItems, setExpandedItems] = useState<string[]>(["Cadastro"]);
   const pathName = useLocation().pathname;
   const navigate = useNavigate();
-  // const { data } = use(getAccountData());
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) =>
@@ -103,8 +104,7 @@ export default function Sidebar({
                 {/* {data?.empresa} */}
                 Empresa Exemplo
               </span>
-              {/* <span className="text-sm text-[#878C9B] truncate text-ellipsis">Conta ID: {data?.id}</span> */}
-              <span className="text-sm text-[#878C9B] truncate text-ellipsis">Conta ID: 123113131</span>
+              <span className="text-sm text-[#878C9B] truncate text-ellipsis">Conta ID: {enterprise_id}</span>
             </div>
           </div>
         </div>

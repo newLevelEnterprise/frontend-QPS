@@ -4,12 +4,14 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { setToken } from "../../../hooks/setToken";
+import { useAuth } from "../../../hooks/useAuth";
 import { signinSchema, type SignInBody } from "../../../schemas/auth";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "./FormErrorMessage";
 
 export default function LoginForm() {
+  const { setEnterpriseId } = useAuth();
   const navigate = useNavigate();
   const {
     register,
@@ -22,7 +24,10 @@ export default function LoginForm() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      const payloadData: Record<string, string> = { username: data.email, password: data.password };
+      const payloadData: Record<string, string> = {
+        username: data.email,
+        password: data.password,
+      };
 
       const params = new URLSearchParams();
       Object.keys(payloadData).forEach((key) => {
@@ -31,12 +36,16 @@ export default function LoginForm() {
       const { data: res } = await apiClient.post<{
         access_token: string;
         refresh_token: string;
-      }>("/auth/login", params.toString(), {headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+        user: { id: number; email: string; enterprise_id: number; };
+      }>("/auth/login", params.toString(), {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
       setToken({
         access_token: res.access_token,
         refresh_token: res.refresh_token,
       });
-      return navigate('/sequenciamento')
+      setEnterpriseId(res.user.enterprise_id);
+      return navigate("/sequenciamento");
     } catch (error) {
       console.error(error);
       toast.error("Erro ao fazer login, verifique suas credenciais.");
