@@ -17,8 +17,13 @@ function CadastroPage() {
   useEffect(() => {
     const getproduction = async () => {
       try {
+        let endpoint = "/production-schedule/latest"
+
+        if(searchParams.get('id')) {
+          endpoint = `/production-schedule/${searchParams.get('id')}`
+        }
         const { data } = await apiClient.get<IProductionSchedule>(
-          "/production-schedule/latest"
+          endpoint
         );
         setProduction(data);
       } catch (error) {
@@ -30,8 +35,6 @@ function CadastroPage() {
     getproduction();
   }, []);
 
-  
-  console.log(searchParams);
 
   return (
     <div className="flex flex-col w-full gap-1">

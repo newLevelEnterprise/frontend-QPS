@@ -1,77 +1,90 @@
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { apiClient } from "../../utils/apiClient";
 
-// Interface para os dados da API
 interface HistoryItem {
   sequencing_start: string;
   machine_status: "On Time" | "Late";
   id: number;
 }
 
-
-const mockHistoryData: HistoryItem[] = [
-  { 
-    id: 1, 
-    sequencing_start: "2024-01-15T14:30:42.391Z", 
-    machine_status: "On Time" 
-  },
-  { 
-    id: 2, 
-    sequencing_start: "2024-01-14T09:15:22.123Z", 
-    machine_status: "Late" 
-  },
-  { 
-    id: 3, 
-    sequencing_start: "2024-01-13T16:45:15.789Z", 
-    machine_status: "On Time" 
-  },
-  { 
-    id: 4, 
-    sequencing_start: "2024-01-12T11:20:33.456Z", 
-    machine_status: "On Time" 
-  },
-  { 
-    id: 5, 
-    sequencing_start: "2024-01-11T13:55:18.234Z", 
-    machine_status: "Late" 
-  },
-];
-
 function HistoryPage() {
-  const [historyData] = useState<HistoryItem[]>(mockHistoryData);
+  const navigate = useNavigate();
+  const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function getHistory() {
+      try {
+        setIsLoading(true);
+        const { data } = await apiClient.get<HistoryItem[]>(
+          "/production-schedule"
+        );
+        setHistoryData(data);
+      } catch (error) {
+        console.log(error);
+        setHistoryData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    getHistory();
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getStatusColor = (status: "On Time" | "Late") => {
-    return status === "On Time" 
-      ? "bg-green-100 text-green-800" 
+    return status === "On Time"
+      ? "bg-green-100 text-green-800"
       : "bg-red-100 text-red-800";
   };
 
   const handleCardClick = (id: number) => {
-    console.log(`ID do processamento: ${id}`);
+    navigate({
+      pathname: "/cadastro",
+      search: `?id=${id}`,
+    });
+    return;
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex flex-col w-full gap-6">
+        <h1 className="text-lg md:text-xl lg:text-2xl text-[#878C9B] font-semibold">
+          Histórico de Processamentos
+        </h1>
+
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+            <div className="text-gray-500 text-lg">Carregando histórico...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col w-full gap-6">
       <h1 className="text-lg md:text-xl lg:text-2xl text-[#878C9B] font-semibold">
         Histórico de Processamentos
       </h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {historyData.map((item) => (
           <div
@@ -86,7 +99,11 @@ function HistoryPage() {
               <div className="text-xs text-gray-600 mb-2">
                 {formatTime(item.sequencing_start)}
               </div>
-              <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.machine_status)}`}>
+              <div
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                  item.machine_status
+                )}`}
+              >
                 {item.machine_status}
               </div>
             </div>
@@ -94,7 +111,7 @@ function HistoryPage() {
         ))}
       </div>
 
-      {historyData.length === 0 && (
+      {historyData.length === 0 && !isLoading && (
         <div className="flex flex-col items-center justify-center py-12">
           <div className="text-gray-400 text-lg mb-2">
             Nenhum histórico encontrado

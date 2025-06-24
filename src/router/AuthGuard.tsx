@@ -14,7 +14,7 @@ function AuthGuard({ isPrivate = false }: AuthGuardProps) {
   }
 
   if (access_token && !isPrivate) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/sequenciamento" replace />;
   }
 
   return (
