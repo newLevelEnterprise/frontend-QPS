@@ -24,7 +24,7 @@ function PageLayout() {
           <IoIosMenu size={22} />
         </button>
 
-        <div className="p-2 md:p-6">
+        <div className="p-2 md:p-4">
           <Outlet />
         </div>
       </div>

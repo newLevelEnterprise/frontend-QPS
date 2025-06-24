@@ -3,6 +3,7 @@ import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaUserCircle } from "react-icons/fa";
 import { IoChevronDown, IoClose, IoHomeOutline } from "react-icons/io5";
+import { MdHistory } from "react-icons/md";
 import { RiFileList3Line } from "react-icons/ri";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
@@ -45,7 +46,12 @@ const menuItems: MenuItem[] = [
         url: "/cadastro/produto",
       },
     ],
-  }
+  },
+  {
+    title: "Histórico",
+    icon: MdHistory,
+    url: "/historico",
+  },
 ];
 
 const isActive = (url: string, pathName: string) => url === pathName;

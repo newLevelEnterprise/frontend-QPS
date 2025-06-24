@@ -1,15 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import type { IProductionSchedule } from "../../../types/ProductionSchedule";
 
 function SequenciamentoTabela({dados}: {dados: IProductionSchedule['results']}) {
-  const [data] = useState<IProductionSchedule['results']>(dados);
-  const [dadosFiltrados, setDadosFiltrados] = useState<IProductionSchedule['results']>(data);
   const [busca, setBusca] = useState<string>('');
 
-  useEffect(() => {
-    setDadosFiltrados(data.filter(d => d.client_name.includes(busca)));
-  }, []);  
 
   return (
     <div className="flex-1 rounded-md bg-white shadow p-4">
@@ -60,7 +55,7 @@ function SequenciamentoTabela({dados}: {dados: IProductionSchedule['results']}) 
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {dadosFiltrados.map((order, index) => (
+              {dados.filter(p => p.client_name.includes(busca)).map((order, index) => (
                 <tr
                   key={order.job_id}
                   className={`${
@@ -88,7 +83,7 @@ function SequenciamentoTabela({dados}: {dados: IProductionSchedule['results']}) 
                   <td className="px-4 py-3 text-sm">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        order.status === "No Prazo"
+                        order.status === "On Time"
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800"
                       }`}

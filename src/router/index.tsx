@@ -4,6 +4,7 @@ import PageLayout from "../ui/layouts/PageLayout";
 import CadastroPage from "../ui/pages/cadastro";
 import ClientesPages from "../ui/pages/clientes";
 import ForgotPasswordPage from "../ui/pages/ForgotPassword";
+import HistoryPage from "../ui/pages/historyPage";
 import LoginPage from "../ui/pages/LoginPage";
 import ProdutosPage from "../ui/pages/produto";
 import Sequenciamento from "../ui/pages/Sequenciamento";
@@ -29,6 +30,7 @@ function Router() {
             <Route path="/cadastro" element={<CadastroPage />} />
             <Route path="/cadastro/cliente" element={<ClientesPages />} />
             <Route path="/cadastro/produto" element={<ProdutosPage />} />
+            <Route path="/historico" element={<HistoryPage />} />
 
             <Route path="/*" element={<div className="">Nada encontrado</div>} />
           </Route>

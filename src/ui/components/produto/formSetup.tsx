@@ -6,8 +6,8 @@ import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 
 export interface ResponseOfProductsSetups {
-  tempo_setup: number;
-  produto_destino: {
+  setup_time: number;
+  pair_product: {
     id: number;
     name: string;
   };
@@ -34,7 +34,7 @@ function FormSetup({ produtos, produto_ref, onClose }: FormNovoProdutoProps) {
       setIsLoading(true);
       const setup = setupProdutos.map((p) => ({
         product_id: p.id,
-        tempo_setup: p.tempo_setup,
+        setup_time: p.tempo_setup,
       }));
 
       const payload = {
@@ -64,11 +64,11 @@ function FormSetup({ produtos, produto_ref, onClose }: FormNovoProdutoProps) {
           setSetupProdutos(produtos);
         } else {
           const products = data
-            .filter((p) => p.produto_destino.id !== produto_ref)
+            .filter((p) => p.pair_product.id !== produto_ref)
             .map((p) => ({
-              nomeProdutoDestino: p.produto_destino.name,
-              tempo_setup: p.tempo_setup,
-              id: p.produto_destino.id,
+              nomeProdutoDestino: p.pair_product.name,
+              tempo_setup: p.setup_time,
+              id: p.pair_product.id,
             }));
           if (products.length === produtos.length) {
             setSetupProdutos(products);

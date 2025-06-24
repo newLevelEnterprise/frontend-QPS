@@ -1,14 +1,3 @@
-// export interface IPedido {
-//   cliente: string;
-//   dataPrometida: string;
-//   horarioPrometido: string;
-//   prazo?: string;
-//   produto: string;
-//   ciclo?: number;
-//   demanda: number | string;
-//   valor: number;
-// }
-
 export interface IPedido {
   name: string
   promised_date: string

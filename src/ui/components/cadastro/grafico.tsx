@@ -12,7 +12,7 @@ import type { IProductionSchedule } from "../../../types/ProductionSchedule";
 function GraficoFaturamento({
   dados,
 }: {
-  dados: IProductionSchedule["results"];
+  dados: IProductionSchedule["revenue_forecast"];
 }) {
   return (
     <div className="w-full h-full bg-white rounded-lg shadow p-4">
@@ -34,7 +34,7 @@ function GraficoFaturamento({
           <YAxis tickFormatter={(v) => `R$ ${v.toLocaleString("pt-BR")}`} />
           <Tooltip formatter={(v) => `R$ ${v.toLocaleString("pt-BR")}`} />
           <Bar
-            dataKey="expected_revenue"
+            dataKey="revenue_total"
             fill="#2382E7"
             barSize={24}
             radius={[4, 4, 0, 0]}
