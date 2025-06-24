@@ -2,7 +2,6 @@ import { useState } from "react";
 import { IoIosMenu } from "react-icons/io";
 import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import AuthProvider from "../../contexts/AuthContext";
 import Sidebar from "../components/sidebar";
 
 function PageLayout() {
@@ -13,12 +12,10 @@ function PageLayout() {
   return (
     <div className="h-full flex flex-col md:flex-row font-[family-name:var(--font-red-hat)]">
       <ToastContainer position="top-center" />
-      <AuthProvider>
-        <Sidebar
+      <Sidebar
           mobileSidebar={mobileSidebar}
           onMobileSidebar={handleMobileSidebar}
         />
-      </AuthProvider>
       <div className="flex-1 bg-[#D4D4D4] relative">
         <button
           onClick={handleMobileSidebar}
