@@ -1,7 +1,16 @@
+import { useMemo } from "react";
 import type { IProductionSchedule } from "../../../types/ProductionSchedule";
 
 
 function Resumo({ dados }: {dados: IProductionSchedule['results']}) {
+
+  const total = useMemo(() => dados.reduce((acc, curr) => {
+    acc.quantity += curr.quantity;
+    acc.revenue_total += curr.expected_revenue;
+
+    return acc;
+  } ,{quantity: 0, revenue_total: 0}), [dados]);
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full relative overflow-hidden">
       <div className="p-6">
@@ -30,8 +39,8 @@ function Resumo({ dados }: {dados: IProductionSchedule['results']}) {
         <footer className="border-t-2 border-gray-300">
           <div className="text-sm font-medium flex justify-between">
             <span className="py-2 text-gray-900">Total: </span>
-            <span className="py-2 text-gray-900">165.000,00</span>
-            <span className="py-2 text-gray-900">R$ 567.650,00</span>
+            <span className="py-2 text-gray-900">{total.quantity}</span>
+            <span className="py-2 text-gray-900">R$ {Intl.NumberFormat('pt-BR').format(total.revenue_total)}</span>
           </div>
         </footer>
       </div>
