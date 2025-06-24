@@ -1,1 +1,45 @@
 @import "tailwindcss";
+
+/* Reset global para evitar overflow desnecessário */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Garantir que o layout principal não cause overflow */
+.h-full {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Corrigir comportamento do scroll */
+.overflow-y-auto {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Evitar que elementos causem overflow horizontal */
+.flex-1 {
+  min-width: 0;
+}
+
+/* Garantir que containers não ultrapassem a largura da tela */
+.w-full {
+  max-width: 100%;
+}
+
+/* Corrigir comportamento do grid */
+.grid {
+  min-width: 0;
+}

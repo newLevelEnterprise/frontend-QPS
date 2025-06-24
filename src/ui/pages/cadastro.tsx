@@ -37,7 +37,7 @@ function CadastroPage() {
 
 
   return (
-    <div className="flex flex-col w-full gap-1">
+    <div className="h-full flex flex-col w-full gap-1 overflow-hidden">
       <h1 className="text-lg md:text-xl text-[#878C9B]">
         Painel se Sequenciamento da Produção
       </h1>
@@ -47,7 +47,7 @@ function CadastroPage() {
         </div>
         <SequenciamentoTabela dados={production ? production.results : []} />
       </div>
-      <div className="flex-1 flex md:flex-row flex-col gap-6">
+      <div className="flex-1 flex md:flex-row flex-col gap-6 overflow-hidden">
         <div className="w-[98%] md:w-1/5 flex flex-col justify-between gap-2">
           <HorasMaquina
             dados={{

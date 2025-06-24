@@ -100,6 +100,8 @@ function FormSetup({ produtos, produto_ref, onClose }: FormNovoProdutoProps) {
 
     getProducts();
   }, []);
+
+
   return (
     <div className="w-full flex flex-col gap-10 my-6 overflow-y-auto max-h-[95%]">
       {isLoadingProducts ? (
