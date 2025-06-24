@@ -1,50 +1,144 @@
-import { useEffect, useState } from "react";
+import { type Dispatch, useEffect, useState } from "react";
+import { VscLoading } from "react-icons/vsc";
+import { toast } from "react-toastify";
 import type { IProdutoSetup } from "../../../types/Produto";
+import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 
-interface FormNovoProdutoProps {
-  produtos: IProdutoSetup[];
+export interface ResponseOfProductsSetups {
+  tempo_setup: number;
+  produto_destino: {
+    id: number;
+    name: string;
+  };
 }
 
-function FormSetup({ produtos }: FormNovoProdutoProps) {
+interface FormNovoProdutoProps {
+  produto_ref: number;
+  produtos: IProdutoSetup[];
+  onClose: Dispatch<
+    React.SetStateAction<{
+      nome: string;
+      id: number;
+    } | null>
+  >;
+}
+
+function FormSetup({ produtos, produto_ref, onClose }: FormNovoProdutoProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [setupProdutos, setSetupProdutos] = useState<IProdutoSetup[]>([]);
 
-  const adicionarSetup = () => console.log('Setup',setupProdutos);
+  const adicionarSetup = async () => {
+    try {
+      setIsLoading(true);
+      const setup = setupProdutos.map((p) => ({
+        product_id: p.id,
+        tempo_setup: p.tempo_setup,
+      }));
+
+      const payload = {
+        product_ref: produto_ref,
+        setups: setup,
+      };
+
+      await apiClient.post("/setup_trocas/batch", payload);
+      onClose(null);
+    } catch (error) {
+      console.log(error);
+      toast.error("Erro ao criar o setup.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setSetupProdutos(produtos);
-  }, []);
+    const getProducts = async () => {
+      try {
+        setIsLoadingProducts(true);
+        const { data } = await apiClient.get<ResponseOfProductsSetups[]>(
+          `/setup_trocas/produto/${produto_ref}/resumo`
+        );
 
+        if (data.length === 0) {
+          setSetupProdutos(produtos);
+        } else {
+          const products = data
+            .filter((p) => p.produto_destino.id !== produto_ref)
+            .map((p) => ({
+              nomeProdutoDestino: p.produto_destino.name,
+              tempo_setup: p.tempo_setup,
+              id: p.produto_destino.id,
+            }));
+          if (products.length === produtos.length) {
+            setSetupProdutos(products);
+          } else {
+            const mergeProducts = [...products, ...produtos].reduce(
+              (acc, current) => {
+                const existingIndex = acc.findIndex(
+                  (item) => item['id'] === current['id']
+                );
+
+                if (existingIndex === -1) {
+                  acc.push(current);
+                }
+
+                return acc;
+              },
+              [] as IProdutoSetup[]
+            );
+            setSetupProdutos(mergeProducts);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        setSetupProdutos(produtos);
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    };
+
+    getProducts();
+  }, []);
   return (
     <div className="w-full flex flex-col gap-10 my-6 overflow-y-auto max-h-[95%]">
-      {setupProdutos.map((produto) => (
-        <div
-          key={produto.id}
-          className="w-full flex justify-between items-center border-b border-gray-300"
-        >
-          <p>{produto.nomeProdutoDestino}</p>
-          <p>Tempo</p>
-          <input
-            type="number"
-            className="p-1 outline-none border border-gray-200 rounded-md mb-2"
-            value={produto.tempo_setup}
-            onChange={(e) => {
-              const index = setupProdutos.findIndex(p => p.id === produto.id);
-
-              setSetupProdutos(prev => {
-                const oldProducts = [...prev];
-                oldProducts[index] = {
-                  ...produto,
-                  tempo_setup: Number(e.target.value)
-                }
-                return oldProducts
-              });
-            }}
-          />
+      {isLoadingProducts ? (
+        <div className="w-full h-full flex justify-center items-center">
+          <VscLoading size={20} className="animate-spin" />
         </div>
-      ))} 
+      ) : (
+        setupProdutos.map((produto) => (
+          <div
+            key={produto.id}
+            className="w-full flex justify-between items-center border-b border-gray-300"
+          >
+            <p>{produto.nomeProdutoDestino}</p>
+            <p>Tempo</p>
+            <input
+              type="number"
+              className="p-1 outline-none border border-gray-200 rounded-md mb-2"
+              value={produto.tempo_setup}
+              onChange={(e) => {
+                const index = setupProdutos.findIndex(
+                  (p) => p.id === produto.id
+                );
+                setSetupProdutos((prev) => {
+                  const oldProducts = [...prev];
+                  oldProducts[index] = {
+                    ...produto,
+                    tempo_setup: Number(e.target.value),
+                  };
+                  return oldProducts;
+                });
+              }}
+            />
+          </div>
+        ))
+      )}
       <div className="w-full flex justify-end">
         <Button
+          disable={isLoading || isLoadingProducts}
+          isLoading={isLoading}
           onClick={adicionarSetup}
           title="Ok"
           type="button"

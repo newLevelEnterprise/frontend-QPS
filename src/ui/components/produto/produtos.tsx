@@ -12,7 +12,6 @@ import FormSetup from "./formSetup";
 function Produtos() {
   const [novoProduto, setNovoProduto] = useState<boolean>(false);
   const [editarProduto, setEditarProduto] = useState<boolean>(false);
-  const [preenchimento, setPreenchimento] = useState<boolean>(false);
   const [products, setProducts] = useState<IProduto[]>([]);
   const [busca, setBusca] = useState<string>("");
   const [setup, setSetup] = useState<{nome: string; id: number} | null>(null);
@@ -103,31 +102,19 @@ function Produtos() {
               <IoSearchSharp className="h-4 w-4 text-gray-400" />
             </div>
             <input
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
+              value={''}
+              // onChange={(e) => setBusca(e.target.value)}
               type="text"
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          <div className="flex gap-2">
-            <p>Outro preenchimento </p>
-            <input
-              type="checkbox"
-              name="preenchimento"
-              id="preenchimento"
-              checked={preenchimento}
-              onChange={(e) => setPreenchimento(e.target.checked)}
-            />
-          </div>
           <FormSetup
+            onClose={setSetup}
+            produto_ref={setup?.id || 0}
             produtos={products.filter(p => p.name !== setup?.nome).map(p => ({
               ciclo: p.cycle,
               id: p.id,
-              maior_produto: 0,
-              menor_produto: 0,
-              nomeProdutoOrigem: setup?.nome || '',
               nomeProdutoDestino: p.name,
-              produto_de: setup?.id || 0,
               produto_para: p.id,
               tempo_setup: 0
             }))}
@@ -142,6 +129,7 @@ function Produtos() {
           <IoSearchSharp className="h-4 w-4 text-gray-400" />
         </div>
         <input
+          onChange={(e) => setBusca(e.target.value)}
           type="text"
           placeholder="Buscar..."
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -1,7 +1,7 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Link, redirect } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { setToken } from "../../../hooks/setToken";
 import { signinSchema, type SignInBody } from "../../../schemas/auth";
@@ -10,6 +10,7 @@ import Button from "../Button";
 import FormErrorMessage from "./FormErrorMessage";
 
 export default function LoginForm() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -35,7 +36,7 @@ export default function LoginForm() {
         access_token: res.access_token,
         refresh_token: res.refresh_token,
       });
-      return redirect('/')
+      return navigate('/sequenciamento')
     } catch (error) {
       console.error(error);
       toast.error("Erro ao fazer login, verifique suas credenciais.");
