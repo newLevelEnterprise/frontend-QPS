@@ -96,9 +96,6 @@ function PedidosDisponiveis({
                   Data Prometida
                 </th>
                 <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
-                  Horário Prometido
-                </th>
-                <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Valor
                 </th>
               </tr>
@@ -120,10 +117,7 @@ function PedidosDisponiveis({
                     {pedido.demand}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.promised_date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.total_time_hours}
+                    {Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(new Date(pedido.promised_date))}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {pedido.product_value}

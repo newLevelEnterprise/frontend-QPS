@@ -94,7 +94,7 @@ function Produtos() {
       <Modal.Root isVisible={!!setup}>
         <Modal.Container>
           <Modal.Header
-            title="Setup Produto com nome grande"
+            title={setup?.nome || ''}
             onClose={() => setSetup(null)}
           />
           <div className="relative max-w-md mt-4">

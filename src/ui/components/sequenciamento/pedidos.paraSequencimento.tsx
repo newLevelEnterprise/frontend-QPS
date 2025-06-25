@@ -20,7 +20,7 @@ function PedidosParaSequenciamento({
   const [dataDoPedido, setDataDoPedido] = useState<string>(
     new Date().toISOString()
   );
-  const [maquinasDisponiveis, setMaquinasDisponiveis] = useState<number>(0);
+  const [maquinasDisponiveis, setMaquinasDisponiveis] = useState<number>(100);
   const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
   const [pedidosFiltrados, setPedidosFiltrados] =
     useState<IPedido[]>([]);
@@ -49,6 +49,12 @@ function PedidosParaSequenciamento({
   const iniciarSequenciamentoFunc = async () => {
     try {
       setIsloading(true);
+
+      if(maquinasDisponiveis > 100 || maquinasDisponiveis < 1) {
+        toast.error('O número de máquinas disponíveis deve ser entre 0 e 100.')
+        return;
+      }
+
       await apiClient.post(
         `/sequenciamento/sequenciamento/solve?sequencing_date=${dataDoPedido}&machine_availability=${maquinasDisponiveis}`,
         todosPedidos.map((p) => p.id)
@@ -114,9 +120,6 @@ function PedidosParaSequenciamento({
                   Data Prometida
                 </th>
                 <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
-                  Horário Prometido
-                </th>
-                <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Valor
                 </th>
               </tr>
@@ -141,9 +144,6 @@ function PedidosParaSequenciamento({
                     {pedido.promised_date}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.total_time_hours}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {pedido.product_value}
                   </td>
                 </tr>
@@ -157,11 +157,13 @@ function PedidosParaSequenciamento({
         <div className="w-full  flex  items-center gap-10">
           <div className="w-full flex flex-col gap-2">
             <label htmlFor="maquinas-disponiveis">
-              Quantidade de máquinas disponíveis
+              Disponibilidade de máquinas
             </label>
             <input
               id="maquinas-disponiveis"
               type="number"
+              min={1}
+              max={100}
               value={maquinasDisponiveis}
               onChange={(e) => setMaquinasDisponiveis(Number(e.target.value))}
               className="w-full outline-none border-b border-[#A4AABC]"

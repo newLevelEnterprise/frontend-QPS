@@ -20,7 +20,6 @@ interface FormNovoPedidoProps {
 }
 
 function FormNovoPedido({
-  setTodosPedidos,
   setNovoPedido,
 }: FormNovoPedidoProps) {
   const [clients, setClients] = useState<ICliente[]>([]);
@@ -37,7 +36,7 @@ function FormNovoPedido({
    
   const onSubmit = async (data: ICriarPedidoBody) => {
     try {
-      const { data: res } = await apiClient.post<IPedido>("/jobs/", {
+      await apiClient.post<IPedido>("/jobs/", {
         promised_date: data.promised_date,
         demand: parseInt(data.demand),
         product_value: parseInt(data.product_value),
@@ -46,27 +45,7 @@ function FormNovoPedido({
         fk_id_client: data.fk_id_client,
         fk_id_product: data.fk_id_product,
       });
-      // setTodosPedidos((prev) => [
-      //   ...prev,
-      //   {
-      //     deadline_days: data.deadline_days,
-      //     cycle: parseInt(data.cycle),
-      //     id: res.id,
-      //     name: data.name,
-      //     promised_date: data.promised_date,
-      //     sequencing_start_date: res.sequencing_start_date,
-      //     total_time_sec: res.total_time_sec,
-      //     demand: parseInt(data.demand),
-      //     total_time_hours: res.total_time_hours,
-      //     product_value: data.product_value,
-      //     processed: res.processed,
-      //     fk_id_client: res.fk_id_client,
-      //     fk_id_product: res.fk_id_product,
-      //     deadline_hours: parseInt(data.deadline_hours),
-      //   },
-      // ]);
-      console.log(res);
-      console.log(data);
+
       toast.success("Pedido criado com sucesso!");
       setNovoPedido(false);
     } catch (error) {
@@ -80,7 +59,7 @@ function FormNovoPedido({
       try {
         const [clientsRes, productsRes] = await Promise.all([
           apiClient.get<ICliente[]>("/clients/"),
-          apiClient.get<IProduto[]>("products/"),
+          apiClient.get<IProduto[]>("/products/"),
         ]);
 
         setClients(clientsRes.data);
@@ -93,7 +72,7 @@ function FormNovoPedido({
     }
 
     getClientAndProducts();
-  }, []);
+  }, [setNovoPedido]);
 
   return (
     <form
