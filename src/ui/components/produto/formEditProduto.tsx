@@ -2,32 +2,34 @@ import { ErrorMessage } from "@hookform/error-message";
 import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import {
-  type IEditarProdutoBody
-} from "../../../schemas/produto";
+import { type IEditarProdutoBody } from "../../../schemas/produto";
 import type { IProduto } from "../../../types/Produto";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
 
 interface FormEditarProdutoProps {
-  produto: Pick<IProduto, "id" | "name" | "cycle" | "scrap">;
+  produto: Pick<IProduto, "id" | "name" | "cycle" | "scrap" | "bottleneck">;
   setEditarProduto: Dispatch<SetStateAction<boolean>>;
   setProducts: Dispatch<SetStateAction<IProduto[]>>;
 }
 
-function FormEditarProduto({produto, setEditarProduto, setProducts}: FormEditarProdutoProps) {
+function FormEditarProduto({
+  produto,
+  setEditarProduto,
+  setProducts,
+}: FormEditarProdutoProps) {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<IEditarProdutoBody>({
-    // resolver: zodResolver(editarProdutoSchema),
     defaultValues: {
       name: produto.name,
       refugo: String(produto.scrap),
       ciclo: String(produto.cycle),
-    }
+      bottleneck: produto.bottleneck.toString(),
+    },
   });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
@@ -35,22 +37,22 @@ function FormEditarProduto({produto, setEditarProduto, setProducts}: FormEditarP
       const { data: res } = await apiClient.put(`/products/${produto.id}`, {
         name: data.name,
         cycle: parseInt(data.ciclo),
-        bottleneck: 0,
+        bottleneck: parseInt(data.bottleneck),
         scrap: parseInt(data.refugo),
       });
-      setProducts(prev => {
+      setProducts((prev) => {
         const newProducts = [...prev];
-        const index = newProducts.findIndex(p => p.id === produto.id);
+        const index = newProducts.findIndex((p) => p.id === produto.id);
         newProducts[index] = {
           id: produto.id,
           name: res.name,
           bottleneck: res.bottleneck,
           cycle: res.cycle,
-          scrap: res.scrap
-        }
+          scrap: res.scrap,
+        };
 
         return newProducts;
-      })
+      });
       toast.success("Produto criado com sucesso!");
       setEditarProduto(false);
     } catch (error) {
@@ -142,6 +144,31 @@ function FormEditarProduto({produto, setEditarProduto, setProducts}: FormEditarP
             )}
           </div>
         </div>
+      </div>
+
+      <div className="w-full flex flex-col gap-3">
+        <label
+          htmlFor="Gargalo"
+          className="text-[#212A4F] font-semibold truncate text-ellipsis"
+        >
+          Gargalo do produto
+        </label>
+        <div className="flex gap-1">
+          <input
+            id="Gargalo"
+            placeholder="Gargalo do Produto"
+            type="number"
+            className="w-full outline-none border-b border-[#A4AABC]"
+            {...register("bottleneck")}
+          />
+        </div>
+        {errors.bottleneck && (
+          <ErrorMessage
+            errors={errors}
+            name="bottleneck"
+            render={({ message }) => <FormErrorMessage message={message} />}
+          />
+        )}
       </div>
 
       <div className="w-full flex justify-end">

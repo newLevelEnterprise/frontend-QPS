@@ -14,16 +14,18 @@ function Produtos() {
   const [editarProduto, setEditarProduto] = useState<boolean>(false);
   const [products, setProducts] = useState<IProduto[]>([]);
   const [busca, setBusca] = useState<string>("");
+  const [buscaSetup, setBuscaSetup] = useState<string>("");
   const [setup, setSetup] = useState<{nome: string; id: number} | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [produto, setProduto] = useState<
-    Pick<IProduto, "id" | "name" | "cycle" | 'scrap'>
+    Pick<IProduto, "id" | "name" | "cycle" | 'scrap' | 'bottleneck'>
   >({
     id: 0,
     name: "",
     cycle: 0,
-    scrap: 0
+    scrap: 0,
+    bottleneck: 0
   });
 
   const [produtoListaFiltrada, setProdutoListaFiltrada] =
@@ -103,7 +105,7 @@ function Produtos() {
             </div>
             <input
               value={''}
-              // onChange={(e) => setBusca(e.target.value)}
+              onChange={(e) => setBuscaSetup(e.target.value)}
               type="text"
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -111,7 +113,7 @@ function Produtos() {
           <FormSetup
             onClose={setSetup}
             produto_ref={setup?.id || 0}
-            produtos={products.filter(p => p.name !== setup?.nome).map(p => ({
+            produtos={products.filter(p => p.name !== setup?.nome).filter(p => p.name === buscaSetup).map(p => ({
               ciclo: p.cycle,
               id: p.id,
               nomeProdutoDestino: p.name,
@@ -163,6 +165,9 @@ function Produtos() {
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
                   Tempo Restante de Processamento
                 </th>
+                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
+                  Refugo
+                </th>
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">
                   Ações
                 </th>
@@ -182,6 +187,9 @@ function Produtos() {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {produto.bottleneck}
+                  </td>
+                   <td className="px-6 py-4 text-sm text-gray-900">
+                    {produto.scrap}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="w-full flex justify-end gap-2">

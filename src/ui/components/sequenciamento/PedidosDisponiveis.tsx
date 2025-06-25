@@ -1,5 +1,7 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
+import { TbTrash } from "react-icons/tb";
+import { toast } from "react-toastify";
 import type { IPedido } from "../../../types/Pedido";
 import { apiClient } from "../../../utils/apiClient";
 
@@ -13,12 +15,7 @@ function PedidosDisponiveis({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
   const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
-  const [pedidosFiltrados, setPedidosFiltrados] =
-    useState<IPedido[]>([]);
-
-  const handleAddPedido = (pedido: IPedido) => {
-    setPedidosSequenciamento((prev) => [...prev, pedido]);
-  };
+  const [pedidosFiltrados, setPedidosFiltrados] = useState<IPedido[]>([]);
 
   useEffect(() => {
     const getjobs = async () => {
@@ -44,7 +41,28 @@ function PedidosDisponiveis({
       todosPedidos.filter((pedido) => pedido.name.includes(busca))
     );
   }, [busca]);
-  
+
+
+  const handleAddPedido = (pedido: IPedido) => {
+    setPedidosSequenciamento((prev) => [...prev, pedido]);
+  };
+
+  const deletarJobFn = async (id: number) => {
+    try {
+      await apiClient.delete(`/jobs/${id}`);
+      toast.success('Pedido deletado com sucesso');
+      setPedidosFiltrados(prev => {
+        const newJobs = [...prev];
+        const index = newJobs.findIndex(p => p.id === id);
+        newJobs.splice(index, 1);
+        return newJobs;
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error('Erro ao deletar pedido');
+    }
+  }
+
   return (
     <div className="w-full md:w-1/2 bg-white rounded-md shadow p-4">
       <h1 className="text-lg md:text-xl text-[#5B85D5] font-bold">
@@ -98,6 +116,9 @@ function PedidosDisponiveis({
                 <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Valor
                 </th>
+                 <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                  Ações
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 overflow-y-auto">
@@ -117,10 +138,23 @@ function PedidosDisponiveis({
                     {pedido.demand}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(new Date(pedido.promised_date))}
+                    {Intl.DateTimeFormat("pt-BR", {
+                      dateStyle: "short",
+                    }).format(new Date(pedido.promised_date))}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {pedido.product_value}
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                    <div className="w-full flex justify-end gap-2">
+                      <button
+                        onClick={() => deletarJobFn(pedido.id)}
+                        className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
+                      >
+                        <TbTrash className="w-4 h-4 md:w-5 md:h-5"/>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
