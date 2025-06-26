@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { forgotPasswordSchema, type ForgotPasswordBody } from "../../../schemas/auth";
+import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "./FormErrorMessage";
 
@@ -18,10 +19,11 @@ export default function ForgotPasswordForm() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      console.log(data);
+      await apiClient.post('/password-reset/request', data);
+      toast.success('Reset de senha solicitado. Verifique seu email.');
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao fazer login, verifique suas credenciais.");
+      toast.error("Erro requisitar o RESET da sua senha.");
     }
   };
 
@@ -30,7 +32,7 @@ export default function ForgotPasswordForm() {
       <div className="h-full flex justify-center items-center">
         <div className="w-full px-10 lg:p-0 lg:w-1/2">
           <h1 className="text-2xl lg:text-3xl text-[#47506F] mb-4">
-            Reset a sua senha
+            Solicite uma nova senha
           </h1>
           <form
             className="flex flex-col gap-8"
@@ -61,7 +63,7 @@ export default function ForgotPasswordForm() {
             </div>
             <div className="w-full flex flex-col-reverse lg:flex-row justify-between items-center gap-2 lg:gap-7">
               <Button
-                title="Entrar"
+                title="Fazer solicitação"
                 isLoading={isSubmitting}
                 className="w-full flex items-center justify-center lg:flex-1"
                 type="submit"

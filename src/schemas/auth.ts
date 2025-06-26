@@ -48,6 +48,15 @@ export const forgotPasswordSchema = z.object({
     .email('Email inválido')
 })
 
+export const resetPasswordSchema = z.object({
+  password: z
+    .string()
+    .min(1, 'Senha é obrigatória')
+    .min(6, 'Senha deve ter pelo menos 6 caracteres')
+    .max(100, 'Senha deve ter no máximo 100 caracteres'),
+})
+
 export type SignInBody = z.infer<typeof signinSchema>
 export type SignUpBody = z.infer<typeof signupSchema>
 export type ForgotPasswordBody = z.infer<typeof forgotPasswordSchema>
+export type ResetPasswordBody = z.infer<typeof resetPasswordSchema>

@@ -7,6 +7,7 @@ import ForgotPasswordPage from "../ui/pages/ForgotPassword";
 import HistoryPage from "../ui/pages/historyPage";
 import LoginPage from "../ui/pages/LoginPage";
 import ProdutosPage from "../ui/pages/produto";
+import ResetPasswordPage from "../ui/pages/ResetPassword";
 import Sequenciamento from "../ui/pages/Sequenciamento";
 import SignUpPage from "../ui/pages/SignUpPage";
 import AuthGuard from "./AuthGuard";
@@ -20,6 +21,7 @@ function Router() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
           </Route>
         </Route>
 
