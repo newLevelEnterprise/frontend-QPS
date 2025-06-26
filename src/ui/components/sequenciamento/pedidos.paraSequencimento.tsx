@@ -1,6 +1,8 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { IoSearchSharp } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAuth } from "../../../hooks/useAuth";
 import type { IPedido } from "../../../types/Pedido";
 import { apiClient } from "../../../utils/apiClient";
 import Modal from "../modal";
@@ -15,7 +17,10 @@ function PedidosParaSequenciamento({
   allOrders,
   setOrders,
 }: PedidosParaSequenciamentoProps) {
+  const navigate = useNavigate();
   const [isLoading, setIsloading] = useState<boolean>(false);
+  const [pedidoFinalizado, setPedidoFinalizado] = useState<boolean>(false);
+  const [processamentoEmAndamento, setProcessamentoEmAndamento] = useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
   const [dataDoPedido, setDataDoPedido] = useState<string>(
     new Date().toISOString()
@@ -24,6 +29,8 @@ function PedidosParaSequenciamento({
   const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
   const [pedidosFiltrados, setPedidosFiltrados] =
     useState<IPedido[]>([]);
+  const [eventSource, setEventSource] = useState<EventSource | null>(null);
+  const { user_id } = useAuth();
 
   useEffect(() => {
     setTodosPedidos(allOrders);
@@ -36,6 +43,64 @@ function PedidosParaSequenciamento({
       todosPedidos.filter((pedido) => pedido.name.includes(busca))
     );
   }, [busca]);
+
+  const connectToSSE = () => {
+    try {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const sseUrl = `${baseURL}/sequenciamento/sequenciamento/stream?user_id=${user_id}`;
+      
+      const newEventSource = new EventSource(sseUrl);
+
+      newEventSource.onopen = () => { 
+        console.log('SSE connection established');
+      };
+
+      newEventSource.onmessage = (event) => {
+        try {
+          console.log('Evento recebido',event);
+          const data = JSON.parse(event.data);
+          // const isFinished = data.finished || data.completed || data.status === 'finished';
+          console.log('dado',data)
+          // if (isFinished) {
+          //   setPedidoFinalizado(true);
+          //   setProcessamentoEmAndamento(false);
+            
+          //   newEventSource.close();
+          //   setEventSource(null);
+            
+          //   setTimeout(() => {
+          //     navigate('/sequenciamento');
+          //   }, 1000);
+          // }
+        } catch (error) {
+          console.error('Erro ao processar mensagem SSE:', error);
+        }
+      };
+
+      newEventSource.onerror = (error) => {
+        console.error('SSE connection error:', error);
+        newEventSource.close();
+        setEventSource(null);
+        setProcessamentoEmAndamento(false);
+        setPedidoFinalizado(false);
+      };
+
+      setEventSource(newEventSource);
+    } catch (error) {
+      console.error('Erro ao conectar ao SSE:', error);
+      setProcessamentoEmAndamento(false);
+      setPedidoFinalizado(true);
+    }
+  };
+
+  useEffect(() => {
+    connectToSSE();
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, []);
 
   const handleVoltarPedido = (pedido: IPedido) => {
     setOrders((prev) => {
@@ -50,6 +115,11 @@ function PedidosParaSequenciamento({
     try {
       setIsloading(true);
 
+      if(!pedidoFinalizado) {
+        toast.error('O processamento ainda não foi finalizado !')
+        return;
+      }
+
       if(maquinasDisponiveis > 100 || maquinasDisponiveis < 1) {
         toast.error('O número de máquinas disponíveis deve ser entre 0 e 100.')
         return;
@@ -60,11 +130,17 @@ function PedidosParaSequenciamento({
         todosPedidos.map((p) => p.id)
       );
 
+      if(!eventSource){
+        connectToSSE();
+      }
+      setPedidoFinalizado(false);
+      setProcessamentoEmAndamento(true);
       setTodosPedidos([]);
       setPedidosFiltrados([]);
       toast.success("Sequenciamento iniciado com sucesso!");
     } catch (error) {
       console.log(error);
+      setProcessamentoEmAndamento(false);
       toast.error("Erro ao iniciar o sequenciamento. Tente novamente.");
     } finally {
       setIsloading(false);
@@ -181,11 +257,11 @@ function PedidosParaSequenciamento({
           </div>
         </div>
         <button
-          disabled={isLoading || todosPedidos.length === 0 || !dataDoPedido || !maquinasDisponiveis}
+          disabled={isLoading || todosPedidos.length === 0 || !dataDoPedido || !maquinasDisponiveis || processamentoEmAndamento || !pedidoFinalizado}
           onClick={iniciarSequenciamentoFunc}
           className="w-1/2 md:w-full text-sm  cursor-pointer inline-flex items-center justify-center md:text-lg px-2 py-2 bg-green-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-green-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
         >
-          Iniciar
+          {processamentoEmAndamento ? 'Processando...' : 'Iniciar'}
         </button>
       </div>
     </div>

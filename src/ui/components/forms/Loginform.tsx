@@ -11,7 +11,7 @@ import Button from "../Button";
 import FormErrorMessage from "./FormErrorMessage";
 
 export default function LoginForm() {
-  const { setEnterpriseId } = useAuth();
+  const { setEnterpriseId, setUserIdFn } = useAuth();
   const navigate = useNavigate();
   const {
     register,
@@ -45,6 +45,7 @@ export default function LoginForm() {
         refresh_token: res.refresh_token,
       });
       setEnterpriseId(res.user.enterprise_id);
+      setUserIdFn(res.user.id);
       return navigate("/sequenciamento");
     } catch (error) {
       console.error(error);
