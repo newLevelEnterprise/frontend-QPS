@@ -69,7 +69,7 @@ function HistoryPage() {
           Histórico de Processamentos
         </h1>
         
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-12 overflow-y-auto">
           <div className="flex flex-col items-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
             <div className="text-gray-500 text-lg">Carregando histórico...</div>

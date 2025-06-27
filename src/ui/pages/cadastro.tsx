@@ -37,17 +37,17 @@ function CadastroPage() {
 
 
   return (
-    <div className="h-full flex flex-col w-full gap-1 overflow-hidden">
+    <div className="md:h-full flex flex-col w-full gap-1 overflow-y-auto">
       <h1 className="text-lg md:text-xl text-[#878C9B]">
         Painel se Sequenciamento da Produção
       </h1>
-      <div className="md:h-[365px] w-full flex md:flex-row flex-col gap-6">
+      <div className="md:h-[365px] w-full flex md:flex-row flex-col gap-6 overflow-y-auto">
         <div className="w-[98%] md:w-1/6 bg-white rounded-md shadow">
           <Info dados={production ? production : undefined} />
         </div>
         <SequenciamentoTabela dados={production ? production.results : []} />
       </div>
-      <div className="flex-1 flex md:flex-row flex-col gap-6 overflow-hidden">
+      <div className="flex-1 flex md:flex-row flex-col gap-6 overflow-y-auto">
         <div className="w-[98%] md:w-1/5 flex flex-col justify-between gap-2">
           <HorasMaquina
             dados={{

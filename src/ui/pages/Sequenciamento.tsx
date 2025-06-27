@@ -10,9 +10,9 @@ function Sequenciamento() {
   );
 
   return (
-    <div className="h-full flex flex-col w-full gap-2 overflow-hidden">
+    <div className="md:h-full flex flex-col w-full gap-2 overflow-y-auto lg:overflow-hidden">
       <XlsxUpload endpoint="jobs-xlsx" />
-      <div className="w-full flex flex-col md:flex-row gap-2 h-full overflow-hidden">
+      <div className="w-full flex flex-col md:flex-row gap-2 h-full overflow-y-auto lg:overflow-hidden">
         <PedidosDisponiveis setPedidosSequenciamento={setPedidosSequencimento}/>
         <PedidosParaSequenciamento
           setOrders={setPedidosSequencimento}

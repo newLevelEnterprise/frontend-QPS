@@ -81,7 +81,7 @@ function PedidosDisponiveis({
         />
       </div>
 
-      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[400px] md:h-[470px]">
+      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[400px] md:h-[470px] overflow-x-auto">
         {isLoading ? (
           <div className="w-full h-full flex justify-center items-center">
             <div className="flex flex-col items-center">
@@ -98,7 +98,7 @@ function PedidosDisponiveis({
             </h2>
           </div>
         ) : (
-          <table className="w-full">
+          <table className="w-full overflow-x-auto">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">

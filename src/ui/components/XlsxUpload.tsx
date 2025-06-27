@@ -40,23 +40,23 @@ function XlsxUpload({ endpoint }: { endpoint: string }) {
   };
 
   return (
-    <div className="col-span-2 p-6 rounded-md shadow h-[250px] md:h-[200px] bg-white">
+    <div className="col-span-2 p-6 rounded-md shadow h-[250px] lg:h-[200px] bg-white">
       <span className="flex gap-2 items-center text-[#255DC8]">
         <BsFiletypeXlsx />
         <p className="text-base font-bold text-[#255DC8]">Cadastrar XLSX</p>
       </span>
 
-      <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mt-4">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 mt-4">
         <div
           {...getRootProps({ className: "dropzone" })}
-          className="w-full md:w-1/2 flex items-center justify-center border-2 border-dashed border-gray-400 h-[81px]"
+          className="w-full lg:w-1/2 flex items-center justify-center border-2 border-dashed border-gray-400 h-[81px]"
         >
           <input {...getInputProps()} />
           <div className="flex gap-2 items-center">
-            <p className="hidden md:block">
+            <p className="hidden lg:block">
               Arraste e solte seu arquivo XLSX para cá ou{" "}
             </p>
-            <span className="px-2 py-1 md:px-4 md:py-1 text-base border-2 rounded-full border-[#10A4DA] text-[#10A4DA] font-bold cursor-pointer">
+            <span className="px-2 py-1 lg:px-4 lg:py-1 text-base border-2 rounded-full border-[#10A4DA] text-[#10A4DA] font-bold cursor-pointer">
               Escolha o arquivo <BiUpload className="inline" size={22} />
             </span>
           </div>

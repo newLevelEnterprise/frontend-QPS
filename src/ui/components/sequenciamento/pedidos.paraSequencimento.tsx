@@ -1,6 +1,5 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { IoSearchSharp } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/useAuth";
 import type { IPedido } from "../../../types/Pedido";
@@ -17,7 +16,7 @@ function PedidosParaSequenciamento({
   allOrders,
   setOrders,
 }: PedidosParaSequenciamentoProps) {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState<boolean>(false);
   const [processamentoEmAndamento, setProcessamentoEmAndamento] = useState<boolean>(false);
@@ -172,7 +171,7 @@ function PedidosParaSequenciamento({
         />
       </div>
 
-      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[350px] md:h-[380px]">
+      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[350px] md:h-[380px] overflow-x-auto">
         {allOrders.length === 0 ? (
           <div className="w-full h-full flex justify-center items-center">
             <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">
@@ -180,7 +179,7 @@ function PedidosParaSequenciamento({
             </h2>
           </div>
         ) : (
-          <table className="w-full">
+          <table className="w-full overflow-x-auto">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
