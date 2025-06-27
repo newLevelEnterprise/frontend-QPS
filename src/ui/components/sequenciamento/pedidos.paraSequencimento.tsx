@@ -57,9 +57,9 @@ function PedidosParaSequenciamento({
       newEventSource.onmessage = (event) => {
         try {
           console.log('Evento recebido',event);
-          const data = JSON.parse(event.data);
+          // const data = JSON.parse(event.data);
           // const isFinished = data.finished || data.completed || data.status === 'finished';
-          console.log('dado',data)
+          // console.log('dado',data)
           // if (isFinished) {
           //   setPedidoFinalizado(true);
           //   setProcessamentoEmAndamento(false);
