@@ -59,7 +59,7 @@ function Clientes() {
     setClientesFiltrados(
       clientes.filter((c) => c.name.includes(busca))
     );
-  }, [busca]);
+  }, [busca, clientes]);
 
   return (
     <div className="w-full bg-white rounded-md shadow p-4">

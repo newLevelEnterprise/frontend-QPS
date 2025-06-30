@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import type { IProductionSchedule } from "../../types/ProductionSchedule";
-import { apiClient } from "../../utils/apiClient";
-import GraficoFaturamento from "../components/cadastro/grafico";
-import HorasMaquina from "../components/cadastro/horasMaquina";
-import Info from "../components/cadastro/info";
-import Resumo from "../components/cadastro/resumo";
-import SequenciamentoTabela from "../components/cadastro/sequenciamentoTabela";
+import type { IProductionSchedule } from "../../../types/ProductionSchedule";
+import { apiClient } from "../../../utils/apiClient";
+import GraficoFaturamento from "../../components/cadastro/grafico";
+import HorasMaquina from "../../components/cadastro/horasMaquina";
+import Info from "../../components/cadastro/info";
+import Resumo from "../../components/cadastro/resumo";
+import SequenciamentoTabela from "../../components/cadastro/sequenciamentoTabela";
 
 function CadastroPage() {
     const [production, setProduction] = useState<IProductionSchedule[]>([]);
@@ -47,7 +47,7 @@ function CadastroPage() {
         </div>
 
         <div className="flex-1 overflow-x-auto">
-          <GraficoFaturamento dados={production.length > 0 ? production[0].results : []}/>
+          <GraficoFaturamento dados={production.length > 0 ? production[0].revenue_forecast : []}/>
         </div>
       </div>
     </div>
