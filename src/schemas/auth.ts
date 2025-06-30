@@ -20,8 +20,7 @@ export const signupSchema = z.object({
     .max(100, 'Nome deve ter no máximo 100 caracteres'),
   password: z
     .string()
-    .min(1, 'Senha é obrigatória')
-    .min(6, 'Senha deve ter pelo menos 6 caracteres')
+    .min(8, 'Senha deve ter pelo menos 8 caracteres')
     .max(100, 'Senha deve ter no máximo 100 caracteres'),
   email: z
     .string()
@@ -31,11 +30,6 @@ export const signupSchema = z.object({
     .string()
     .min(1, 'Token é obrigatório')
     .max(32, 'Token deve ter no máximo 32 caracteres'),
-  cargo: z
-    .string()
-    .min(1, 'Cargo é obrigatório')
-    .min(2, 'Cargo deve ter pelo menos 2 caracteres')
-    .max(100, 'Cargo deve ter no máximo 100 caracteres'),
   termos: z.boolean().refine(val => val === true, {
     message: 'Você deve aceitar os termos de uso'}),
   politica: z.boolean().refine(val => val === true, {
@@ -51,8 +45,7 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z.object({
   password: z
     .string()
-    .min(1, 'Senha é obrigatória')
-    .min(6, 'Senha deve ter pelo menos 6 caracteres')
+    .min(8, 'Senha deve ter pelo menos 8 caracteres')
     .max(100, 'Senha deve ter no máximo 100 caracteres'),
 })
 

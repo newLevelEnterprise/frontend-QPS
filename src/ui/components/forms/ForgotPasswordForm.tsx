@@ -1,6 +1,7 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { forgotPasswordSchema, type ForgotPasswordBody } from "../../../schemas/auth";
 import { apiClient } from "../../../utils/apiClient";
@@ -8,6 +9,7 @@ import Button from "../Button";
 import FormErrorMessage from "./FormErrorMessage";
 
 export default function ForgotPasswordForm() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -21,6 +23,8 @@ export default function ForgotPasswordForm() {
     try {
       await apiClient.post('/password-reset/request', data);
       toast.success('Reset de senha solicitado. Verifique seu email.');
+      navigate('/login');
+      return;
     } catch (error) {
       console.error(error);
       toast.error("Erro requisitar o RESET da sua senha.");

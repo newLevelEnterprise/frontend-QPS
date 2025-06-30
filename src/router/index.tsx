@@ -21,7 +21,7 @@ function Router() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/resetar" element={<ResetPasswordPage />} />
           </Route>
         </Route>
 
