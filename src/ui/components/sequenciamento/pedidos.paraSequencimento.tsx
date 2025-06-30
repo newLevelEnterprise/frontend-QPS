@@ -1,5 +1,6 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { IoSearchSharp } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/useAuth";
 import type { IPedido } from "../../../types/Pedido";
@@ -16,7 +17,7 @@ function PedidosParaSequenciamento({
   allOrders,
   setOrders,
 }: PedidosParaSequenciamentoProps) {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState<boolean>(false);
   const [processamentoEmAndamento, setProcessamentoEmAndamento] = useState<boolean>(false);
@@ -56,21 +57,21 @@ function PedidosParaSequenciamento({
 
       newEventSource.onmessage = (event) => {
         try {
-          console.log('Evento recebido',event);
-          // const data = JSON.parse(event.data);
-          // const isFinished = data.finished || data.completed || data.status === 'finished';
-          // console.log('dado',data)
-          // if (isFinished) {
-          //   setPedidoFinalizado(true);
-          //   setProcessamentoEmAndamento(false);
+          console.log('Evento recebido',event.data);
+          const data = event.data;
+          const isFinished = data !== "false";
+          if (isFinished) {
+            setPedidoFinalizado(true);
+            setProcessamentoEmAndamento(false);
             
-          //   newEventSource.close();
-          //   setEventSource(null);
+            newEventSource.close();
+            setEventSource(null);
             
-          //   setTimeout(() => {
-          //     navigate('/sequenciamento');
-          //   }, 1000);
-          // }
+            navigate('/sequenciamento');
+          } else {
+            setPedidoFinalizado(false);
+            setProcessamentoEmAndamento(true);
+          }
         } catch (error) {
           console.error('Erro ao processar mensagem SSE:', error);
         }

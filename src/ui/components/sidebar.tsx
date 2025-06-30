@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaUserCircle } from "react-icons/fa";
 import { IoChevronDown, IoClose, IoHomeOutline } from "react-icons/io5";
@@ -9,6 +9,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import LogoSidebar from "../../assets/sidebar-logo.png";
 import { useAuth } from "../../hooks/useAuth";
+import { apiClient } from "../../utils/apiClient";
 import LogoutButton from "./LogoutButton";
 
 interface MenuItem {
@@ -67,6 +68,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const {enterprise_id} = useAuth();
 
+  const [enterpriseName, setEnterpriseName] = useState<string>("");
   const [expandedItems, setExpandedItems] = useState<string[]>(["Cadastro"]);
   const pathName = useLocation().pathname;
   const navigate = useNavigate();
@@ -78,6 +80,13 @@ export default function Sidebar({
         : [...prev, title]
     );
   };
+
+  useEffect(() => {
+    apiClient.get(`/enterprises/${enterprise_id}`).then(res => setEnterpriseName(res.data.name)).catch(err => {
+      console.log(err);
+      setEnterpriseName("");
+    })
+  }, []);
 
   return (
     <div
@@ -108,7 +117,7 @@ export default function Sidebar({
             <div className="flex flex-col">
               <span className="text-xl font-bold text-[#212A4F] truncate text-ellipsis">
                 {/* {data?.empresa} */}
-                Empresa Exemplo
+                {enterpriseName}
               </span>
               <span className="text-sm text-[#878C9B] truncate text-ellipsis">Conta ID: {enterprise_id}</span>
             </div>
