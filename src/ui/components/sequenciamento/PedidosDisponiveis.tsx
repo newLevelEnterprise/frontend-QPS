@@ -150,7 +150,7 @@ function PedidosDisponiveis({
                     <div className="w-full flex justify-end gap-2">
                       <button
                         onClick={() => deletarJobFn(pedido.id)}
-                        className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
+                        className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150 z-20"
                       >
                         <TbTrash className="w-4 h-4 md:w-5 md:h-5"/>
                       </button>

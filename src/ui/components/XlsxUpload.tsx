@@ -21,7 +21,7 @@ function XlsxUpload({ endpoint }: { endpoint: string }) {
   });
 
   const onUpload = async () => {
-    await apiClient.postForm(`/upload/${endpoint}/`, {
+    await apiClient.postForm(`/upload/${endpoint}`, {
       file: acceptedFiles[0],
     });
   };
