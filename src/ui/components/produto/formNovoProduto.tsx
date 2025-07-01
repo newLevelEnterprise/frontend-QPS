@@ -33,7 +33,7 @@ function FormNovoProduto({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      const { data: res } = await apiClient.post("/products/", {
+      const { data: res } = await apiClient.post("/products", {
         name: data.name,
         cycle: data.ciclo,
         bottleneck: data.bottleneck,

@@ -42,7 +42,7 @@ function FormSetup({ produtos, produto_ref, onClose }: FormNovoProdutoProps) {
         setups: setup,
       };
 
-      await apiClient.post("/setup_trocas/batch/", payload);
+      await apiClient.post("/setup_trocas/batch", payload);
       onClose(null);
     } catch (error) {
       console.log(error);

@@ -36,7 +36,7 @@ function FormNovoPedido({
    
   const onSubmit = async (data: ICriarPedidoBody) => {
     try {
-      await apiClient.post<IPedido>("/jobs/", {
+      await apiClient.post<IPedido>("/jobs", {
         promised_date: data.promised_date,
         demand: parseInt(data.demand),
         product_value: parseInt(data.product_value),
