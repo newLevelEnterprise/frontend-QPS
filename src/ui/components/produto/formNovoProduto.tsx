@@ -36,7 +36,7 @@ function FormNovoProduto({
       const { data: res } = await apiClient.post("/products/", {
         name: data.name,
         cycle: data.ciclo,
-        bottleneck: 0,
+        bottleneck: data.bottleneck,
         scrap: data.refugo,
       });
       setProducts((prev) => [
@@ -142,6 +142,31 @@ function FormNovoProduto({
             )}
           </div>
         </div>
+      </div>
+
+      <div className="w-full flex flex-col gap-3">
+        <label
+          htmlFor="gargalo"
+          className="text-[#212A4F] font-semibold truncate text-ellipsis"
+        >
+          Gargalo do produto
+        </label>
+        <div className="flex gap-1">
+          <input
+            id="gargalo"
+            placeholder="gargalo do Produto"
+            type="text"
+            className="w-full outline-none border-b border-[#A4AABC]"
+            {...register("bottleneck")}
+          />
+        </div>
+        {errors.bottleneck && (
+          <ErrorMessage
+            errors={errors}
+            name="bottleneck"
+            render={({ message }) => <FormErrorMessage message={message} />}
+          />
+        )}
       </div>
 
       <div className="w-full flex justify-end">
