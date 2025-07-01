@@ -67,7 +67,8 @@ function PedidosParaSequenciamento({
             newEventSource.close();
             setEventSource(null);
             
-            navigate('/sequenciamento');
+            navigate('/cadastro');
+            return;
           } else {
             setPedidoFinalizado(false);
             setProcessamentoEmAndamento(true);
