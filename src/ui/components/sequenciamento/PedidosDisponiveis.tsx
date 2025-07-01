@@ -7,15 +7,21 @@ import { apiClient } from "../../../utils/apiClient";
 
 interface PedidosDisponiveisProps {
   setPedidosSequenciamento: Dispatch<SetStateAction<IPedido[]>>;
+  todosPedidos:IPedido[];
+  setTodosPedidos: Dispatch<SetStateAction<IPedido[]>>;
+  pedidosFiltrados:IPedido[];
+  setPedidosFiltrados: Dispatch<SetStateAction<IPedido[]>>;
 }
 
 function PedidosDisponiveis({
   setPedidosSequenciamento,
+  pedidosFiltrados,
+  setPedidosFiltrados,
+  setTodosPedidos,
+  todosPedidos
 }: PedidosDisponiveisProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
-  const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
-  const [pedidosFiltrados, setPedidosFiltrados] = useState<IPedido[]>([]);
 
   useEffect(() => {
     const getjobs = async () => {
@@ -40,10 +46,16 @@ function PedidosDisponiveis({
     setPedidosFiltrados(
       todosPedidos.filter((pedido) => pedido.name.includes(busca))
     );
-  }, [busca]);
+  }, [busca, setPedidosFiltrados, todosPedidos]);
 
 
   const handleAddPedido = (pedido: IPedido) => {
+    setTodosPedidos(prev => {
+      const oldJobs = [...prev];
+      const jobIndex = todosPedidos.findIndex(p => p.id === pedido.id);
+      oldJobs.splice(jobIndex, 1);
+      return oldJobs;
+    });
     setPedidosSequenciamento((prev) => [...prev, pedido]);
   };
 

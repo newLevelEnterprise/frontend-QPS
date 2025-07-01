@@ -10,11 +10,13 @@ import Loading from "./loading";
 interface PedidosParaSequenciamentoProps {
   allOrders: IPedido[];
   setOrders: Dispatch<SetStateAction<IPedido[]>>;
+  setTodosPedidosDisponiveis: Dispatch<SetStateAction<IPedido[]>>;
 }
 
 function PedidosParaSequenciamento({
   allOrders,
   setOrders,
+  setTodosPedidosDisponiveis,
 }: PedidosParaSequenciamentoProps) {
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState<boolean>(false);
@@ -99,6 +101,7 @@ function PedidosParaSequenciamento({
   }, []);
 
   const handleVoltarPedido = (pedido: IPedido) => {
+    setTodosPedidosDisponiveis(prev => [...prev, pedido]);
     setOrders((prev) => {
       const newOrders = [...prev];
       const index = newOrders.findIndex(p => p.id === pedido.id);

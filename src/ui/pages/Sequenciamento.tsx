@@ -8,13 +8,23 @@ function Sequenciamento() {
   const [pedidosSequencimento, setPedidosSequencimento] = useState<IPedido[]>(
     []
   );
+  const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
+  const [pedidosFiltrados, setPedidosFiltrados] = useState<IPedido[]>([]);
 
   return (
     <div className="md:h-full flex flex-col w-full gap-2 overflow-y-auto lg:overflow-hidden">
       <XlsxUpload endpoint="jobs-xlsx" />
       <div className="w-full flex flex-col md:flex-row gap-2 h-full overflow-y-auto lg:overflow-hidden">
-        <PedidosDisponiveis setPedidosSequenciamento={setPedidosSequencimento}/>
+        <PedidosDisponiveis
+          pedidosFiltrados={pedidosFiltrados}
+          setPedidosFiltrados={setPedidosFiltrados}
+          setTodosPedidos={setTodosPedidos}
+          todosPedidos={todosPedidos} 
+          setPedidosSequenciamento={setPedidosSequencimento}
+        />
+
         <PedidosParaSequenciamento
+          setTodosPedidosDisponiveis={setTodosPedidos}
           setOrders={setPedidosSequencimento}
           allOrders={pedidosSequencimento}
         />
