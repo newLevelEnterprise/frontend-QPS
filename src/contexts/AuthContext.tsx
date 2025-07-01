@@ -16,11 +16,23 @@ interface AuthContextProviderProps {
 export const AuthContext = createContext({} as IAuthContext);
 
 function AuthProvider({children}: AuthContextProviderProps) {
-  const [enterprise_id, setEnterprise_Id] = useState<number>(0);
-  const [userId, setUserId] = useState<number>(0);
+  const [enterprise_id, setEnterprise_Id] = useState<number>(() => {
+    const id = localStorage.getItem('enterprise_id') as string ?? 0;
+    return parseInt(id);
+  });
+  const [userId, setUserId] = useState<number>(() => {
+    const id = localStorage.getItem('user_id') as string ?? 0;
+    return parseInt(id);
+  });
 
-  const setEnterpriseId = (enterprise_id: number) => setEnterprise_Id(enterprise_id);
-  const setUserIdFn = (user_id: number) => setUserId(user_id);
+  const setEnterpriseId = (enterprise_id: number) => {
+    localStorage.setItem('enterprise_id', `${enterprise_id}`);
+    setEnterprise_Id(enterprise_id);
+  };
+  const setUserIdFn = (user_id: number) => {
+    localStorage.setItem('user_id', `${user_id}`);
+    setUserId(user_id)
+  };
 
   return (
     <AuthContext.Provider value={{enterprise_id, setEnterpriseId, setUserIdFn, user_id: userId}}>

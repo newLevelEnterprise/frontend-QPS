@@ -12,6 +12,8 @@ export default function LogoutButton() {
     } catch (error) {
       console.error('Logout failed:', error);
     }
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('enterprise_id');
     setToken({access_token: '' , refresh_token: ''});
     return navigate('/login');
   };
