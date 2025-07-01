@@ -29,7 +29,7 @@ function FormNovoCliente({setNovoCliente, setCliente}: IFormNovoClienteProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      const { data: res } = await apiClient.post<ICliente>("/clients/", {
+      const { data: res } = await apiClient.post<ICliente>("/clients", {
         name: data.name,
         priority: parseInt(data.priority),
       });
