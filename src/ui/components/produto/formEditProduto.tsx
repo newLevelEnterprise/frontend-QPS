@@ -34,7 +34,7 @@ function FormEditarProduto({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      const { data: res } = await apiClient.put(`/products/${produto.id}`, {
+      const { data: res } = await apiClient.put(`/products/${produto.id}/`, {
         name: data.name,
         cycle: parseInt(data.ciclo),
         bottleneck: parseInt(data.bottleneck),

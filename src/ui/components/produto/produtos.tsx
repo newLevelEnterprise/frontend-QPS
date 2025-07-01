@@ -47,7 +47,7 @@ function Produtos() {
     const getProducts = async () => {
       setIsLoading(true);
       try {
-        const { data } = await apiClient.get<IProduto[]>("/products");
+        const { data } = await apiClient.get<IProduto[]>("/products/");
         setProdutoListaFiltrada(data);
         setProducts(data);
       } catch (error) {
