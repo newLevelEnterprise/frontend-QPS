@@ -1,6 +1,5 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { IoSearchSharp } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/useAuth";
 import type { IPedido } from "../../../types/Pedido";
@@ -17,7 +16,6 @@ function PedidosParaSequenciamento({
   allOrders,
   setOrders,
 }: PedidosParaSequenciamentoProps) {
-  const navigate = useNavigate();
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState<boolean>(false);
   const [processamentoEmAndamento, setProcessamentoEmAndamento] = useState<boolean>(false);
@@ -66,8 +64,7 @@ function PedidosParaSequenciamento({
             
             newEventSource.close();
             setEventSource(null);
-            
-            navigate('/cadastro');
+
             return;
           } else {
             setPedidoFinalizado(false);
