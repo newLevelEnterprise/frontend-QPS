@@ -82,7 +82,7 @@ export default function Sidebar({
   };
 
   useEffect(() => {
-    apiClient.get(`/enterprises/${enterprise_id}`).then(res => setEnterpriseName(res.data.name)).catch(err => {
+    apiClient.get(`/enterprises/${enterprise_id}/`).then(res => setEnterpriseName(res.data.name)).catch(err => {
       console.log(err);
       setEnterpriseName("");
     })

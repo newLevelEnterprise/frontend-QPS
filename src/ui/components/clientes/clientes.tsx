@@ -41,7 +41,7 @@ function Clientes() {
     const getclients = async () => {
       setIsLoading(true);
       try {
-        const { data } = await apiClient.get<ICliente[]>("/clients");
+        const { data } = await apiClient.get<ICliente[]>("/clients/");
         setClientes(data);
         setClientesFiltrados(data);
       } catch (error) {
