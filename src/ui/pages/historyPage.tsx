@@ -114,12 +114,9 @@ function HistoryPage() {
       </div>
 
       {historyData.length === 0 && !isLoading && (
-        <div className="flex flex-col items-center justify-center py-12">
+        <div className="flex flex-col w-full h-full items-center justify-center py-12">
           <div className="text-gray-400 text-lg mb-2">
             Nenhum histórico encontrado
-          </div>
-          <div className="text-gray-300 text-sm">
-            Os processamentos aparecerão aqui
           </div>
         </div>
       )}
