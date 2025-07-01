@@ -57,15 +57,13 @@ function PedidosParaSequenciamento({
         try {
           console.log('Evento recebido',event.data);
           const data = event.data;
-          const isFinished = data !== "false";
+          const isFinished = data === "true";
           if (isFinished) {
             setPedidoFinalizado(true);
             setProcessamentoEmAndamento(false);
             
             newEventSource.close();
             setEventSource(null);
-
-            return;
           } else {
             setPedidoFinalizado(false);
             setProcessamentoEmAndamento(true);

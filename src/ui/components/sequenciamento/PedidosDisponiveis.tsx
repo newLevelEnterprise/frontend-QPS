@@ -146,10 +146,13 @@ function PedidosDisponiveis({
                     {pedido.product_value}
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis z-20">
-                    <div className="w-full flex justify-end gap-2">
+                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
+                    <div className="w-full flex justify-center gap-2">
                       <button
-                        onClick={() => deletarJobFn(pedido.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deletarJobFn(pedido.id);
+                        }}
                         className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
                       >
                         <TbTrash className="w-4 h-4 md:w-5 md:h-5"/>
