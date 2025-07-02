@@ -76,7 +76,7 @@ function PedidosDisponiveis({
   }
 
   return (
-    <div className="w-full md:w-1/2 bg-white rounded-md shadow p-4">
+    <div className="w-full md:w-1/2 bg-white rounded-md shadow p-4 overflow-hidden">
       <h1 className="text-lg md:text-xl text-[#5B85D5] font-bold">
         Pedidos Disponíveis
       </h1>

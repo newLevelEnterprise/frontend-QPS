@@ -14,7 +14,7 @@ function Sequenciamento() {
   return (
     <div className="md:h-full flex flex-col w-full gap-2 overflow-y-auto lg:overflow-hidden">
       <XlsxUpload endpoint="jobs-xlsx" />
-      <div className="w-full flex flex-col md:flex-row gap-2 h-full overflow-y-auto lg:overflow-hidden">
+      <div className="w-full flex flex-col md:flex-row gap-2 max-h-full overflow-y-auto lg:overflow-hidden">
         <PedidosDisponiveis
           pedidosFiltrados={pedidosFiltrados}
           setPedidosFiltrados={setPedidosFiltrados}

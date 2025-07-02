@@ -147,7 +147,7 @@ function PedidosParaSequenciamento({
   };
 
   return (
-    <div className="w-full md:w-1/2 bg-white rounded-md shadow p-4">
+    <div className="w-full md:w-1/2 bg-white rounded-md shadow p-4 overflow-y-auto">
       <Modal.Root isVisible={isLoading}>
         <Modal.Container>
           <Loading />
