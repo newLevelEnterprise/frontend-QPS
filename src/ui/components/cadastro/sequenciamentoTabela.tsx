@@ -69,16 +69,16 @@ function SequenciamentoTabela({dados}: {dados: IProductionSchedule['results']}) 
                     {order.product_name}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
-                    {order.scheduled_date}
+                    {Intl.DateTimeFormat('pt-br').format(new Date(order.scheduled_date))}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
-                    {order.actual_date}
+                    {Intl.DateTimeFormat('pt-br').format(new Date(order.actual_date))}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
                     {order.completion_time}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
-                    {order.billing_date}
+                    {Intl.DateTimeFormat('pt-br').format(new Date(order.billing_date))}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span
@@ -92,7 +92,7 @@ function SequenciamentoTabela({dados}: {dados: IProductionSchedule['results']}) 
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                    {order.expected_revenue}
+                    {Intl.NumberFormat('pt-br', {style: 'currency', currency: 'BRL'}).format(order.expected_revenue)}
                   </td>
                 </tr>
               ))}

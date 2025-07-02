@@ -29,7 +29,7 @@ function Router() {
           <Route element={<PageLayout />}>
             <Route path="/sequenciamento" element={<Sequenciamento />} />
 
-            <Route path="/cadastro" element={<CadastroPage />} />
+            <Route path="/resultados" element={<CadastroPage />} />
             <Route path="/cadastro/cliente" element={<ClientesPages />} />
             <Route path="/cadastro/produto" element={<ProdutosPage />} />
             <Route path="/historico" element={<HistoryPage />} />

@@ -15,7 +15,7 @@ function AuthLayout() {
           height={400}
         />
         <p className="text-center text-white">
-          Planejamento de sequenciamento de producção - qps1
+          Planejamento de Sequenciamento da Produção – QPS- 1
         </p>
       </div>
       <div className="flex flex-col lg:hidden justify-center items-center w-full rounded-br-[70px] rounded-bl-[70px] bg-linear-to-b from-[#1C1D31] to-[#335C9F]">
@@ -27,7 +27,7 @@ function AuthLayout() {
         />
 
         <p className="text-xs text-center text-white">
-          Planejamento de sequenciamento de producção - qps1
+          Planejamento de Sequenciamento da Produção – QPS- 1
         </p>
       </div>
       <Outlet />

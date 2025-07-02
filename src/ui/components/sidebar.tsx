@@ -32,9 +32,9 @@ const menuItems: MenuItem[] = [
     url: "/sequenciamento",
   },
   {
-    title: "Cadastro",
+    title: "Resultados",
     icon: CiCirclePlus,
-    url: "/cadastro",
+    url: "/resultados",
     items: [
       {
         title: "Cliente",

@@ -29,18 +29,18 @@ function Resumo({ dados }: {dados: IProductionSchedule['results']}) {
               {dados.map((item) => (
                 <tr key={item.job_id} className="text-sm">
                   <td className="py-2 text-gray-900">{item.client_name}</td>
-                  <td className="py-2 text-gray-700">{item.quantity}</td>
-                  <td className="py-2 text-gray-700">{item.expected_revenue}</td>
+                  <td className="py-2 text-gray-700">{Intl.NumberFormat('pt-br').format(item.quantity)}</td>
+                  <td className="py-2 text-gray-700">{Intl.NumberFormat('pt-br', {style: 'currency', currency: 'BRL'}).format(item.expected_revenue)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <footer className="border-t-2 border-gray-300">
-          <div className="text-sm font-medium flex justify-between">
-            <span className="py-2 text-gray-900">Total: </span>
-            <span className="py-2 text-gray-900">{total.quantity}</span>
-            <span className="py-2 text-gray-900">R$ {Intl.NumberFormat('pt-BR').format(total.revenue_total)}</span>
+        <footer className="border-t-2 border-gray-300 flex justify-between">
+          <span className="py-2 text-gray-900 w-1/4">Total: </span>
+          <div className="text-sm font-medium flex-1 flex justify-between pr-5">
+            <span className="py-2 text-gray-900">{Intl.NumberFormat('pt-br').format(total.quantity)}</span>
+            <span className="py-2 text-gray-900">{Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(total.revenue_total)}</span>
           </div>
         </footer>
       </div>
