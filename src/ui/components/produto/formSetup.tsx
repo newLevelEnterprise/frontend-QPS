@@ -57,7 +57,7 @@ function FormSetup({ produtos, produto_ref, onClose }: FormNovoProdutoProps) {
       try {
         setIsLoadingProducts(true);
         const { data } = await apiClient.get<ResponseOfProductsSetups[]>(
-          `/setup_trocas/produto/${produto_ref}`
+          `/setup_trocas/produto/${produto_ref}/resumo`
         );
 
         if (data.length === 0) {
