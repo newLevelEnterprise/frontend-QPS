@@ -14,7 +14,6 @@ function Produtos() {
   const [editarProduto, setEditarProduto] = useState<boolean>(false);
   const [products, setProducts] = useState<IProduto[]>([]);
   const [busca, setBusca] = useState<string>("");
-  const [buscaSetup, setBuscaSetup] = useState<string>("");
   const [setup, setSetup] = useState<{nome: string; id: number} | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -80,7 +79,7 @@ function Produtos() {
         </Modal.Container>
       </Modal.Root>
 
-        <Modal.Root isVisible={editarProduto}>
+      <Modal.Root isVisible={editarProduto}>
         <Modal.Container>
           <Modal.Header
             title="Editar Produto"
@@ -99,27 +98,9 @@ function Produtos() {
             title={setup?.nome || ''}
             onClose={() => setSetup(null)}
           />
-          <div className="relative max-w-md mt-4">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <IoSearchSharp className="h-4 w-4 text-gray-400" />
-            </div>
-            <input
-              value={''}
-              onChange={(e) => setBuscaSetup(e.target.value)}
-              type="text"
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
           <FormSetup
             onClose={setSetup}
             produto_ref={setup?.id || 0}
-            produtos={products.filter(p => p.name !== setup?.nome).filter(p => p.name === buscaSetup).map(p => ({
-              ciclo: p.cycle,
-              id: p.id,
-              nomeProdutoDestino: p.name,
-              produto_para: p.id,
-              tempo_setup: 0
-            }))}
           />
         </Modal.Container>
       </Modal.Root>
@@ -160,13 +141,13 @@ function Produtos() {
                   Produto
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Ciclo
+                  Ciclo (Seg/ç)
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
                   Tempo Restante de Processamento
                 </th>
                  <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Refugo
+                  Refugo (em %)
                 </th>
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">
                   Ações
@@ -183,13 +164,13 @@ function Produtos() {
                     {produto.name}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    {produto.cycle}
+                    {produto.cycle}<span className="text-[10px] ml-1">(Seg/ç)</span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     {produto.bottleneck}
                   </td>
                    <td className="px-6 py-4 text-sm text-gray-900">
-                    {produto.scrap}
+                    {produto.scrap}<span className="text-[10px] ml-1">%</span>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="w-full flex justify-end gap-2">

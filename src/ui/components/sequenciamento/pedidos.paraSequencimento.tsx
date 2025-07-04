@@ -25,6 +25,7 @@ function PedidosParaSequenciamento({
   const [dataDoPedido, setDataDoPedido] = useState<string>(
     new Date().toISOString()
   );
+  const [horario, setHorario] = useState<string>("");
   const [maquinasDisponiveis, setMaquinasDisponiveis] = useState<number>(100);
   const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
   const [pedidosFiltrados, setPedidosFiltrados] =
@@ -145,7 +146,7 @@ function PedidosParaSequenciamento({
       setIsloading(false);
     }
   };
-
+  console.log(horario);
   return (
     <div className="w-full md:w-1/2 bg-white rounded-md shadow p-4 overflow-y-auto">
       <Modal.Root isVisible={isLoading}>
@@ -229,9 +230,9 @@ function PedidosParaSequenciamento({
       </div>
 
       <div className="flex gap-4 flex-col w-full justify-center mt-6">
-        <div className="w-full  flex  items-center gap-10">
+        <div className="w-full flex items-center gap-10">
           <div className="w-full flex flex-col gap-2 relative">
-            <label htmlFor="maquinas-disponiveis">
+            <label htmlFor="maquinas-disponiveis" className="text-sm md:text-base">
               Disponibilidade de máquina (em %)
             </label>
             <input
@@ -245,8 +246,20 @@ function PedidosParaSequenciamento({
             />
             <span className="absolute right-4 bottom-2 text-xs">%</span>
           </div>
+          <div className="w-1/3 flex flex-col gap-2 relative">
+            <label htmlFor="horario" className="text-sm md:text-base">
+              Horario
+            </label>
+            <input
+              id="horario"
+              type="time"
+              value={horario}
+              onChange={(e) => setHorario(e.target.value)}
+              className="w-full outline-none border-b border-[#A4AABC]"
+            />
+          </div>
           <div className="w-full flex flex-col gap-2">
-            <label htmlFor="data-pedido">Data do Pedido</label>
+            <label htmlFor="data-pedido" className="text-sm md:text-base">Data do Pedido</label>
             <input
               id="data-pedido"
               type="date"
@@ -257,7 +270,7 @@ function PedidosParaSequenciamento({
           </div>
         </div>
         <button
-          disabled={isLoading || todosPedidos.length === 0 || !dataDoPedido || !maquinasDisponiveis || processamentoEmAndamento || !pedidoFinalizado}
+          disabled={isLoading || todosPedidos.length === 0 || !dataDoPedido || !maquinasDisponiveis || processamentoEmAndamento || !pedidoFinalizado || !horario}
           onClick={iniciarSequenciamentoFunc}
           className="w-1/2 md:w-full text-sm  cursor-pointer inline-flex items-center justify-center md:text-lg px-2 py-2 bg-green-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-green-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
         >
