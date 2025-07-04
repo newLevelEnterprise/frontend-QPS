@@ -5,7 +5,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { IoChevronDown, IoClose, IoHomeOutline } from "react-icons/io5";
 import { MdHistory } from "react-icons/md";
 import { RiFileList3Line } from "react-icons/ri";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
 import LogoSidebar from "../../assets/sidebar-logo.png";
 import { useAuth } from "../../hooks/useAuth";
@@ -32,10 +32,15 @@ const menuItems: MenuItem[] = [
     url: "/sequenciamento",
   },
   {
-    title: "Resultados",
+    title: "Cadastros",
     icon: CiCirclePlus,
-    url: "/resultados",
+    url: "",
     items: [
+       {
+        title: "Resultados",
+        icon: CiCirclePlus,
+        url: "/resultados",
+      },
       {
         title: "Cliente",
         icon: FaUserCircle,
@@ -71,7 +76,6 @@ export default function Sidebar({
   const [enterpriseName, setEnterpriseName] = useState<string>("");
   const [expandedItems, setExpandedItems] = useState<string[]>(["Cadastro"]);
   const pathName = useLocation().pathname;
-  const navigate = useNavigate();
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) =>
@@ -131,8 +135,7 @@ export default function Sidebar({
               <li key={item.title}>
                 {item.items ? (
                   <div>
-                    <button
-                      onClick={() => navigate(item.url)}
+                    <div
                       className={`w-full flex items-center justify-between px-3 py-2 font-bold rounded-md hover:bg-gray-100 transition-colors duration-200 ${
                         isActive(item.url, pathName)
                           ? "text-blue-700"
@@ -149,7 +152,7 @@ export default function Sidebar({
                           expandedItems.includes(item.title) ? "rotate-180" : ""
                         }`}
                       />
-                    </button>
+                    </div>
 
                     <div
                       className={`

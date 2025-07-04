@@ -96,9 +96,9 @@ function FormNovoProduto({
               htmlFor="ciclo"
               className="text-[#212A4F] font-semibold truncate text-ellipsis"
             >
-              Ciclo do produto
+              Ciclo do produto (Seg/pç)
             </label>
-            <div className="flex gap-1">
+            <div className="flex gap-1 relative">
               <input
                 id="ciclo"
                 placeholder="Ciclo do Produto"
@@ -106,6 +106,7 @@ function FormNovoProduto({
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("ciclo")}
               />
+              <span className="absolute right-4 text-xs">Seg/pç</span>
             </div>
             {errors.ciclo && (
               <ErrorMessage
@@ -122,16 +123,19 @@ function FormNovoProduto({
               htmlFor="refugo"
               className="text-[#212A4F] font-semibold truncate text-ellipsis"
             >
-              Refugo do produto
+              Refugo do produto (em %)
             </label>
-            <div className="flex gap-1">
+            <div className="flex gap-1 relative">
               <input
                 id="refugo"
                 placeholder="Refugo do produto"
+                min={0}
+                max={100}
                 type="number"
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("refugo")}
               />
+               <span className="absolute right-5 text-xs">%</span>
             </div>
             {errors.refugo && (
               <ErrorMessage
@@ -149,12 +153,12 @@ function FormNovoProduto({
           htmlFor="gargalo"
           className="text-[#212A4F] font-semibold truncate text-ellipsis"
         >
-          Gargalo do produto
+          Tempo Restante de Processamento
         </label>
         <div className="flex gap-1">
           <input
             id="gargalo"
-            placeholder="gargalo do Produto"
+            placeholder="Tempo Restante de Processamento"
             type="text"
             className="w-full outline-none border-b border-[#A4AABC]"
             {...register("bottleneck")}

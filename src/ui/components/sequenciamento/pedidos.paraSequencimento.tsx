@@ -230,9 +230,9 @@ function PedidosParaSequenciamento({
 
       <div className="flex gap-4 flex-col w-full justify-center mt-6">
         <div className="w-full  flex  items-center gap-10">
-          <div className="w-full flex flex-col gap-2">
+          <div className="w-full flex flex-col gap-2 relative">
             <label htmlFor="maquinas-disponiveis">
-              Disponibilidade de máquinas
+              Disponibilidade de máquina (em %)
             </label>
             <input
               id="maquinas-disponiveis"
@@ -243,6 +243,7 @@ function PedidosParaSequenciamento({
               onChange={(e) => setMaquinasDisponiveis(Number(e.target.value))}
               className="w-full outline-none border-b border-[#A4AABC]"
             />
+            <span className="absolute right-4 bottom-2 text-xs">%</span>
           </div>
           <div className="w-full flex flex-col gap-2">
             <label htmlFor="data-pedido">Data do Pedido</label>

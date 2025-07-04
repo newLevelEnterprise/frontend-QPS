@@ -155,12 +155,12 @@ function FormEditarProduto({
           htmlFor="Gargalo"
           className="text-[#212A4F] font-semibold truncate text-ellipsis"
         >
-          Gargalo do produto
+          Tempo Restante de Processamento
         </label>
         <div className="flex gap-1">
           <input
             id="Gargalo"
-            placeholder="Gargalo do Produto"
+            placeholder="Tempo Restante de Processamento"
             type="number"
             className="w-full outline-none border-b border-[#A4AABC]"
             {...register("bottleneck")}
