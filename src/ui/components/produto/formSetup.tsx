@@ -45,16 +45,19 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
         product_id: p.id,
         setup_time: p.tempo_setup,
       }));
-      const dirtiedFields = setupNew.filter((p, index) => p.setup_time !== setupOld[index].setup_time);
+      const dirtiedFields = setupNew.filter((p, index) => p.setup_time !== setupOld[index].setup_time).map(setup => ({
+        id: setup.setup_id,
+        setup_time: setup.setup_time
+      }));
 
-      // const payload = {
-      //   product_ref: produto_ref,
-      //   setups: setup,
-      // };
-      console.log('New',setupNew);
-      console.log('Old',setupOld);
-      console.log('Dirited Filedsd', dirtiedFields);
-      // await apiClient.post("/setup_trocas/batch", payload);
+      const payload = {
+        updates: dirtiedFields
+      };
+
+      if(payload.updates.length > 0) {
+        console.log('Payload', payload);
+        // await apiClient.post("/setup_trocas/batch", payload);
+      }
       onClose(null);
     } catch (error) {
       console.log(error);
