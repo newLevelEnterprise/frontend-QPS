@@ -147,7 +147,7 @@ function PedidosDisponiveis({
                     {pedido.product_value}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.demand}
+                    {Intl.NumberFormat('pt-br').format(pedido.demand)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {Intl.DateTimeFormat("pt-BR", {

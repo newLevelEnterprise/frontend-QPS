@@ -56,7 +56,7 @@ function HistoryPage() {
 
   const handleCardClick = (id: number) => {
     navigate({
-      pathname: "/cadastro",
+      pathname: "/resultados",
       search: `?id=${id}`,
     });
     return;
