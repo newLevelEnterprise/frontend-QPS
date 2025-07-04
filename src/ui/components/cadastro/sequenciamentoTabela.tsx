@@ -29,6 +29,9 @@ function SequenciamentoTabela({dados}: {dados: IProductionSchedule['results']}) 
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Ordem
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                   Clientes
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
@@ -62,6 +65,9 @@ function SequenciamentoTabela({dados}: {dados: IProductionSchedule['results']}) 
                     index % 2 === 1 ? "bg-gray-50" : "bg-white"
                   } hover:bg-gray-100 transition-colors`}
                 >
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                    {index + 1}º
+                  </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
                     {order.client_name}
                   </td>

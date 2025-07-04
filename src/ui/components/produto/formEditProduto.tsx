@@ -98,16 +98,17 @@ function FormEditarProduto({
               htmlFor="ciclo"
               className="text-[#212A4F] font-semibold truncate text-ellipsis"
             >
-              Ciclo do produto
+              Ciclo do produto (Seg/pç)
             </label>
-            <div className="flex gap-1">
+            <div className="flex gap-1 relative">
               <input
                 id="ciclo"
-                placeholder="Ciclo do Produto"
+                placeholder="Ciclo do Produto (Seg/pç)"
                 type="number"
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("ciclo")}
               />
+              <span className="absolute right-4 text-xs">Seg/pç</span>
             </div>
             {errors.ciclo && (
               <ErrorMessage
@@ -124,16 +125,19 @@ function FormEditarProduto({
               htmlFor="refugo"
               className="text-[#212A4F] font-semibold truncate text-ellipsis"
             >
-              Refugo do produto
+              Refugo do produto (em %)
             </label>
-            <div className="flex gap-1">
+            <div className="flex gap-1 relative">
               <input
                 id="refugo"
-                placeholder="Refugo do produto"
+                placeholder="Refugo do produto (em %)"
                 type="number"
+                min={0}
+                max={100}
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("refugo")}
               />
+              <span className="absolute right-5 text-xs">%</span>
             </div>
             {errors.refugo && (
               <ErrorMessage

@@ -11,7 +11,7 @@ export const criarProdutoSchema = z.object({
 
 export const editarProdutoSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
-  refugo: z.string(),
+  refugo: z.string().min(0, 'A quantidade de refugo deve ser no mínimo 0%').max(100, 'A quantidade de refugo deve ser no máximo 100%'),
   ciclo: z.string(),
   bottleneck: z.string(),
 });
