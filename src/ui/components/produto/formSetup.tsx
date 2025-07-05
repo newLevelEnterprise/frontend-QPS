@@ -55,8 +55,7 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
       };
 
       if(payload.updates.length > 0) {
-        console.log('Payload', payload);
-        // await apiClient.post("/setup_trocas/batch", payload);
+        await apiClient.put("/setup_trocas/batch", payload);
       }
       onClose(null);
     } catch (error) {
