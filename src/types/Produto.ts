@@ -8,6 +8,7 @@ export interface IProduto {
 
 export interface IProdutoSetup {
   nomeProdutoDestino: string;
-  tempo_setup: number
-  id: number
+  tempo_setup: number;
+  id: number;
+  setup_id: number;
 }

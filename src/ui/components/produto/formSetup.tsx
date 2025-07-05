@@ -36,12 +36,12 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
     try {
       setIsLoading(true);
       const setupNew = setupProdutos.map((p) => ({
-        setup_id: p.id,
+        setup_id: p.setup_id,
         product_id: p.id,
         setup_time: p.tempo_setup,
       }));
       const setupOld = setupOldProdutos.map((p) => ({
-        setup_id: p.id,
+        setup_id: p.setup_id,
         product_id: p.id,
         setup_time: p.tempo_setup,
       }));
@@ -56,6 +56,7 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
 
       if(payload.updates.length > 0) {
         await apiClient.put("/setup_trocas/batch", payload);
+        toast.success('Setup atualizado');
       }
       onClose(null);
     } catch (error) {
@@ -82,6 +83,7 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
               nomeProdutoDestino: p.pair_product.name,
               tempo_setup: p.setup_time,
               id: p.pair_product.id,
+              setup_id: p.id
             }));
           setSetupProdutos(products);
           setSetupOldProdutos(products);
