@@ -43,3 +43,18 @@ html, body {
 .grid {
   min-width: 0;
 }
+
+/* Customização da barra de progresso do react-toastify */
+.Toastify__progress-bar {
+  transform-origin: left;
+  animation: toast-progress-left 3s linear forwards;
+}
+
+@keyframes toast-progress-left {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
