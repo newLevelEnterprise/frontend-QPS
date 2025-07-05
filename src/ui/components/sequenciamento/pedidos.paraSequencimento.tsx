@@ -124,9 +124,11 @@ function PedidosParaSequenciamento({
         toast.error('O número de máquinas disponíveis deve ser entre 0 e 100.')
         return;
       }
-
+      console.log(dataDoPedido)
+      console.log(horario);
+      const dataPedido = `${dataDoPedido}T${horario}`
       await apiClient.post(
-        `/sequenciamento/sequenciamento/solve?sequencing_date=${dataDoPedido}&machine_availability=${maquinasDisponiveis}`,
+        `/sequenciamento/sequenciamento/solve?sequencing_date=${dataPedido}&machine_availability=${maquinasDisponiveis}`,
         todosPedidos.map((p) => p.id)
       );
 
@@ -270,7 +272,7 @@ function PedidosParaSequenciamento({
           </div>
         </div>
         <button
-          disabled={isLoading || todosPedidos.length === 0 || !dataDoPedido || !maquinasDisponiveis || processamentoEmAndamento || !pedidoFinalizado || !horario}
+          disabled={isLoading ||  todosPedidos.length === 0 || !dataDoPedido || !maquinasDisponiveis || processamentoEmAndamento || !pedidoFinalizado || !horario}
           onClick={iniciarSequenciamentoFunc}
           className="w-1/2 md:w-full text-sm  cursor-pointer inline-flex items-center justify-center md:text-lg px-2 py-2 bg-green-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-green-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
         >
