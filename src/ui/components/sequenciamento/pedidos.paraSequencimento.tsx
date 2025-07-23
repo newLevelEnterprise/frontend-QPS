@@ -81,7 +81,15 @@ function PedidosParaSequenciamento() {
 
   const {data: pedidos} = useQuery({
     queryKey: ["jobs", "para", "sequenciamento"],
-    queryFn: () => queryClient.getQueryData(["jobs", "para", "sequenciamento"]) as IPedido[]
+    queryFn: () => {
+      const jsonItens = localStorage.getItem("jobs_para_sequenciamento");
+      if (!jsonItens) {
+        return queryClient.getQueryData(["jobs", "para", "sequenciamento"]) as IPedido[];
+      }
+      const jobsParaSequenciamento = JSON.parse(jsonItens) as IPedido[];
+
+      return jobsParaSequenciamento as IPedido[];
+    }
   });
 
   const handleVoltarPedido = (pedido: IPedido) => {
@@ -94,6 +102,7 @@ function PedidosParaSequenciamento() {
       const oldOrders = [...oldData];
       const index = oldOrders.findIndex((p) => p.id === pedido.id);
       oldOrders.splice(index, 1);
+      localStorage.setItem("jobs_para_sequenciamento", JSON.stringify(oldOrders));
       return oldOrders;
     });
   };
@@ -111,8 +120,7 @@ function PedidosParaSequenciamento() {
         toast.error("O número de máquinas disponíveis deve ser entre 0 e 100.");
         return;
       }
-      console.log(dataDoPedido);
-      console.log(horario);
+
       const dataPedido = `${dataDoPedido}T${horario}`;
       await apiClient.post(
         `/sequenciamento/sequenciamento/solve?sequencing_date=${dataPedido}&machine_availability=${maquinasDisponiveis}`,

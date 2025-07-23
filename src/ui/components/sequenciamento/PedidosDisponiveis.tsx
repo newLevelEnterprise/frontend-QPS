@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import type { IPedido } from "../../../types/Pedido";
 import { apiClient } from "../../../utils/apiClient";
 
-
 function PedidosDisponiveis() {
   const queryClient = useQueryClient();
   const [busca, setBusca] = useState<string>("");
@@ -15,6 +14,25 @@ function PedidosDisponiveis() {
     queryKey: ["get", "jobs"],
     queryFn: async () => {
       const { data } = await apiClient.get<IPedido[]>("/jobs");
+      const jsonItens = localStorage.getItem("jobs_para_sequenciamento");
+      if (!jsonItens) {
+        return data;
+      }
+      const jobsParaSequenciamento = JSON.parse(jsonItens) as IPedido[];
+      const filteredData: IPedido[] = [];
+
+      if (jobsParaSequenciamento.length > 0) {
+        for (const p of data) {
+          if (jobsParaSequenciamento.some((j) => j.id === p.id)) {
+            continue;
+          } else {
+            filteredData.push(p);
+          }
+        }
+
+        return filteredData;
+      }
+
       return data;
     },
   });
@@ -27,11 +45,23 @@ function PedidosDisponiveis() {
       orders.splice(jobIndex, 1);
       return orders;
     });
-    queryClient.setQueryData(["jobs", "para", "sequenciamento"], (actualData: IPedido[]) => {
-      console.log(actualData);
-      if (!actualData) return [pedido];
-      return [...actualData, pedido];
-    });
+    queryClient.setQueryData(
+      ["jobs", "para", "sequenciamento"],
+      (actualData: IPedido[]) => {
+        if (!actualData) {
+          localStorage.setItem(
+            "jobs_para_sequenciamento",
+            JSON.stringify([pedido])
+          );
+          return [pedido];
+        }
+        localStorage.setItem(
+          "jobs_para_sequenciamento",
+          JSON.stringify([...actualData, pedido])
+        );
+        return [...actualData, pedido];
+      }
+    );
   };
 
   const deletarJobFn = async (id: number) => {
