@@ -20,7 +20,8 @@ function PedidosParaSequenciamento({
 }: PedidosParaSequenciamentoProps) {
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState<boolean>(false);
-  const [processamentoEmAndamento, setProcessamentoEmAndamento] = useState<boolean>(false);
+  const [processamentoEmAndamento, setProcessamentoEmAndamento] =
+    useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
   const [dataDoPedido, setDataDoPedido] = useState<string>(
     new Date().toISOString()
@@ -28,8 +29,7 @@ function PedidosParaSequenciamento({
   const [horario, setHorario] = useState<string>("");
   const [maquinasDisponiveis, setMaquinasDisponiveis] = useState<number>(100);
   const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
-  const [pedidosFiltrados, setPedidosFiltrados] =
-    useState<IPedido[]>([]);
+  const [pedidosFiltrados, setPedidosFiltrados] = useState<IPedido[]>([]);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const { user_id } = useAuth();
 
@@ -37,7 +37,6 @@ function PedidosParaSequenciamento({
     setTodosPedidos(allOrders);
     setPedidosFiltrados(allOrders);
   }, [allOrders]);
-  
 
   useEffect(() => {
     setPedidosFiltrados(
@@ -49,22 +48,22 @@ function PedidosParaSequenciamento({
     try {
       const baseURL = import.meta.env.VITE_BACKEND_URL;
       const sseUrl = `${baseURL}/sequenciamento/sequenciamento/stream?user_id=${user_id}`;
-      
+
       const newEventSource = new EventSource(sseUrl);
 
-      newEventSource.onopen = () => { 
-        console.log('SSE connection established');
+      newEventSource.onopen = () => {
+        console.log("SSE connection established");
       };
 
       newEventSource.onmessage = (event) => {
         try {
-          console.log('Evento recebido',event.data);
+          console.log("Evento recebido", event.data);
           const data = event.data;
           const isFinished = data === "true";
           if (isFinished) {
             setPedidoFinalizado(true);
             setProcessamentoEmAndamento(false);
-            
+
             newEventSource.close();
             setEventSource(null);
           } else {
@@ -72,12 +71,12 @@ function PedidosParaSequenciamento({
             setProcessamentoEmAndamento(true);
           }
         } catch (error) {
-          console.error('Erro ao processar mensagem SSE:', error);
+          console.error("Erro ao processar mensagem SSE:", error);
         }
       };
 
       newEventSource.onerror = (error) => {
-        console.error('SSE connection error:', error);
+        console.error("SSE connection error:", error);
         newEventSource.close();
         setEventSource(null);
         setProcessamentoEmAndamento(false);
@@ -86,7 +85,7 @@ function PedidosParaSequenciamento({
 
       setEventSource(newEventSource);
     } catch (error) {
-      console.error('Erro ao conectar ao SSE:', error);
+      console.error("Erro ao conectar ao SSE:", error);
       setProcessamentoEmAndamento(false);
       setPedidoFinalizado(true);
     }
@@ -102,10 +101,10 @@ function PedidosParaSequenciamento({
   }, []);
 
   const handleVoltarPedido = (pedido: IPedido) => {
-    setTodosPedidosDisponiveis(prev => [...prev, pedido]);
+    setTodosPedidosDisponiveis((prev) => [...prev, pedido]);
     setOrders((prev) => {
       const newOrders = [...prev];
-      const index = newOrders.findIndex(p => p.id === pedido.id);
+      const index = newOrders.findIndex((p) => p.id === pedido.id);
       newOrders.splice(index, 1);
       return newOrders;
     });
@@ -115,24 +114,24 @@ function PedidosParaSequenciamento({
     try {
       setIsloading(true);
 
-      if(!pedidoFinalizado) {
-        toast.error('O processamento ainda não foi finalizado !')
+      if (!pedidoFinalizado) {
+        toast.error("O processamento ainda não foi finalizado !");
         return;
       }
 
-      if(maquinasDisponiveis > 100 || maquinasDisponiveis < 1) {
-        toast.error('O número de máquinas disponíveis deve ser entre 0 e 100.')
+      if (maquinasDisponiveis > 100 || maquinasDisponiveis < 1) {
+        toast.error("O número de máquinas disponíveis deve ser entre 0 e 100.");
         return;
       }
-      console.log(dataDoPedido)
+      console.log(dataDoPedido);
       console.log(horario);
-      const dataPedido = `${dataDoPedido}T${horario}`
+      const dataPedido = `${dataDoPedido}T${horario}`;
       await apiClient.post(
         `/sequenciamento/sequenciamento/solve?sequencing_date=${dataPedido}&machine_availability=${maquinasDisponiveis}`,
         todosPedidos.map((p) => p.id)
       );
 
-      if(!eventSource){
+      if (!eventSource) {
         connectToSSE();
       }
       setPedidoFinalizado(false);
@@ -150,7 +149,7 @@ function PedidosParaSequenciamento({
   };
   console.log(horario);
   return (
-    <div className="w-full md:w-1/2 bg-white rounded-md shadow p-4 overflow-y-auto">
+    <div className="w-full md:flex-1 bg-white rounded-md shadow p-4 overflow-y-auto overflow-x-auto">
       <Modal.Root isVisible={isLoading}>
         <Modal.Container>
           <Loading />
@@ -174,7 +173,7 @@ function PedidosParaSequenciamento({
         />
       </div>
 
-      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[350px] md:h-[380px] overflow-x-auto">
+      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[300px] md:h-[300px] overflow-x-auto">
         {allOrders.length === 0 ? (
           <div className="w-full h-full flex justify-center items-center">
             <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">
@@ -232,9 +231,12 @@ function PedidosParaSequenciamento({
       </div>
 
       <div className="flex gap-4 flex-col w-full justify-center mt-6">
-        <div className="w-full flex items-center gap-10">
+        <div className="w-full flex flex-col items-center gap-10">
           <div className="w-full flex flex-col gap-2 relative">
-            <label htmlFor="maquinas-disponiveis" className="text-sm md:text-base">
+            <label
+              htmlFor="maquinas-disponiveis"
+              className="text-sm md:text-base"
+            >
               Disponibilidade de máquina (em %)
             </label>
             <input
@@ -248,35 +250,47 @@ function PedidosParaSequenciamento({
             />
             <span className="absolute right-4 bottom-2 text-xs">%</span>
           </div>
-          <div className="w-1/3 flex flex-col gap-2 relative">
-            <label htmlFor="horario" className="text-sm md:text-base">
-              Horario
-            </label>
-            <input
-              id="horario"
-              type="time"
-              value={horario}
-              onChange={(e) => setHorario(e.target.value)}
-              className="w-full outline-none border-b border-[#A4AABC]"
-            />
-          </div>
-          <div className="w-full flex flex-col gap-2">
-            <label htmlFor="data-pedido" className="text-sm md:text-base">Data do Pedido</label>
-            <input
-              id="data-pedido"
-              type="date"
-              value={dataDoPedido}
-              onChange={(e) => setDataDoPedido(e.target.value)}
-              className="w-full outline-none border-b border-[#A4AABC]"
-            />
+          <div className="flex justify-between w-full gap-10">
+            <div className="w-1/3 flex flex-col gap-2 relative">
+              <label htmlFor="horario" className="text-sm md:text-base">
+                Horario
+              </label>
+              <input
+                id="horario"
+                type="time"
+                value={horario}
+                onChange={(e) => setHorario(e.target.value)}
+                className="w-full outline-none border-b border-[#A4AABC]"
+              />
+            </div>
+            <div className="w-full flex flex-col gap-2">
+              <label htmlFor="data-pedido" className="text-sm md:text-base">
+                Data do Pedido
+              </label>
+              <input
+                id="data-pedido"
+                type="date"
+                value={dataDoPedido}
+                onChange={(e) => setDataDoPedido(e.target.value)}
+                className="w-full outline-none border-b border-[#A4AABC]"
+              />
+            </div>
           </div>
         </div>
         <button
-          disabled={isLoading ||  todosPedidos.length === 0 || !dataDoPedido || !maquinasDisponiveis || processamentoEmAndamento || !pedidoFinalizado || !horario}
+          disabled={
+            isLoading ||
+            todosPedidos.length === 0 ||
+            !dataDoPedido ||
+            !maquinasDisponiveis ||
+            processamentoEmAndamento ||
+            !pedidoFinalizado ||
+            !horario
+          }
           onClick={iniciarSequenciamentoFunc}
           className="w-1/2 md:w-full text-sm  cursor-pointer inline-flex items-center justify-center md:text-lg px-2 py-2 bg-green-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-green-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
         >
-          {processamentoEmAndamento ? 'Processando...' : 'Iniciar'}
+          {processamentoEmAndamento ? "Processando..." : "Iniciar"}
         </button>
       </div>
     </div>

@@ -76,7 +76,7 @@ function PedidosDisponiveis({
   }
 
   return (
-    <div className="w-full md:w-1/2 bg-white rounded-md shadow p-4 overflow-hidden">
+    <div className="w-full md:w-[65%]  bg-white rounded-md shadow p-4 overflow-x-auto">
       <h1 className="text-lg md:text-xl text-[#5B85D5] font-bold">
         Pedidos Disponíveis
       </h1>
@@ -93,7 +93,7 @@ function PedidosDisponiveis({
         />
       </div>
 
-      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[400px] md:h-[470px] overflow-x-auto">
+      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[400px] md:h-[470px] overflow-x-scroll">
         {isLoading ? (
           <div className="w-full h-full flex justify-center items-center">
             <div className="flex flex-col items-center">
@@ -113,22 +113,22 @@ function PedidosDisponiveis({
           <table className="w-full overflow-x-auto">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Cliente
                 </th>
-                <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Produto
                 </th>
-                <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Demanda
                 </th>
-                <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Data Prometida
                 </th>
-                <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Valor
                 </th>
-                 <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                 <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
@@ -140,25 +140,25 @@ function PedidosDisponiveis({
                   onClick={() => handleAddPedido(pedido)}
                   className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {pedido.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {pedido.product_value}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {Intl.NumberFormat('pt-br').format(pedido.demand)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {Intl.DateTimeFormat("pt-BR", {
                       dateStyle: "short",
                     }).format(new Date(pedido.promised_date))}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {pedido.product_value}
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
+                  <td className="px-4 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
                     <div className="w-full flex justify-center gap-2">
                       <button
                         onClick={(e) => {
