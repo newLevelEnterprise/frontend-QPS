@@ -1,4 +1,5 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/useAuth";
@@ -7,17 +8,8 @@ import { apiClient } from "../../../utils/apiClient";
 import Modal from "../modal";
 import Loading from "./loading";
 
-interface PedidosParaSequenciamentoProps {
-  allOrders: IPedido[];
-  setOrders: Dispatch<SetStateAction<IPedido[]>>;
-  setTodosPedidosDisponiveis: Dispatch<SetStateAction<IPedido[]>>;
-}
-
-function PedidosParaSequenciamento({
-  allOrders,
-  setOrders,
-  setTodosPedidosDisponiveis,
-}: PedidosParaSequenciamentoProps) {
+function PedidosParaSequenciamento() {
+  const queryClient = useQueryClient();
   const [isLoading, setIsloading] = useState<boolean>(false);
   const [pedidoFinalizado, setPedidoFinalizado] = useState<boolean>(false);
   const [processamentoEmAndamento, setProcessamentoEmAndamento] =
@@ -28,21 +20,8 @@ function PedidosParaSequenciamento({
   );
   const [horario, setHorario] = useState<string>("");
   const [maquinasDisponiveis, setMaquinasDisponiveis] = useState<number>(100);
-  const [todosPedidos, setTodosPedidos] = useState<IPedido[]>([]);
-  const [pedidosFiltrados, setPedidosFiltrados] = useState<IPedido[]>([]);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const { user_id } = useAuth();
-
-  useEffect(() => {
-    setTodosPedidos(allOrders);
-    setPedidosFiltrados(allOrders);
-  }, [allOrders]);
-
-  useEffect(() => {
-    setPedidosFiltrados(
-      todosPedidos.filter((pedido) => pedido.name.includes(busca))
-    );
-  }, [busca]);
 
   const connectToSSE = () => {
     try {
@@ -100,13 +79,22 @@ function PedidosParaSequenciamento({
     };
   }, []);
 
+  const {data: pedidos} = useQuery({
+    queryKey: ["jobs", "para", "sequenciamento"],
+    queryFn: () => queryClient.getQueryData(["jobs", "para", "sequenciamento"]) as IPedido[]
+  });
+
   const handleVoltarPedido = (pedido: IPedido) => {
-    setTodosPedidosDisponiveis((prev) => [...prev, pedido]);
-    setOrders((prev) => {
-      const newOrders = [...prev];
-      const index = newOrders.findIndex((p) => p.id === pedido.id);
-      newOrders.splice(index, 1);
-      return newOrders;
+    queryClient.setQueryData(["get", "jobs"], (actualData: IPedido[]) => {
+      if (!actualData) return actualData;
+      return [...actualData, pedido]
+    });
+    queryClient.setQueryData(["jobs", "para", "sequenciamento"], (oldData: IPedido[]) => {
+      if (!oldData) return oldData;
+      const oldOrders = [...oldData];
+      const index = oldOrders.findIndex((p) => p.id === pedido.id);
+      oldOrders.splice(index, 1);
+      return oldOrders;
     });
   };
 
@@ -128,7 +116,7 @@ function PedidosParaSequenciamento({
       const dataPedido = `${dataDoPedido}T${horario}`;
       await apiClient.post(
         `/sequenciamento/sequenciamento/solve?sequencing_date=${dataPedido}&machine_availability=${maquinasDisponiveis}`,
-        todosPedidos.map((p) => p.id)
+        pedidos?.map((p) => p.id)
       );
 
       if (!eventSource) {
@@ -136,8 +124,9 @@ function PedidosParaSequenciamento({
       }
       setPedidoFinalizado(false);
       setProcessamentoEmAndamento(true);
-      setTodosPedidos([]);
-      setPedidosFiltrados([]);
+      queryClient.setQueryData(["jobs", "para", "sequenciamento"], () => {
+        return [];
+      });
       toast.success("Sequenciamento iniciado com sucesso!");
     } catch (error) {
       console.log(error);
@@ -147,7 +136,7 @@ function PedidosParaSequenciamento({
       setIsloading(false);
     }
   };
-  console.log(horario);
+
   return (
     <div className="w-full md:flex-1 bg-white rounded-md shadow p-4 overflow-y-auto overflow-x-auto">
       <Modal.Root isVisible={isLoading}>
@@ -174,7 +163,7 @@ function PedidosParaSequenciamento({
       </div>
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[300px] md:h-[300px] overflow-x-auto">
-        {allOrders.length === 0 ? (
+        {(!pedidos || pedidos.length === 0) ? (
           <div className="w-full h-full flex justify-center items-center">
             <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">
               Nenhum pedido encontrado !
@@ -202,7 +191,7 @@ function PedidosParaSequenciamento({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 overflow-y-auto">
-              {pedidosFiltrados.map((pedido) => (
+              {pedidos.filter(p => p.name.includes(busca)).map((pedido) => (
                 <tr
                   key={pedido.id}
                   onClick={() => handleVoltarPedido(pedido)}
@@ -218,7 +207,9 @@ function PedidosParaSequenciamento({
                     {pedido.demand}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.promised_date}
+                     {Intl.DateTimeFormat("pt-BR", {
+                        dateStyle: "short",
+                      }).format(new Date(pedido.promised_date))}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                     {pedido.product_value}
@@ -280,7 +271,7 @@ function PedidosParaSequenciamento({
         <button
           disabled={
             isLoading ||
-            todosPedidos.length === 0 ||
+            (!pedidos || pedidos.length === 0) ||
             !dataDoPedido ||
             !maquinasDisponiveis ||
             processamentoEmAndamento ||

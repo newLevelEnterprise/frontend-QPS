@@ -14,7 +14,7 @@ import FormErrorMessage from "../forms/FormErrorMessage";
 
 interface IFormNovoClienteProps {
   setNovoCliente: Dispatch<SetStateAction<boolean>>;
-  setCliente: Dispatch<SetStateAction<ICliente[]>>;
+  setCliente: () => void;
 }
 
 function FormNovoCliente({setNovoCliente, setCliente}: IFormNovoClienteProps) {
@@ -34,11 +34,7 @@ function FormNovoCliente({setNovoCliente, setCliente}: IFormNovoClienteProps) {
         priority: parseInt(data.priority),
       });
       toast.success("Cliente criado com sucesso!");
-      setCliente(prev => [...prev, {
-        id: res.id,
-        name: res.name,
-        priority: res.priority
-      }]);
+      setCliente();
       setNovoCliente(false);
       console.log(res);
     } catch (error) {

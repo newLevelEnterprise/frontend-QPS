@@ -1,79 +1,56 @@
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import { TbTrash } from "react-icons/tb";
 import { toast } from "react-toastify";
 import type { IPedido } from "../../../types/Pedido";
 import { apiClient } from "../../../utils/apiClient";
 
-interface PedidosDisponiveisProps {
-  setPedidosSequenciamento: Dispatch<SetStateAction<IPedido[]>>;
-  todosPedidos:IPedido[];
-  setTodosPedidos: Dispatch<SetStateAction<IPedido[]>>;
-  pedidosFiltrados:IPedido[];
-  setPedidosFiltrados: Dispatch<SetStateAction<IPedido[]>>;
-}
 
-function PedidosDisponiveis({
-  setPedidosSequenciamento,
-  pedidosFiltrados,
-  setPedidosFiltrados,
-  setTodosPedidos,
-  todosPedidos
-}: PedidosDisponiveisProps) {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+function PedidosDisponiveis() {
+  const queryClient = useQueryClient();
   const [busca, setBusca] = useState<string>("");
 
-  useEffect(() => {
-    const getjobs = async () => {
-      setIsLoading(true);
-      try {
-        const { data } = await apiClient.get<IPedido[]>("/jobs");
-        setPedidosFiltrados(data ?? []);
-        setTodosPedidos(data ?? []);
-      } catch (error) {
-        console.error("Erro ao buscar pedidos:", error);
-        setPedidosFiltrados([]);
-        setTodosPedidos([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getjobs();
-  }, []);
-
-  useEffect(() => {
-    setPedidosFiltrados(
-      todosPedidos.filter((pedido) => pedido.name.includes(busca))
-    );
-  }, [busca, setPedidosFiltrados, todosPedidos]);
-
+  const { data: jobs, isFetching } = useQuery({
+    queryKey: ["get", "jobs"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IPedido[]>("/jobs");
+      return data;
+    },
+  });
 
   const handleAddPedido = (pedido: IPedido) => {
-    setTodosPedidos(prev => {
-      const oldJobs = [...prev];
-      const jobIndex = todosPedidos.findIndex(p => p.id === pedido.id);
-      oldJobs.splice(jobIndex, 1);
-      return oldJobs;
+    queryClient.setQueryData(["get", "jobs"], (oldData: IPedido[]) => {
+      if (!oldData) return oldData;
+      const orders = [...oldData];
+      const jobIndex = orders.findIndex((p) => p.id === pedido.id);
+      orders.splice(jobIndex, 1);
+      return orders;
     });
-    setPedidosSequenciamento((prev) => [...prev, pedido]);
+    queryClient.setQueryData(["jobs", "para", "sequenciamento"], (actualData: IPedido[]) => {
+      console.log(actualData);
+      if (!actualData) return [pedido];
+      return [...actualData, pedido];
+    });
   };
 
   const deletarJobFn = async (id: number) => {
     try {
       await apiClient.delete(`/jobs/${id}`);
-      toast.success('Pedido deletado com sucesso');
-      setPedidosFiltrados(prev => {
-        const newJobs = [...prev];
-        const index = newJobs.findIndex(p => p.id === id);
-        newJobs.splice(index, 1);
-        return newJobs;
+      toast.success("Pedido deletado com sucesso", {
+        toastId: "deletePedidoToast",
+      });
+      queryClient.setQueryData(["get", "jobs"], (oldData: IPedido[]) => {
+        if (!oldData) return oldData;
+        return oldData.filter((client) => client.id !== id);
       });
     } catch (error) {
       console.log(error);
-      toast.error('Erro ao deletar pedido');
+      toast.error("Erro ao deletar pedido", {
+        toastId: "deletePedidoToast",
+      });
     }
-  }
+  };
 
   return (
     <div className="w-full md:w-[65%]  bg-white rounded-md shadow p-4 overflow-x-auto">
@@ -94,7 +71,7 @@ function PedidosDisponiveis({
       </div>
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[400px] md:h-[470px] overflow-x-scroll">
-        {isLoading ? (
+        {isFetching ? (
           <div className="w-full h-full flex justify-center items-center">
             <div className="flex flex-col items-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -103,7 +80,7 @@ function PedidosDisponiveis({
               </p>
             </div>
           </div>
-        ) : todosPedidos.length === 0 ? (
+        ) : !jobs || jobs.length === 0 ? (
           <div className="w-full h-full flex justify-center items-center">
             <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">
               Nenhum pedido encontrado !
@@ -128,51 +105,53 @@ function PedidosDisponiveis({
                 <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Valor
                 </th>
-                 <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Ações
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 overflow-y-auto">
-              {pedidosFiltrados.map((pedido) => (
-                <tr
-                  key={pedido.id}
-                  onClick={() => handleAddPedido(pedido)}
-                  className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
-                >
-                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.name}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.product_value}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {Intl.NumberFormat('pt-br').format(pedido.demand)}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {Intl.DateTimeFormat("pt-BR", {
-                      dateStyle: "short",
-                    }).format(new Date(pedido.promised_date))}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.product_value}
-                  </td>
+              {jobs
+                .filter((pedido) => pedido.name.includes(busca))
+                .map((pedido) => (
+                  <tr
+                    key={pedido.id}
+                    onClick={() => handleAddPedido(pedido)}
+                    className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+                  >
+                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                      {pedido.name}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                      {pedido.product_value}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                      {Intl.NumberFormat("pt-br").format(pedido.demand)}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                      {Intl.DateTimeFormat("pt-BR", {
+                        dateStyle: "short",
+                      }).format(new Date(pedido.promised_date))}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                      {pedido.product_value}
+                    </td>
 
-                  <td className="px-4 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
-                    <div className="w-full flex justify-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deletarJobFn(pedido.id);
-                        }}
-                        className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
-                      >
-                        <TbTrash className="w-4 h-4 md:w-5 md:h-5"/>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    <td className="px-4 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
+                      <div className="w-full flex justify-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deletarJobFn(pedido.id);
+                          }}
+                          className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
+                        >
+                          <TbTrash className="w-4 h-4 md:w-5 md:h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         )}

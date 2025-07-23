@@ -8,14 +8,13 @@ import {
   criarProdutoSchema,
   type ICriarProdutoBody,
 } from "../../../schemas/produto";
-import type { IProduto } from "../../../types/Produto";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
 
 interface FormNovoProdutoProps {
   setNovoProduto: Dispatch<SetStateAction<boolean>>;
-  setProducts: Dispatch<SetStateAction<IProduto[]>>;
+  setProducts: () => void;
 }
 
 function FormNovoProduto({
@@ -33,22 +32,13 @@ function FormNovoProduto({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      const { data: res } = await apiClient.post("/products", {
+      await apiClient.post("/products", {
         name: data.name,
         cycle: data.ciclo,
         bottleneck: data.bottleneck,
         scrap: data.refugo,
       });
-      setProducts((prev) => [
-        ...prev,
-        {
-          id: res.id,
-          name: res.name,
-          cycle: res.cycle,
-          bottleneck: res.bottleneck,
-          scrap: res.scrap,
-        },
-      ]);
+      setProducts();
       toast.success("Produto criado com sucesso!");
       setNovoProduto(false);
     } catch (error) {

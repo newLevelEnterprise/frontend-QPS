@@ -11,7 +11,7 @@ import FormErrorMessage from "../forms/FormErrorMessage";
 interface FormEditarProdutoProps {
   produto: Pick<IProduto, "id" | "name" | "cycle" | "scrap" | "bottleneck">;
   setEditarProduto: Dispatch<SetStateAction<boolean>>;
-  setProducts: Dispatch<SetStateAction<IProduto[]>>;
+  setProducts: () => void;
 }
 
 function FormEditarProduto({
@@ -34,25 +34,13 @@ function FormEditarProduto({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      const { data: res } = await apiClient.put(`/products/${produto.id}`, {
+      await apiClient.put(`/products/${produto.id}`, {
         name: data.name,
         cycle: parseInt(data.ciclo),
         bottleneck: parseInt(data.bottleneck),
         scrap: parseInt(data.refugo),
       });
-      setProducts((prev) => {
-        const newProducts = [...prev];
-        const index = newProducts.findIndex((p) => p.id === produto.id);
-        newProducts[index] = {
-          id: produto.id,
-          name: res.name,
-          bottleneck: res.bottleneck,
-          cycle: res.cycle,
-          scrap: res.scrap,
-        };
-
-        return newProducts;
-      });
+      setProducts();
       toast.success("Produto criado com sucesso!");
       setEditarProduto(false);
     } catch (error) {

@@ -15,7 +15,7 @@ import FormErrorMessage from "../forms/FormErrorMessage";
 interface IFormNovoClienteProps {
   cliente: ICliente;
   setEditarCliente: Dispatch<SetStateAction<boolean>>;
-  setCliente: Dispatch<SetStateAction<ICliente[]>>;
+  setCliente: () => void;
 }
 
 function FormEditarCliente({cliente, setEditarCliente, setCliente}: IFormNovoClienteProps) {
@@ -34,21 +34,11 @@ function FormEditarCliente({cliente, setEditarCliente, setCliente}: IFormNovoCli
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      const { data: res } = await apiClient.put<ICliente>(`/clients/${cliente.id}`, {
+      await apiClient.put<ICliente>(`/clients/${cliente.id}`, {
         name: data.name,
         priority: parseInt(data.priority),
       });
-      setCliente(prev => {
-        const newClientes = [...prev];
-        const index = newClientes.findIndex(c => c.id === cliente.id);
-        newClientes[index] = {
-          id: cliente.id,
-          name: res.name,
-          priority: res.priority
-        }
-
-        return newClientes;
-      })
+      setCliente();
       toast.success("Cliente atualizado com sucesso!");
       setEditarCliente(false);
     } catch (error) {

@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { IoSearchSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
@@ -15,6 +15,7 @@ function Produtos() {
   const [editarProduto, setEditarProduto] = useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
   const [setup, setSetup] = useState<{nome: string; id: number} | null>(null);
+  const queryClient = useQueryClient();
 
   const [produto, setProduto] = useState<
     Pick<IProduto, "id" | "name" | "cycle" | 'scrap' | 'bottleneck'>
@@ -26,15 +27,19 @@ function Produtos() {
     bottleneck: 0
   });
 
-  const [produtoListaFiltrada, setProdutoListaFiltrada] =
-    useState<IProduto[]>([]);
-
 
   const deletarProdutoFn = async (produtoId: number) => {
     try {
       await apiClient.delete(`/products/${produtoId}`);
-      setProdutoListaFiltrada((prev) => prev.filter((p) => p.id !== produtoId));
-      toast.success("Produto removido com sucesso!");
+      
+      queryClient.setQueryData(['get', 'all', 'products'], (oldData: IProduto[]) => {
+        if (!oldData) return oldData;
+        return oldData.filter((client) => client.id !== produtoId);
+      });
+
+      toast.success("Produto removido com sucesso!", {
+        toastId: "deleteProductToast",
+      });
     } catch (error) {
       console.error("Erro ao remover produto:", error);
       toast.error("Erro ao remover produto. Tente novamente.");
@@ -50,10 +55,6 @@ function Produtos() {
   });
 
 
-  useEffect(() => {
-    setProdutoListaFiltrada(products ? products.filter((p) => p.name.includes(busca)) : []);
-  }, [busca]);
-
   return (
     <div className="w-full bg-white rounded-md shadow p-4">
       {/* Modal para o produto */}
@@ -65,7 +66,7 @@ function Produtos() {
              setNovoProduto(false)
             }
           />
-          <FormNovoProduto setNovoProduto={setNovoProduto} setProducts={setProdutoListaFiltrada} />
+          <FormNovoProduto setNovoProduto={setNovoProduto} setProducts={() => queryClient.invalidateQueries({queryKey: ['get', 'all', 'products']})} />
         </Modal.Container>
       </Modal.Root>
 
@@ -77,7 +78,7 @@ function Produtos() {
               setEditarProduto(false)
             }
           />
-          <FormEditarProduto setProducts={setProdutoListaFiltrada} produto={produto} setEditarProduto={setEditarProduto} />
+          <FormEditarProduto setProducts={() => queryClient.invalidateQueries({queryKey: ['get', 'all', 'products']})} produto={produto} setEditarProduto={setEditarProduto} />
         </Modal.Container>
       </Modal.Root>
 
@@ -117,7 +118,7 @@ function Produtos() {
               <p className="mt-2 text-sm text-gray-500">Carregando produtos...</p>
             </div>
           </div>
-        ) : produtoListaFiltrada.length === 0 ? (
+        ) : (!products || products.length === 0) ? (
           <div className="w-full h-full flex justify-center items-center">
             <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">
               Nenhum produto encontrado !
@@ -145,7 +146,7 @@ function Produtos() {
               </tr>
             </thead>
             <tbody>
-              {produtoListaFiltrada.map((produto) => (
+              {products.filter((p) => p.name.includes(busca)).map((produto) => (
                 <tr
                   key={produto.id}
                   className="border-b border-gray-200 last:border-b-0"

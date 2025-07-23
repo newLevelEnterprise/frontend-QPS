@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { IoSearchSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
@@ -9,14 +10,10 @@ import FormEditarCliente from "./formEditarCliente";
 import FormNovoCliente from "./formNovoCliente";
 
 function Clientes() {
+  const queryClient = useQueryClient();
   const [novoCliente, setNovoCliente] = useState<boolean>(false);
   const [editarCliente, setEditarCliente] = useState<boolean>(false);
-  const [clientes, setClientes] = useState<ICliente[]>([]);
   const [busca, setBusca] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const [clientesFiltrados, setClientesFiltrados] =
-    useState<ICliente[]>([]);
 
   const [cliente, setCliente] = useState<ICliente>({
     id: 0,
@@ -27,39 +24,26 @@ function Clientes() {
   const deletarClienteFn = async (clientId: number) => {
     try {
       await apiClient.delete(`/clients/${clientId}`);
-      setClientesFiltrados((prev) =>
-        prev.filter((cliente) => cliente.id !== clientId)
-      );
-      toast.success("Cliente removido com sucesso!");
+      queryClient.setQueryData(["get", "all", "clients"], (oldData: ICliente[]) => {
+        if (!oldData) return oldData;
+        return oldData.filter((client) => client.id !== clientId);
+      });
+      toast.success("Cliente removido com sucesso!", {
+        toastId: "deleteClientToast",
+      });
     } catch (error) {
       console.error("Erro ao remover cliente:", error);
       toast.error("Erro ao remover cliente. Tente novamente.");
     }
   };
 
-  useEffect(() => {
-    const getclients = async () => {
-      setIsLoading(true);
-      try {
-        const { data } = await apiClient.get<ICliente[]>("/clients/");
-        setClientes(data);
-        setClientesFiltrados(data);
-      } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
-        setClientes([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getclients();
-  }, []);
-
-  useEffect(() => {
-    setClientesFiltrados(
-      clientes.filter((c) => c.name.includes(busca))
-    );
-  }, [busca, clientes]);
+  const { data: clientes, isFetching } = useQuery({
+    queryKey: ["get", "all", "clients"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<ICliente[]>("/clients/");
+      return data;
+    },
+  });
 
   return (
     <div className="w-full bg-white rounded-md shadow p-4">
@@ -67,22 +51,33 @@ function Clientes() {
         <Modal.Container>
           <Modal.Header
             title="Adicionar Novo Cliente"
-            onClose={() =>
-              setNovoCliente(false)
-            }
+            onClose={() => setNovoCliente(false)}
           />
-          <FormNovoCliente setCliente={setClientesFiltrados} setNovoCliente={setNovoCliente}/>
+          <FormNovoCliente
+            setCliente={() =>
+              queryClient.invalidateQueries({
+                queryKey: ["get", "all", "clients"],
+              })
+            }
+            setNovoCliente={setNovoCliente}
+          />
         </Modal.Container>
       </Modal.Root>
-        <Modal.Root isVisible={editarCliente}>
+      <Modal.Root isVisible={editarCliente}>
         <Modal.Container>
           <Modal.Header
             title="Editar Cliente"
-            onClose={() =>
-              setEditarCliente(false)
-            }
+            onClose={() => setEditarCliente(false)}
           />
-          <FormEditarCliente setCliente={setClientesFiltrados} setEditarCliente={setEditarCliente} cliente={cliente}/>
+          <FormEditarCliente
+            setCliente={() =>
+              queryClient.invalidateQueries({
+                queryKey: ["get", "all", "clients"],
+              })
+            }
+            setEditarCliente={setEditarCliente}
+            cliente={cliente}
+          />
         </Modal.Container>
       </Modal.Root>
       <h1 className="text-xl text-[#5B85D5] font-bold">Clientes Cadastrados</h1>
@@ -91,7 +86,7 @@ function Clientes() {
           <IoSearchSharp className="h-4 w-4 text-gray-400" />
         </div>
         <input
-          disabled={clientes.length === 0}
+          disabled={!clientes || clientes.length === 0}
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
           type="text"
@@ -101,14 +96,16 @@ function Clientes() {
       </div>
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[470px] overflow-x-auto">
-        {isLoading ? (
+        {isFetching ? (
           <div className="w-full h-full flex justify-center items-center">
             <div className="flex flex-col items-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-sm text-gray-500">Carregando clientes...</p>
+              <p className="mt-2 text-sm text-gray-500">
+                Carregando clientes...
+              </p>
             </div>
           </div>
-        ) : clientes.length === 0 ? (
+        ) : !clientes || clientes.length === 0 ? (
           <div className="w-full h-full flex justify-center items-center">
             <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">
               Nenhum cliente encontrado !
@@ -130,38 +127,40 @@ function Clientes() {
               </tr>
             </thead>
             <tbody>
-              {clientesFiltrados.map((cliente) => (
-                <tr
-                  key={cliente.id}
-                  className="border-b border-gray-200 last:border-b-0"
-                >
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    {cliente.name}
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    {cliente.priority}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="w-full flex justify-end gap-2">
-                      <button
-                        onClick={() => {
-                          setEditarCliente(true);
-                          setCliente(cliente);
-                        }}
-                        className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => deletarClienteFn(cliente.id)}
-                        className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
-                      >
-                        Remover
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {clientes
+                .filter((c) => c.name.includes(busca))
+                .map((cliente) => (
+                  <tr
+                    key={cliente.id}
+                    className="border-b border-gray-200 last:border-b-0"
+                  >
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {cliente.name}
+                    </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {cliente.priority}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="w-full flex justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setEditarCliente(true);
+                            setCliente(cliente);
+                          }}
+                          className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => deletarClienteFn(cliente.id)}
+                          className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         )}
