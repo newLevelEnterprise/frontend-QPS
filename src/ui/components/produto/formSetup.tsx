@@ -136,7 +136,7 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
                   const oldProducts = [...prev];
                   oldProducts[index] = {
                     ...produto,
-                    tempo_setup: Number(e.target.value),
+                    tempo_setup: Number(e.target.value) > 0 ? Number(e.target.value) : 0,
                   };
                   return oldProducts;
                 });

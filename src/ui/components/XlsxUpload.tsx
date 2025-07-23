@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { BiUpload } from "react-icons/bi";
@@ -6,8 +7,9 @@ import { toast } from "react-toastify";
 import { apiClient } from "../../utils/apiClient";
 import Button from "./Button";
 
-function XlsxUpload({ endpoint }: { endpoint: string }) {
+function XlsxUpload({ endpoint, cachekey }: { endpoint: string; cachekey?: string[]}) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const queryClient = useQueryClient();
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
     maxFiles: 1,
     maxSize: 10 * 1024 * 1024,
@@ -24,6 +26,9 @@ function XlsxUpload({ endpoint }: { endpoint: string }) {
     await apiClient.postForm(`/upload/${endpoint}`, {
       file: acceptedFiles[0],
     });
+    if(cachekey) {
+      queryClient.invalidateQueries({queryKey: cachekey})
+    }
   };
 
   const handleUpload = async () => {

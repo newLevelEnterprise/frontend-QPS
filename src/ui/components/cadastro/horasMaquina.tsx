@@ -14,21 +14,21 @@ function HorasMaquina({ dados }: HorasMaquinaProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 w-full">
       <h2 className="text-lg font-medium text-purple-600 mb-4">
-        Horas de Máquina Gargalo
+        Horas de Máquina
       </h2>
 
       <div className="space-y-3 mb-4">
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Prazo Máximo de Entrega</span>
+          <span className="text-sm text-gray-600">Hs. Limite de Entrega</span>
           <span className="text-sm font-medium text-gray-900">
-            {max_deadline_hours}
+            {new Intl.NumberFormat('pt-BR').format(max_deadline_hours)}
           </span>
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Horas Nec. e Máquina</span>
+          <span className="text-sm text-gray-600">Hs. Nec. de Produção</span>
           <span className="text-sm font-medium text-gray-900">
-            {total_machine_hours}
+            {new Intl.NumberFormat('pt-BR', { style: 'decimal' }).format(total_machine_hours)}
           </span>
         </div>
       </div>
@@ -43,7 +43,7 @@ function HorasMaquina({ dados }: HorasMaquinaProps) {
                 machine_status === "On Time" && "bg-green-300 text-green-800"
               )}
             >
-              {machine_status}
+              {machine_status === "On Time" ? 'No Prazo' : 'Fora do Prazo'}
             </span>
           )}
         </div>

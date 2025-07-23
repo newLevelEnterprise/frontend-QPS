@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { IoSearchSharp } from "react-icons/io5";
@@ -12,10 +13,8 @@ import FormSetup from "./formSetup";
 function Produtos() {
   const [novoProduto, setNovoProduto] = useState<boolean>(false);
   const [editarProduto, setEditarProduto] = useState<boolean>(false);
-  const [products, setProducts] = useState<IProduto[]>([]);
   const [busca, setBusca] = useState<string>("");
   const [setup, setSetup] = useState<{nome: string; id: number} | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [produto, setProduto] = useState<
     Pick<IProduto, "id" | "name" | "cycle" | 'scrap' | 'bottleneck'>
@@ -42,26 +41,17 @@ function Produtos() {
     } 
   };
 
-  useEffect(() => {
-    const getProducts = async () => {
-      setIsLoading(true);
-      try {
-        const { data } = await apiClient.get<IProduto[]>("/products/");
-        setProdutoListaFiltrada(data);
-        setProducts(data);
-      } catch (error) {
-        console.error("Erro ao buscar pedidos:", error);
-        setProducts([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const {data: products, isFetching} = useQuery({
+    queryKey: ['get', 'all', 'products'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IProduto[]>("/products/");
+      return data;
+    }
+  });
 
-    getProducts();
-  }, []);
 
   useEffect(() => {
-    setProdutoListaFiltrada(products.filter((p) => p.name.includes(busca)));
+    setProdutoListaFiltrada(products ? products.filter((p) => p.name.includes(busca)) : []);
   }, [busca]);
 
   return (
@@ -120,7 +110,7 @@ function Produtos() {
       </div>
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[470px] overflow-x-auto">
-        {isLoading ? (
+        {isFetching ? (
           <div className="w-full h-full flex justify-center items-center">
             <div className="flex flex-col items-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

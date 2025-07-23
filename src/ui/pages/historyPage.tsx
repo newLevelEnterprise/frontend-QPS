@@ -85,6 +85,14 @@ function HistoryPage() {
         Histórico de Processamentos
       </h1>
       
+        {((historyData.length === 0 || historyData.length > 100) && !isLoading) && (
+        <div className="flex flex-col w-full h-full items-center justify-center py-12">
+          <div className="text-gray-400 text-lg mb-2">
+            Nenhum histórico encontrado
+          </div>
+        </div>
+      )}
+
       <div className="flex-1 overflow-y-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-4">
           {historyData.map((item) => (
@@ -112,14 +120,6 @@ function HistoryPage() {
           ))}
         </div>
       </div>
-
-      {historyData.length === 0 && !isLoading && (
-        <div className="flex flex-col w-full h-full items-center justify-center py-12">
-          <div className="text-gray-400 text-lg mb-2">
-            Nenhum histórico encontrado
-          </div>
-        </div>
-      )}
     </div>
   );
 }

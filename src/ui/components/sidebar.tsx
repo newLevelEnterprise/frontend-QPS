@@ -36,11 +36,6 @@ const menuItems: MenuItem[] = [
     icon: CiCirclePlus,
     url: "",
     items: [
-       {
-        title: "Resultados",
-        icon: CiCirclePlus,
-        url: "/resultados",
-      },
       {
         title: "Cliente",
         icon: FaUserCircle,
@@ -52,6 +47,11 @@ const menuItems: MenuItem[] = [
         url: "/cadastro/produto",
       },
     ],
+  },
+  {
+    title: "Resultados",
+    icon: CiCirclePlus,
+    url: "/resultados",
   },
   {
     title: "Histórico",
@@ -71,7 +71,7 @@ export default function Sidebar({
   mobileSidebar,
   onMobileSidebar,
 }: SidebarProps) {
-  const {enterprise_id} = useAuth();
+  const { enterprise_id } = useAuth();
 
   const [enterpriseName, setEnterpriseName] = useState<string>("");
   const [expandedItems, setExpandedItems] = useState<string[]>(["Cadastro"]);
@@ -86,10 +86,13 @@ export default function Sidebar({
   };
 
   useEffect(() => {
-    apiClient.get(`/enterprises/${enterprise_id}/`).then(res => setEnterpriseName(res.data.name)).catch(err => {
-      console.log(err);
-      setEnterpriseName("");
-    })
+    apiClient
+      .get(`/enterprises/${enterprise_id}/`)
+      .then((res) => setEnterpriseName(res.data.name))
+      .catch((err) => {
+        console.log(err);
+        setEnterpriseName("");
+      });
   }, []);
 
   return (
@@ -123,7 +126,9 @@ export default function Sidebar({
                 {/* {data?.empresa} */}
                 {enterpriseName}
               </span>
-              <span className="text-sm text-[#878C9B] truncate text-ellipsis">Conta ID: {enterprise_id}</span>
+              <span className="text-sm text-[#878C9B] truncate text-ellipsis">
+                Conta ID: {enterprise_id}
+              </span>
             </div>
           </div>
         </div>

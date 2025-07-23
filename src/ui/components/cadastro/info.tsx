@@ -59,7 +59,7 @@ function Info({dados}: {dados: IProductionSchedule | undefined}) {
       <InfoCard titulo="Hr. Inicio Prog." valor={formatHour} cor="azul"/>
       <InfoCard titulo="Qtd. Setup Nec." valor={`${setup_count}`} cor="azul"/>
       <InfoCard titulo="Qtde Setups Planejado" valor={`${optimized_setups}`} cor="verde"/>
-      <InfoCard titulo="Atend. de Lotes no Prazo" valor={`${on_time_jobs}`} cor="roxo" />
+      <InfoCard titulo="Pedidos no Prazo" valor={`${on_time_jobs}`} cor="roxo" />
       <InfoCard titulo="Hr. de Fat Até:" valor="16:59:00" cor="roxo" />
     </div>
   )

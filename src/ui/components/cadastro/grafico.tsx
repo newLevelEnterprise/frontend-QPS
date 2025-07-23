@@ -48,7 +48,7 @@ function GraficoFaturamento({
           />
           <Bar
             dataKey="faturamento_total"
-            fill="#2382E7"
+            fill="#255DC8"
             barSize={24}
             radius={[4, 4, 0, 0]}
           />
