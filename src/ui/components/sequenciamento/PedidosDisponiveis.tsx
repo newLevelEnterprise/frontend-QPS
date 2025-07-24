@@ -1,7 +1,8 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import { TbTrash } from "react-icons/tb";
+import { VscLoading } from "react-icons/vsc";
 import { toast } from "react-toastify";
 import type { IPedido } from "../../../types/Pedido";
 import { apiClient } from "../../../utils/apiClient";
@@ -82,22 +83,66 @@ function PedidosDisponiveis() {
     }
   };
 
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async () => {
+      if (jobs) {
+        for (const job of jobs) {
+          console.log('deletado', job.id);
+          await apiClient.delete(`/jobs/${job.id}`);
+        }
+      }
+    },
+  });
+  const deletarTodosJobsFn = async () => {
+    try {
+      await mutateAsync();
+      toast.success("Pedidos deletado com sucesso", {
+        toastId: "deleteTodosPedidosToast",
+      });
+      queryClient.setQueryData(["get", "jobs"], () => {
+        localStorage.removeItem("jobs_para_sequenciamento");
+        return [];
+      });
+      queryClient.setQueryData(["jobs", "para", "sequenciamento"], () => {
+        return [];
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Erro ao deletar os pedidos", {
+        toastId: "deleteTodosPedidosToast",
+      });
+    }
+  };
+
   return (
     <div className="w-full md:w-[65%]  bg-white rounded-md shadow p-4 overflow-x-auto">
       <h1 className="text-lg md:text-xl text-[#5B85D5] font-bold">
         Pedidos Disponíveis
       </h1>
-      <div className="relative max-w-md mt-4">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <IoSearchSharp className="h-4 w-4 text-gray-400" />
+      <div className="flex justify-between items-end gap-10">
+        <div className="relative flex-1 mt-4">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <IoSearchSharp className="h-4 w-4 text-gray-400" />
+          </div>
+          <input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            type="text"
+            placeholder="Buscar..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
-        <input
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          type="text"
-          placeholder="Buscar..."
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
+        <button
+          disabled={!jobs || jobs.length === 0}
+          onClick={deletarTodosJobsFn}
+          className="bg-red-700 disabled:bg-red-200 disabled:cursor-default text-xs px-4 py-3 md:text-sm md:px-6 md:py-3 rounded-xl text-white hover:bg-red-600 cursor-pointer transition-colors duration-200"
+        >
+          {isPending ? (
+            <VscLoading size={20} className="animate-spin" />
+          ) : (
+            "Apagar tudo"
+          )}
+        </button>
       </div>
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[400px] md:h-[470px] overflow-x-scroll">

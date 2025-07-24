@@ -85,7 +85,7 @@ function HistoryPage() {
         Histórico de Processamentos
       </h1>
       
-        {((historyData.length === 0 || historyData.length > 100) && !isLoading) && (
+        {((historyData.length === 0) && !isLoading) && (
         <div className="flex flex-col w-full h-full items-center justify-center py-12">
           <div className="text-gray-400 text-lg mb-2">
             Nenhum histórico encontrado

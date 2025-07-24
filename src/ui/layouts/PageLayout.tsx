@@ -12,7 +12,7 @@ function PageLayout() {
 
   return (
     <div className="h-full flex flex-col md:flex-row font-[family-name:var(--font-red-hat)] overflow-y-auto lg:overflow-hidden">
-      <ToastContainer limit={1} pauseOnHover={false} pauseOnFocusLoss={false} position="top-center" />
+      <ToastContainer autoClose={1000} limit={1} pauseOnHover={false} pauseOnFocusLoss={false} position="top-center" />
       <Sidebar
           mobileSidebar={mobileSidebar}
           onMobileSidebar={handleMobileSidebar}
