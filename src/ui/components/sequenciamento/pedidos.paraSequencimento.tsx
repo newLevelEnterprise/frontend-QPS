@@ -135,6 +135,7 @@ function PedidosParaSequenciamento() {
       queryClient.setQueryData(["jobs", "para", "sequenciamento"], () => {
         return [];
       });
+      localStorage.removeItem("jobs_para_sequenciamento");
       toast.success("Sequenciamento iniciado com sucesso!");
     } catch (error) {
       console.log(error);
