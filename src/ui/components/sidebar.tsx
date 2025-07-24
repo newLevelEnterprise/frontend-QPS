@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaUserCircle } from "react-icons/fa";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { IoChevronDown, IoClose, IoHomeOutline } from "react-icons/io5";
 import { MdHistory } from "react-icons/md";
 import { RiFileList3Line } from "react-icons/ri";
@@ -50,7 +51,7 @@ const menuItems: MenuItem[] = [
   },
   {
     title: "Resultados",
-    icon: CiCirclePlus,
+    icon: IoMdCheckmarkCircleOutline ,
     url: "/resultados",
   },
   {
