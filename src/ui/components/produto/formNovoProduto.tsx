@@ -121,7 +121,7 @@ function FormNovoProduto({
                 placeholder="Refugo do produto"
                 min={0}
                 max={100}
-                type="number"
+                type="tel"
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("refugo")}
               />

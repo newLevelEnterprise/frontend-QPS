@@ -119,9 +119,9 @@ function FormEditarProduto({
               <input
                 id="refugo"
                 placeholder="Refugo do produto (em %)"
-                type="number"
                 min={0}
                 max={100}
+                type="tel"
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("refugo")}
               />

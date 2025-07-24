@@ -5,9 +5,22 @@ import { BiUpload } from "react-icons/bi";
 import { BsFiletypeXlsx } from "react-icons/bs";
 import { toast } from "react-toastify";
 import { apiClient } from "../../utils/apiClient";
+import { cn } from "../../utils/cn";
 import Button from "./Button";
 
-function XlsxUpload({ endpoint, cachekey }: { endpoint: string; cachekey?: string[]}) {
+interface XlsxUploadProps {
+  endpoint: string;
+  cachekey?: string[];
+  mainDivClassName?: string;
+  uploaderContainerClassName?: string;
+}
+
+function XlsxUpload({
+  endpoint,
+  cachekey,
+  mainDivClassName,
+  uploaderContainerClassName
+}: XlsxUploadProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
@@ -26,8 +39,8 @@ function XlsxUpload({ endpoint, cachekey }: { endpoint: string; cachekey?: strin
     await apiClient.postForm(`/upload/${endpoint}`, {
       file: acceptedFiles[0],
     });
-    if(cachekey) {
-      queryClient.invalidateQueries({queryKey: cachekey})
+    if (cachekey) {
+      queryClient.invalidateQueries({ queryKey: cachekey });
     }
   };
 
@@ -45,7 +58,11 @@ function XlsxUpload({ endpoint, cachekey }: { endpoint: string; cachekey?: strin
   };
 
   return (
-    <div className="col-span-2 p-6 rounded-md shadow h-[250px] lg:h-[200px] bg-white">
+    <div
+      className={cn(
+        "col-span-2 p-6 rounded-md shadow h-[250px] lg:h-[200px] bg-white",mainDivClassName
+      )}
+    >
       <span className="flex gap-2 items-center text-[#255DC8]">
         <BsFiletypeXlsx />
         <p className="text-base font-bold text-[#255DC8]">Cadastrar XLSX</p>
@@ -54,14 +71,14 @@ function XlsxUpload({ endpoint, cachekey }: { endpoint: string; cachekey?: strin
       <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 mt-4">
         <div
           {...getRootProps({ className: "dropzone" })}
-          className="w-full lg:w-1/2 flex items-center justify-center border-2 border-dashed border-gray-400 h-[81px]"
+          className={cn("w-full lg:w-1/2 flex items-center justify-center border-2 border-dashed border-gray-400 h-[81px]", uploaderContainerClassName)}
         >
           <input {...getInputProps()} />
-          <div className="flex gap-2 items-center">
+          <div className="flex flex-wrap gap-2 justify-center items-center">
             <p className="hidden lg:block">
               Arraste e solte seu arquivo XLSX para cá ou{" "}
             </p>
-            <span className="px-2 py-1 lg:px-4 lg:py-1 text-base border-2 rounded-full border-[#10A4DA] text-[#10A4DA] font-bold cursor-pointer">
+            <span className="text-base px-2 py-1 lg:px-4 lg:py-1 border-2 rounded-full border-[#10A4DA] text-[#10A4DA] font-bold cursor-pointer">
               Escolha o arquivo <BiUpload className="inline" size={22} />
             </span>
           </div>

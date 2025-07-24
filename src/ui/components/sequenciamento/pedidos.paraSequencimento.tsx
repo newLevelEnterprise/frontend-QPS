@@ -19,7 +19,7 @@ function PedidosParaSequenciamento() {
     new Date().toISOString()
   );
   const [horario, setHorario] = useState<string>("");
-  const [maquinasDisponiveis, setMaquinasDisponiveis] = useState<number>(100);
+  const [maquinasDisponiveis, setMaquinasDisponiveis] = useState<string>('100');
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const { user_id } = useAuth();
 
@@ -110,20 +110,26 @@ function PedidosParaSequenciamento() {
   const iniciarSequenciamentoFunc = async () => {
     try {
       setIsloading(true);
+      const regex = /^\d+(\.\d{1,2})?$/;
+
+      if(!regex.test(maquinasDisponiveis)) {
+        toast.error("O valor das máquinas disponíveis deve ser um número decimal");
+        return;
+      }
 
       if (!pedidoFinalizado) {
         toast.error("O processamento ainda não foi finalizado !");
         return;
       }
 
-      if (maquinasDisponiveis > 100 || maquinasDisponiveis < 1) {
+      if (parseFloat(maquinasDisponiveis) > 100 || parseFloat(maquinasDisponiveis) < 1) {
         toast.error("O número de máquinas disponíveis deve ser entre 0 e 100.");
         return;
       }
 
       const dataPedido = `${dataDoPedido}T${horario}`;
       await apiClient.post(
-        `/sequenciamento/sequenciamento/solve?sequencing_date=${dataPedido}&machine_availability=${maquinasDisponiveis}`,
+        `/sequenciamento/sequenciamento/solve?sequencing_date=${dataPedido}&machine_availability=${parseFloat(maquinasDisponiveis)}`,
         pedidos?.map((p) => p.id)
       );
 
@@ -241,11 +247,11 @@ function PedidosParaSequenciamento() {
             </label>
             <input
               id="maquinas-disponiveis"
-              type="number"
-              min={1}
+              min={0}
               max={100}
+              type="tel"
               value={maquinasDisponiveis}
-              onChange={(e) => setMaquinasDisponiveis(Number(e.target.value))}
+              onChange={(e) => setMaquinasDisponiveis(e.target.value)}
               className="w-full outline-none border-b border-[#A4AABC]"
             />
             <span className="absolute right-4 bottom-2 text-xs">%</span>

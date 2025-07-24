@@ -30,7 +30,7 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [setupProdutos, setSetupProdutos] = useState<IProdutoSetup[]>([]);
   const [setupOldProdutos, setSetupOldProdutos] = useState<IProdutoSetup[]>([]);
-  const [busca, setBuscaSetup] = useState<string>('');
+  const [busca, setBuscaSetup] = useState<string>("");
 
   const adicionarSetup = async () => {
     try {
@@ -45,18 +45,20 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
         product_id: p.id,
         setup_time: p.tempo_setup,
       }));
-      const dirtiedFields = setupNew.filter((p, index) => p.setup_time !== setupOld[index].setup_time).map(setup => ({
-        id: setup.setup_id,
-        setup_time: setup.setup_time
-      }));
+      const dirtiedFields = setupNew
+        .filter((p, index) => p.setup_time !== setupOld[index].setup_time)
+        .map((setup) => ({
+          id: setup.setup_id,
+          setup_time: setup.setup_time,
+        }));
 
       const payload = {
-        updates: dirtiedFields
+        updates: dirtiedFields,
       };
 
-      if(payload.updates.length > 0) {
+      if (payload.updates.length > 0) {
         await apiClient.put("/setup_trocas/batch", payload);
-        toast.success('Setup atualizado');
+        toast.success("Setup atualizado");
       }
       onClose(null);
     } catch (error) {
@@ -83,7 +85,7 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
               nomeProdutoDestino: p.pair_product.name,
               tempo_setup: p.setup_time,
               id: p.pair_product.id,
-              setup_id: p.id
+              setup_id: p.id,
             }));
           setSetupProdutos(products);
           setSetupOldProdutos(products);
@@ -101,49 +103,54 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
 
   return (
     <div className="w-full flex flex-col gap-10 my-6 overflow-y-auto max-h-[95%]">
-       <div className="relative max-w-md mt-4">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <IoSearchSharp className="h-4 w-4 text-gray-400" />
-            </div>
-            <input
-              value={''}
-              onChange={(e) => setBuscaSetup(e.target.value)}
-              type="text"
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
+      <div className="relative max-w-md mt-4">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <IoSearchSharp className="h-4 w-4 text-gray-400" />
+        </div>
+        <input
+          value={busca}
+          onChange={(e) => setBuscaSetup(e.target.value)}
+          type="text"
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
       {isLoadingProducts ? (
         <div className="w-full h-full flex justify-center items-center">
           <VscLoading size={20} className="animate-spin" />
         </div>
       ) : (
-        setupProdutos.filter(p => p.nomeProdutoDestino.toLowerCase().includes(busca.toLowerCase())).map((produto) => (
-          <div
-            key={produto.id}
-            className="w-full flex justify-between items-center border-b border-gray-300"
-          >
-            <p>{produto.nomeProdutoDestino}</p>
-            <p>Tempo</p>
-            <input
-              type="number"
-              className="p-1 outline-none border border-gray-200 rounded-md mb-2"
-              value={produto.tempo_setup}
-              onChange={(e) => {
-                const index = setupProdutos.findIndex(
-                  (p) => p.id === produto.id
-                );
-                setSetupProdutos((prev) => {
-                  const oldProducts = [...prev];
-                  oldProducts[index] = {
-                    ...produto,
-                    tempo_setup: Number(e.target.value) > 0 ? Number(e.target.value) : 0,
-                  };
-                  return oldProducts;
-                });
-              }}
-            />
-          </div>
-        ))
+        setupProdutos
+          .filter((p) =>
+            p.nomeProdutoDestino.toLowerCase().includes(busca.toLowerCase())
+          )
+          .map((produto) => (
+            <div
+              key={produto.id}
+              className="w-full flex justify-between items-center border-b border-gray-300"
+            >
+              <p>{produto.nomeProdutoDestino}</p>
+              <p>Tempo</p>
+              <input
+                type="number"
+                className="p-1 outline-none border border-gray-200 rounded-md mb-2"
+                value={produto.tempo_setup}
+                onChange={(e) => {
+                  const index = setupProdutos.findIndex(
+                    (p) => p.id === produto.id
+                  );
+                  setSetupProdutos((prev) => {
+                    const oldProducts = [...prev];
+                    oldProducts[index] = {
+                      ...produto,
+                      tempo_setup:
+                        Number(e.target.value) > 0 ? Number(e.target.value) : 0,
+                    };
+                    return oldProducts;
+                  });
+                }}
+              />
+            </div>
+          ))
       )}
       <div className="w-full flex justify-end">
         <Button
