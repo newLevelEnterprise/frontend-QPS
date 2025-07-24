@@ -120,8 +120,8 @@ function Produtos() {
 
       {/* Listagem dos produtos */}
       <h1 className="text-xl text-[#5B85D5] font-bold">Produtos Cadastrados</h1>
-      <div className="w-full flex justify-between items-end">
-        <div className="flex-1 relative max-w-md mt-4">
+      <div className="w-full flex flex-col gap-4 md:flex-row justify-between items-end">
+        <div className="flex-1 relative w-full md:max-w-md mt-4">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <IoSearchSharp className="h-4 w-4 text-gray-400" />
           </div>
@@ -133,10 +133,10 @@ function Produtos() {
           />
         </div>
         <div className="space-x-10">
-          <button onClick={() => setUploadSetup(prev => !prev)} className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-lg">Upload setup</button>
+          <button onClick={() => setUploadSetup(prev => !prev)} className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">Upload setup</button>
 
           <a target="_top" href="https://api-quant-production.up.railway.app/template/setup-matrix" download>
-            <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-lg">
+            <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">
               Download setup
             </button>
           </a>
@@ -161,7 +161,7 @@ function Produtos() {
           </div>
         ) : (
           <table className="w-full overflow-x-auto">
-            <thead>
+            <thead className="overflow-x-auto">
               <tr className="border-b border-gray-200">
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
                   Produto
@@ -180,7 +180,7 @@ function Produtos() {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="overflow-x-auto">
               {products
                 .filter((p) => p.name.includes(busca))
                 .map((produto) => (

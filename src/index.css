@@ -26,7 +26,7 @@ html, body {
 /* Corrigir comportamento do scroll */
 .overflow-y-auto {
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 /* Evitar que elementos causem overflow horizontal */
