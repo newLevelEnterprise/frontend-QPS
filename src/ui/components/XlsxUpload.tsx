@@ -13,13 +13,15 @@ interface XlsxUploadProps {
   cachekey?: string[];
   mainDivClassName?: string;
   uploaderContainerClassName?: string;
+  onClose?: () => void;
 }
 
 function XlsxUpload({
   endpoint,
   cachekey,
   mainDivClassName,
-  uploaderContainerClassName
+  uploaderContainerClassName,
+  onClose
 }: XlsxUploadProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const queryClient = useQueryClient();
@@ -41,6 +43,9 @@ function XlsxUpload({
     });
     if (cachekey) {
       queryClient.invalidateQueries({ queryKey: cachekey });
+    }
+    if(onClose) {
+      onClose();
     }
   };
 

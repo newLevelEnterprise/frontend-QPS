@@ -114,7 +114,7 @@ function Produtos() {
             title='Upload Setup'
             onClose={() => setUploadSetup(prev => !prev)}
           />
-          <XlsxUpload mainDivClassName="mt-4 shadow-none" uploaderContainerClassName="lg:w-full" endpoint="setup-matrix-xlsx" cachekey={["get", "all", "products"]}/>
+          <XlsxUpload onClose={() => setUploadSetup(prev => !prev)} mainDivClassName="mt-4 shadow-none" uploaderContainerClassName="lg:w-full" endpoint="setup-matrix-xlsx" cachekey={["get", "all", "products"]}/>
         </Modal.Container>
       </Modal.Root>
 
