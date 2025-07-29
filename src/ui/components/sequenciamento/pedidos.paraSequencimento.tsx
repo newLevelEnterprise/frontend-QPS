@@ -153,7 +153,7 @@ function PedidosParaSequenciamento() {
   };
 
   return (
-    <div className="w-full md:flex-1 bg-white rounded-md shadow p-4 overflow-y-auto overflow-x-auto">
+    <div className="max-w-full md:flex-1 bg-white rounded-md shadow p-4 overflow-y-auto overflow-x-auto">
       <Modal.Root isVisible={isLoading}>
         <Modal.Container>
           <Loading />
@@ -205,7 +205,7 @@ function PedidosParaSequenciamento() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200 overflow-y-auto">
+            <tbody className="bg-white divide-y divide-gray-200 overflow-y-auto overflow-x-scroll">
               {pedidos.filter(p => p.name.includes(busca)).map((pedido) => (
                 <tr
                   key={pedido.id}
@@ -213,13 +213,13 @@ function PedidosParaSequenciamento() {
                   className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.name}
+                    {pedido.name.split(' - ')[0]}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.product_value}
+                    {pedido.name.split(' - ')[1]}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.demand}
+                    {Intl.NumberFormat("pt-br").format(pedido.demand)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                      {Intl.DateTimeFormat("pt-BR", {
@@ -227,7 +227,7 @@ function PedidosParaSequenciamento() {
                       }).format(new Date(pedido.promised_date))}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                    {pedido.product_value}
+                    {Intl.NumberFormat("pt-br", {style: 'currency', currency: 'BRL'}).format(pedido.product_value)}
                   </td>
                 </tr>
               ))}

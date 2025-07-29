@@ -167,10 +167,10 @@ function Produtos() {
                   Produto
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Ciclo (Seg/ç)
+                  Ciclo (Seg/pç)
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Tempo Restante de Processamento
+                  Tempo Restante de Processamento (Seg/pç)
                 </th>
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
                   Refugo (em %)
@@ -193,7 +193,6 @@ function Produtos() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {produto.cycle}
-                      <span className="text-[10px] ml-1">(Seg/ç)</span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {produto.bottleneck}

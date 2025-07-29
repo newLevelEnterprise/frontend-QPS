@@ -195,10 +195,10 @@ function PedidosDisponiveis() {
                     className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                   >
                     <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.name}
+                      {pedido.name.split(' - ')[0]}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.product_value}
+                      {pedido.name.split(' - ')[1]}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {Intl.NumberFormat("pt-br").format(pedido.demand)}
@@ -209,7 +209,7 @@ function PedidosDisponiveis() {
                       }).format(new Date(pedido.promised_date))}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.product_value}
+                      {Intl.NumberFormat("pt-br", {style: 'currency', currency: 'BRL'}).format(pedido.product_value)}
                     </td>
 
                     <td className="px-4 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
