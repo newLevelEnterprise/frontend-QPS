@@ -1,5 +1,8 @@
 import { useMemo } from "react";
-import type { IProductionSchedule } from "../../../types/ProductionSchedule";
+import type {
+  IProductionSchedule,
+  Results,
+} from "../../../types/ProductionSchedule";
 
 function Resumo({ dados }: { dados: IProductionSchedule["results"] }) {
   const total = useMemo(
@@ -16,6 +19,34 @@ function Resumo({ dados }: { dados: IProductionSchedule["results"] }) {
     [dados]
   );
 
+  const aggregateData = useMemo(() => {
+    return dados.reduce((acc, curr) => {
+      if (!acc.get(curr.client_name)) {
+        acc.set(curr.client_name, curr);
+        return acc;
+      }
+
+      if (acc.get(curr.client_name)) {
+        const { quantity, expected_revenue, ...data } = acc.get(
+          curr.client_name
+        ) as Results;
+
+        const newQuantity = quantity + curr.quantity;
+        const newRevenue = expected_revenue + curr.expected_revenue;
+
+        acc.set(curr.client_name, {
+          ...data,
+          quantity: newQuantity,
+          expected_revenue: newRevenue,
+        });
+
+        return acc;
+      }
+
+      return acc;
+    }, new Map<string, Results>());
+  }, [dados]);
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full relative overflow-hidden">
       <div className="p-6">
@@ -31,7 +62,7 @@ function Resumo({ dados }: { dados: IProductionSchedule["results"] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {dados.map((item) => (
+              {Array.from(aggregateData.values()).map((item) => (
                 <tr key={item.job_id} className="text-sm">
                   <td className="py-2 text-gray-900">{item.client_name}</td>
                   <td className="py-2 text-gray-700 text-center">

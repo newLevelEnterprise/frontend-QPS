@@ -8,7 +8,7 @@ function SequenciamentoTabela({
   dados: IProductionSchedule["results"];
 }) {
   const [busca, setBusca] = useState<string>("");
-  console.log(dados);
+
   return (
     <div className="flex-1 rounded-md bg-white shadow p-4">
       <h1 className="text-xl text-[#5B85D5] font-bold">
