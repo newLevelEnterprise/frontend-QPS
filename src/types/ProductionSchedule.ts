@@ -23,6 +23,7 @@ export interface Results {
   quantity: number;
   scheduled_date: string;
   actual_date: string;
+  completion_date: string;
   completion_time: string;
   billing_date: string;
   status: string;

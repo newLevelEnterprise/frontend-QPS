@@ -90,7 +90,7 @@ function SequenciamentoTabela({
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {Intl.DateTimeFormat("pt-br", { timeZone: 'UTC' }).format(
-                        new Date(order.actual_date)
+                        new Date(order.completion_date)
                       )}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
