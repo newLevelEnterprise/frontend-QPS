@@ -113,7 +113,7 @@ function PedidosDisponiveis() {
       });
     }
   };
-
+  console.log(jobs);
   return (
     <div className="w-full md:w-[65%]  bg-white rounded-md shadow p-4 overflow-x-auto">
       <h1 className="text-lg md:text-xl text-[#5B85D5] font-bold">
@@ -178,6 +178,9 @@ function PedidosDisponiveis() {
                   Data Prometida
                 </th>
                 <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                  Hora Prometida
+                </th>
+                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Valor
                 </th>
                 <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
@@ -194,25 +197,30 @@ function PedidosDisponiveis() {
                     onClick={() => handleAddPedido(pedido)}
                     className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                   >
-                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                    <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {pedido.name.split(' - ')[0]}
                     </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                    <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {pedido.name.split(' - ')[1]}
                     </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                    <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {Intl.NumberFormat("pt-br").format(pedido.demand)}
                     </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                    <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {Intl.DateTimeFormat("pt-BR", {
                         dateStyle: "short",
                       }).format(new Date(pedido.promised_date))}
                     </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                    <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                      {Intl.DateTimeFormat("pt-BR", {
+                        timeStyle: "short",
+                      }).format(new Date(pedido.promised_date))}
+                    </td>
+                    <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {Intl.NumberFormat("pt-br", {style: 'currency', currency: 'BRL'}).format(pedido.product_value)}
                     </td>
 
-                    <td className="px-4 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
+                    <td className="px-2 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
                       <div className="w-full flex justify-center gap-2">
                         <button
                           onClick={(e) => {
