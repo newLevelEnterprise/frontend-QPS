@@ -14,6 +14,7 @@ function GraficoFaturamento({
 }: {
   dados: IProductionSchedule["revenue_forecast"];
 }) {
+  console.log(dados)
   return (
     <div className="w-full h-full bg-white rounded-lg shadow p-4 flex flex-col justify-end items-end">
       <h2 className="text-[#5A7BEF] font-bold text-lg self-start">
@@ -32,7 +33,7 @@ function GraficoFaturamento({
             height={60}
             tickFormatter={(date) => {
               const d = new Date(date);
-              return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit' }).format(d);
+              return new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC', day: '2-digit', month: '2-digit' }).format(d);
             }}
           />
           <YAxis 
@@ -43,7 +44,7 @@ function GraficoFaturamento({
             formatter={(v) => Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(parseFloat(v as string))}
             labelFormatter={date => {
               const d = new Date(date);
-              return new Intl.DateTimeFormat('pt-BR').format(d);
+              return new Intl.DateTimeFormat('pt-BR', {timeZone: 'UTC'}).format(d);
             }}
           />
           <Bar
