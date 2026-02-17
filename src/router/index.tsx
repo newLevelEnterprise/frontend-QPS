@@ -31,10 +31,23 @@ function Router() {
 
             <Route path="/resultados" element={<CadastroPage />} />
             <Route path="/cadastro/cliente" element={<ClientesPages />} />
+            <Route path="/cadastro/maquinas" element={<h1>Maquinas page</h1>} />
             <Route path="/cadastro/produto" element={<ProdutosPage />} />
             <Route path="/historico" element={<HistoryPage />} />
 
-            <Route path="/*" element={<div className="">Nada encontrado</div>} />
+            <Route path="/linhas-producao" element={<h1>linhas-producao</h1>} />
+            <Route path="/insumos" element={<h1>insumos</h1>} />
+            <Route path="/composicao" element={<h1>composicao</h1>} />
+            <Route
+              path="/turnos-regulares"
+              element={<h1>turnos-regulares</h1>}
+            />
+            <Route path="/feriados" element={<h1>feriados</h1>} />
+
+            <Route
+              path="/*"
+              element={<div className="">Nada encontrado</div>}
+            />
           </Route>
         </Route>
       </Routes>

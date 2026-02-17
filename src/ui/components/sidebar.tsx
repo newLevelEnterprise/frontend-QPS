@@ -1,7 +1,9 @@
 import type React from "react";
 import { useEffect, useState } from "react";
+import { CgPerformance } from "react-icons/cg";
 import { CiCirclePlus } from "react-icons/ci";
 import { FaUserCircle } from "react-icons/fa";
+import { GiRobotGrab } from "react-icons/gi";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { IoChevronDown, IoClose, IoHomeOutline } from "react-icons/io5";
 import { MdHistory } from "react-icons/md";
@@ -47,11 +49,41 @@ const menuItems: MenuItem[] = [
         icon: RiFileList3Line,
         url: "/cadastro/produto",
       },
+      {
+        title: "Máquinas",
+        icon: GiRobotGrab,
+        url: "/cadastro/maquinas",
+      },
     ],
   },
   {
+    title: "Linhas de Produção",
+    icon: CgPerformance,
+    url: "/linhas-producao",
+  },
+  {
+    title: "Insumos",
+    icon: IoMdCheckmarkCircleOutline,
+    url: "/insumos",
+  },
+  {
+    title: "Composição",
+    icon: IoMdCheckmarkCircleOutline,
+    url: "/composicao",
+  },
+  {
+    title: "Turnos Regulares",
+    icon: IoMdCheckmarkCircleOutline,
+    url: "/turnos-regulares",
+  },
+  {
+    title: "Feriados",
+    icon: IoMdCheckmarkCircleOutline,
+    url: "/feriados",
+  },
+  {
     title: "Resultados",
-    icon: IoMdCheckmarkCircleOutline ,
+    icon: IoMdCheckmarkCircleOutline,
     url: "/resultados",
   },
   {
@@ -82,7 +114,7 @@ export default function Sidebar({
     setExpandedItems((prev) =>
       prev.includes(title)
         ? prev.filter((item) => item !== title)
-        : [...prev, title]
+        : [...prev, title],
     );
   };
 
@@ -100,7 +132,7 @@ export default function Sidebar({
     <div
       className={twMerge(
         "fixed md:relative bg-black/70 md:z-0 md:bg-transparent z-10 md:w-fit w-full transition-all duration-200",
-        !mobileSidebar && "w-0 hidden md:flex"
+        !mobileSidebar && "w-0 hidden md:flex",
       )}
     >
       <div className="w-3/4 md:w-56 h-screen bg-white border-r border-gray-200 flex flex-col">
