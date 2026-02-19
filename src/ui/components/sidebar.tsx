@@ -1,12 +1,20 @@
 import type React from "react";
 import { useEffect, useState } from "react";
-import { CgPerformance } from "react-icons/cg";
-import { CiCirclePlus } from "react-icons/ci";
-import { FaUserCircle } from "react-icons/fa";
-import { GiRobotGrab } from "react-icons/gi";
+import { BiPlus, BiUserCircle } from "react-icons/bi";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { IoChevronDown, IoClose, IoHomeOutline } from "react-icons/io5";
-import { MdHistory } from "react-icons/md";
+import { IoChevronDown, IoClose } from "react-icons/io5";
+import { LuSpline } from "react-icons/lu";
+import {
+  MdCalendarMonth,
+  MdGradient,
+  MdMenuBook,
+  MdMessage,
+  MdOutlineHistory,
+  MdOutlinePrecisionManufacturing,
+  MdOutlineTimeline,
+  MdOutlineViewComfyAlt,
+  MdSupervisedUserCircle,
+} from "react-icons/md";
 import { RiFileList3Line } from "react-icons/ri";
 import { Link, useLocation } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
@@ -30,18 +38,17 @@ interface SubMenuItem {
 
 const menuItems: MenuItem[] = [
   {
-    title: "Sequenciamento",
-    icon: IoHomeOutline,
-    url: "/sequenciamento",
-  },
-  {
     title: "Cadastros",
-    icon: CiCirclePlus,
+    icon: (props) => (
+      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
+        <BiPlus className={props.className} />
+      </div>
+    ),
     url: "",
     items: [
       {
-        title: "Cliente",
-        icon: FaUserCircle,
+        title: "Clientes",
+        icon: MdSupervisedUserCircle,
         url: "/cadastro/cliente",
       },
       {
@@ -51,44 +58,93 @@ const menuItems: MenuItem[] = [
       },
       {
         title: "Máquinas",
-        icon: GiRobotGrab,
+        icon: MdOutlinePrecisionManufacturing,
         url: "/cadastro/maquinas",
       },
     ],
   },
   {
     title: "Linhas de Produção",
-    icon: CgPerformance,
+    icon: (props) => (
+      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
+        <LuSpline className={props.className} />
+      </div>
+    ),
     url: "/linhas-producao",
+    items: [
+      {
+        title: "Maq 1",
+        icon: MdOutlinePrecisionManufacturing,
+        url: "/linhas-producao/maq-1",
+      },
+      {
+        title: "Maq 2",
+        icon: MdOutlinePrecisionManufacturing,
+        url: "/linhas-producao/maq-2",
+      },
+    ],
   },
   {
     title: "Insumos",
-    icon: IoMdCheckmarkCircleOutline,
+    icon: (props) => (
+      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
+        <MdOutlineViewComfyAlt className={props.className} />
+      </div>
+    ),
     url: "/insumos",
   },
   {
     title: "Composição",
-    icon: IoMdCheckmarkCircleOutline,
+    icon: (props) => (
+      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
+        <MdGradient className={props.className} />
+      </div>
+    ),
     url: "/composicao",
   },
   {
     title: "Turnos Regulares",
-    icon: IoMdCheckmarkCircleOutline,
+    icon: (props) => (
+      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
+        <MdOutlineHistory className={props.className} />
+      </div>
+    ),
     url: "/turnos-regulares",
   },
   {
     title: "Feriados",
-    icon: IoMdCheckmarkCircleOutline,
+    icon: (props) => (
+      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
+        <MdCalendarMonth className={props.className} />
+      </div>
+    ),
     url: "/feriados",
   },
   {
     title: "Resultados",
-    icon: IoMdCheckmarkCircleOutline,
+    icon: (props) => (
+      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
+        <IoMdCheckmarkCircleOutline className={props.className} />
+      </div>
+    ),
     url: "/resultados",
   },
   {
+    title: "Sequenciamento",
+    icon: (props) => (
+      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
+        <MdOutlineTimeline className={props.className} />
+      </div>
+    ),
+    url: "/sequenciamento",
+  },
+  {
     title: "Histórico",
-    icon: MdHistory,
+    icon: (props) => (
+      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
+        <MdMenuBook className={props.className} />
+      </div>
+    ),
     url: "/historico",
   },
 ];
@@ -181,12 +237,12 @@ export default function Sidebar({
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <item.icon className="h-6 w-6" />
+                        <item.icon className="size-5" />
                         <span>{item.title}</span>
                       </div>
                       <IoChevronDown
                         onClick={() => toggleExpanded(item.title)}
-                        className={`h-6 w-6 transition-transform duration-200 ${
+                        className={`size-4 transition-transform duration-200 ${
                           expandedItems.includes(item.title) ? "rotate-180" : ""
                         }`}
                       />
@@ -216,7 +272,7 @@ export default function Sidebar({
                     }
                   `}
                             >
-                              <subItem.icon className="h-6 w-6" />
+                              <subItem.icon className="size-5" />
                               <span>{subItem.title}</span>
                             </Link>
                           </li>
@@ -239,7 +295,7 @@ export default function Sidebar({
                   `}
                   >
                     <item.icon
-                      className={`h-6 w-6 ${
+                      className={`size-5 ${
                         isActive(item.url, pathName) ? "text-blue-700" : ""
                       }`}
                     />
@@ -248,9 +304,27 @@ export default function Sidebar({
                 )}
               </li>
             ))}
-            <LogoutButton />
           </ul>
         </nav>
+
+        {/* Footer */}
+        <footer className="border-t border-gray-200 p-4 flex flex-col gap-2 mt-auto">
+          <Link
+            to="/perfil"
+            className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-gray-100 transition-colors text-gray-700"
+          >
+            <BiUserCircle className="size-6" />
+            <span>Seu Perfil</span>
+          </Link>
+          <Link
+            to="/atendimento"
+            className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-gray-100 transition-colors text-gray-700"
+          >
+            <MdMessage className="size-6" />
+            <span>Atendimento</span>
+          </Link>
+          <LogoutButton />
+        </footer>
       </div>
     </div>
   );
