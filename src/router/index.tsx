@@ -14,6 +14,7 @@ import ProdutosPage from "../ui/pages/produto";
 import ResetPasswordPage from "../ui/pages/ResetPassword";
 import Sequenciamento from "../ui/pages/Sequenciamento";
 import SignUpPage from "../ui/pages/SignUpPage";
+import TurnosRegularesPage from "../ui/pages/turnosregulares";
 import AuthGuard from "./AuthGuard";
 
 function Router() {
@@ -45,10 +46,7 @@ function Router() {
             />
             <Route path="/insumos" element={<InsumosPage />} />
             <Route path="/composicao" element={<Composicao />} />
-            <Route
-              path="/turnos-regulares"
-              element={<h1>turnos-regulares</h1>}
-            />
+            <Route path="/turnos-regulares" element={<TurnosRegularesPage />} />
             <Route path="/feriados" element={<h1>feriados</h1>} />
 
             <Route
