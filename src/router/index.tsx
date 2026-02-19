@@ -5,6 +5,7 @@ import CadastroPage from "../ui/pages/cadastro";
 import ClientesPages from "../ui/pages/clientes";
 import ForgotPasswordPage from "../ui/pages/ForgotPassword";
 import HistoryPage from "../ui/pages/historyPage";
+import InsumosPage from "../ui/pages/insumos";
 import LoginPage from "../ui/pages/LoginPage";
 import MaquinaPages from "../ui/pages/maquina";
 import MaquinasPages from "../ui/pages/maquinas";
@@ -41,7 +42,7 @@ function Router() {
               path="/linhas-producao/:maquinaId"
               element={<MaquinaPages />}
             />
-            <Route path="/insumos" element={<h1>insumos</h1>} />
+            <Route path="/insumos" element={<InsumosPage />} />
             <Route path="/composicao" element={<h1>composicao</h1>} />
             <Route
               path="/turnos-regulares"
