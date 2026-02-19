@@ -24,10 +24,13 @@ function Clientes() {
   const deletarClienteFn = async (clientId: number) => {
     try {
       await apiClient.delete(`/clients/${clientId}`);
-      queryClient.setQueryData(["get", "all", "clients"], (oldData: ICliente[]) => {
-        if (!oldData) return oldData;
-        return oldData.filter((client) => client.id !== clientId);
-      });
+      queryClient.setQueryData(
+        ["get", "all", "clients"],
+        (oldData: ICliente[]) => {
+          if (!oldData) return oldData;
+          return oldData.filter((client) => client.id !== clientId);
+        },
+      );
       toast.success("Cliente removido com sucesso!", {
         toastId: "deleteClientToast",
       });
@@ -128,7 +131,9 @@ function Clientes() {
             </thead>
             <tbody>
               {clientes
-                .filter((c) => c.name.includes(busca))
+                .filter((c) =>
+                  c.name.toLowerCase().includes(busca.toLowerCase()),
+                )
                 .map((cliente) => (
                   <tr
                     key={cliente.id}

@@ -36,7 +36,7 @@ export default function LoginForm() {
       const { data: res } = await apiClient.post<{
         access_token: string;
         refresh_token: string;
-        user: { id: number; email: string; enterprise_id: number; };
+        user: { id: number; email: string; enterprise_id: number };
       }>("/auth/login", params.toString(), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
@@ -46,7 +46,7 @@ export default function LoginForm() {
       });
       setEnterpriseId(res.user.enterprise_id);
       setUserIdFn(res.user.id);
-      return navigate("/sequenciamento");
+      return navigate("/cadastro/clientes");
     } catch (error) {
       console.error(error);
       toast.error("Erro ao fazer login, verifique suas credenciais.");
