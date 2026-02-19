@@ -3,6 +3,7 @@ import AuthLayout from "../ui/layouts/AuthLayout";
 import PageLayout from "../ui/layouts/PageLayout";
 import CadastroPage from "../ui/pages/cadastro";
 import ClientesPages from "../ui/pages/clientes";
+import Composicao from "../ui/pages/composicao";
 import ForgotPasswordPage from "../ui/pages/ForgotPassword";
 import HistoryPage from "../ui/pages/historyPage";
 import InsumosPage from "../ui/pages/insumos";
@@ -43,7 +44,7 @@ function Router() {
               element={<MaquinaPages />}
             />
             <Route path="/insumos" element={<InsumosPage />} />
-            <Route path="/composicao" element={<h1>composicao</h1>} />
+            <Route path="/composicao" element={<Composicao />} />
             <Route
               path="/turnos-regulares"
               element={<h1>turnos-regulares</h1>}
