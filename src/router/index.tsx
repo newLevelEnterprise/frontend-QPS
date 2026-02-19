@@ -6,6 +6,7 @@ import ClientesPages from "../ui/pages/clientes";
 import ForgotPasswordPage from "../ui/pages/ForgotPassword";
 import HistoryPage from "../ui/pages/historyPage";
 import LoginPage from "../ui/pages/LoginPage";
+import MaquinaPages from "../ui/pages/maquina";
 import MaquinasPages from "../ui/pages/maquinas";
 import ProdutosPage from "../ui/pages/produto";
 import ResetPasswordPage from "../ui/pages/ResetPassword";
@@ -36,7 +37,10 @@ function Router() {
             <Route path="/cadastro/produto" element={<ProdutosPage />} />
             <Route path="/historico" element={<HistoryPage />} />
 
-            <Route path="/linhas-producao" element={<h1>linhas-producao</h1>} />
+            <Route
+              path="/linhas-producao/:maquinaId"
+              element={<MaquinaPages />}
+            />
             <Route path="/insumos" element={<h1>insumos</h1>} />
             <Route path="/composicao" element={<h1>composicao</h1>} />
             <Route

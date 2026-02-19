@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
-import type { IMaquina } from "../../../types/Maquina";
+import type { IMaquinas } from "../../../types/Maquina";
 import Modal from "../modal";
 import FormEditarMaquina from "./formEditarMaquina";
 import FormNovaMaquina from "./formNovaMaquina";
@@ -11,7 +11,7 @@ function Maquinas() {
   const [novaMaquina, setNovaMaquina] = useState<boolean>(false);
   const [editarMaquina, setEditarMaquina] = useState<boolean>(false);
 
-  const [maquina, setMaquina] = useState<IMaquina>({
+  const [maquina, setMaquina] = useState<IMaquinas>({
     id: 0,
     name: "",
     disponibilidade: 0,
@@ -104,7 +104,7 @@ function Maquinas() {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-center mt-4 ">
+      <div className="flex flex-col gap-4 items-center justify-center mt-4">
         <button
           onClick={() => {
             setNovaMaquina(true);
@@ -119,8 +119,10 @@ function Maquinas() {
           <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
           Adicionar Nova Máquina
         </button>
+        <p className="text-gray-500 text-lg">
+          Pode ser cadastrada até 10 máquinas
+        </p>
       </div>
-      <p>Podem ser cadastradas até 10 máquinas</p>
     </div>
   );
 }

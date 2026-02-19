@@ -7,7 +7,7 @@ import {
   criarMaquinaSchema,
   type ICriarMaquinaBody,
 } from "../../../schemas/maquinas";
-import type { IMaquina } from "../../../types/Maquina";
+import type { IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
@@ -32,7 +32,7 @@ function FormNovaMaquina({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      const { data: res } = await apiClient.post<IMaquina>("/maquinas", {
+      const { data: res } = await apiClient.post<IMaquinas>("/maquinas", {
         name: data.name,
         disponibilidade: parseInt(data.disponibilidade),
       });

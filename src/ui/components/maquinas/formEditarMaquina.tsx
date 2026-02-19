@@ -7,13 +7,13 @@ import {
   type IEditarMaquinaBody,
   editarMaquinaSchema,
 } from "../../../schemas/maquinas";
-import type { IMaquina } from "../../../types/Maquina";
+import type { IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
 
 interface IFormEditarMaquinaProps {
-  maquina: IMaquina;
+  maquina: IMaquinas;
   setEditarMaquina: Dispatch<SetStateAction<boolean>>;
   setMaquina: () => void;
 }
@@ -38,7 +38,7 @@ function FormEditarMaquina({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      await apiClient.put<IMaquina>(`/maquinas/${maquina.id}`, {
+      await apiClient.put<IMaquinas>(`/maquinas/${maquina.id}`, {
         name: data.name,
         disponibilidade: parseInt(data.disponibilidade),
       });

@@ -71,18 +71,6 @@ const menuItems: MenuItem[] = [
       </div>
     ),
     url: "/linhas-producao",
-    items: [
-      {
-        title: "Maq 1",
-        icon: MdOutlinePrecisionManufacturing,
-        url: "/linhas-producao/maq-1",
-      },
-      {
-        title: "Maq 2",
-        icon: MdOutlinePrecisionManufacturing,
-        url: "/linhas-producao/maq-2",
-      },
-    ],
   },
   {
     title: "Insumos",
@@ -175,6 +163,19 @@ export default function Sidebar({
   };
 
   useEffect(() => {
+    const machines = [
+      {
+        title: "Maq 1",
+        icon: MdOutlinePrecisionManufacturing,
+        url: "/linhas-producao/maq-1",
+      },
+      {
+        title: "Maq 2",
+        icon: MdOutlinePrecisionManufacturing,
+        url: "/linhas-producao/maq-2",
+      },
+    ];
+    menuItems[1].items = machines;
     apiClient
       .get(`/enterprises/${enterprise_id}/`)
       .then((res) => setEnterpriseName(res.data.name))
