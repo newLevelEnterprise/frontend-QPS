@@ -22,7 +22,7 @@ function Insumos() {
   const maquinas = [];
 
   return (
-    <div className="w-full bg-white rounded-md shadow p-4">
+    <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root isVisible={novoInsumo && maquinas.length < 10}>
         <Modal.Container>
           <Modal.Header

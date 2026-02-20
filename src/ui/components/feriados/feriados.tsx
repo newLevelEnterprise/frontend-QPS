@@ -20,7 +20,7 @@ function Feriados() {
   };
 
   return (
-    <div className="w-full flex flex-col rounded-md shadow p-4">
+    <div className="w-full flex flex-col rounded-md shadow p-4 overflow-auto">
       <h1 className="text-xl text-[#5B85D5] font-bold">Feriados</h1>
       <div className="w-full flex justify-end items-center">
         <button

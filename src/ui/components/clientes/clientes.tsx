@@ -49,7 +49,7 @@ function Clientes() {
   });
 
   return (
-    <div className="w-full bg-white rounded-md shadow p-4">
+    <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root isVisible={novoCliente}>
         <Modal.Container>
           <Modal.Header

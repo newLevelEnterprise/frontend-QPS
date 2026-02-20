@@ -15,7 +15,7 @@ function ComposicaoTable() {
   });
   console.log(composicao);
   return (
-    <div className="w-full bg-white rounded-md shadow p-4">
+    <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <h1 className="text-xl text-[#5B85D5] font-bold">
         Cadastro de Composição de produtos
       </h1>
@@ -61,9 +61,9 @@ function ComposicaoTable() {
               </th>
             </tr>
           </thead>
-          <tbody className="">
+          <tbody>
             {/* Exemplo de linhas, pode ser substituído por map futuramente */}
-            <tr className="border border-gray-300 px-2 py-4">
+            <tr>
               <td className="px-4 py-2">
                 <select className="w-full border rounded p-1">
                   <option>Pote Turim Verde</option>
