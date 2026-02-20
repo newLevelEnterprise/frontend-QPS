@@ -1,4 +1,4 @@
-import EstadoAtualMaquina from "../components/sequenciamento/steps/estadoAtualMaquina";
+import Paradas from "../components/sequenciamento/steps/paradas";
 import XlsxUpload from "../components/XlsxUpload";
 
 function Sequenciamento() {
@@ -8,7 +8,8 @@ function Sequenciamento() {
       <div className="w-full flex flex-col md:flex-row gap-2 max-h-full overflow-y-auto lg:overflow-hidden max-w-full">
         {/* <PedidosDisponiveis /> */}
         {/* <PedidosParaSequenciamento /> */}
-        <EstadoAtualMaquina />
+        {/* <EstadoAtualMaquina /> */}
+        <Paradas />
       </div>
       <div className="flex justify-end items-center">
         <button className="bg-blue-400 text-white text-sm py-1 px-4 cursor-pointer hover:bg-blue-300 transition-all duration-150 rounded">
