@@ -7,10 +7,11 @@ import Composicao from "../ui/pages/composicao";
 import FeriadosPage from "../ui/pages/feriados";
 import ForgotPasswordPage from "../ui/pages/ForgotPassword";
 import HistoryPage from "../ui/pages/historyPage";
-import InsumosPage from "../ui/pages/insumos";
+import ItensCompraPage from "../ui/pages/itensCompra";
 import LoginPage from "../ui/pages/LoginPage";
 import MaquinaPages from "../ui/pages/maquina";
 import MaquinasPages from "../ui/pages/maquinas";
+import InsumosPage from "../ui/pages/materiaPrima";
 import ProdutosPage from "../ui/pages/produto";
 import ResetPasswordPage from "../ui/pages/ResetPassword";
 import Sequenciamento from "../ui/pages/Sequenciamento";
@@ -45,7 +46,8 @@ function Router() {
               path="/linhas-producao/:maquinaId"
               element={<MaquinaPages />}
             />
-            <Route path="/insumos" element={<InsumosPage />} />
+            <Route path="/insumos/materia-prima" element={<InsumosPage />} />
+            <Route path="/insumos/itens-compra" element={<ItensCompraPage />} />
             <Route path="/composicao" element={<Composicao />} />
             <Route path="/turnos-regulares" element={<TurnosRegularesPage />} />
             <Route path="/feriados" element={<FeriadosPage />} />

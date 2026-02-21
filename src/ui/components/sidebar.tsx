@@ -1,6 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { BiPlus, BiUserCircle } from "react-icons/bi";
+import { CiShoppingCart } from "react-icons/ci";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { IoChevronDown, IoClose } from "react-icons/io5";
 import { LuSpline } from "react-icons/lu";
@@ -79,7 +80,19 @@ const menuItems: MenuItem[] = [
         <MdOutlineViewComfyAlt className={props.className} />
       </div>
     ),
-    url: "/insumos",
+    url: "",
+    items: [
+      {
+        title: "Materia Prima",
+        icon: MdOutlineViewComfyAlt,
+        url: "/insumos/materia-prima",
+      },
+      {
+        title: "Itens de Compra",
+        icon: CiShoppingCart,
+        url: "/insumos/itens-compra",
+      },
+    ],
   },
   {
     title: "Composição",

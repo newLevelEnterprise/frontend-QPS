@@ -1,7 +1,7 @@
 import Insumos from "../components/insumos/insumos";
 import XlsxUpload from "../components/XlsxUpload";
 
-function InsumosPage() {
+function MateriaPrimaPage() {
   return (
     <div className="md:h-full flex flex-col w-full gap-2 relative overflow-hidden">
       <XlsxUpload
@@ -15,4 +15,4 @@ function InsumosPage() {
   );
 }
 
-export default InsumosPage;
+export default MateriaPrimaPage;
