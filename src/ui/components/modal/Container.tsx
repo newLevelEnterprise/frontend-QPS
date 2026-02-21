@@ -9,7 +9,7 @@ function Container({ children, className }: ContainerProps) {
   return (
     <div
       className={cn(
-        "w-[95%] md:w-1/3 bg-white p-2 md:p-6 rounded-lg",
+        "w-fit max-w-[95vw] bg-white p-2 md:p-6 rounded-lg overflow-auto",
         className,
       )}
     >

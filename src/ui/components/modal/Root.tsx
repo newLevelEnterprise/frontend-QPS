@@ -9,7 +9,7 @@ function Root({ children, isVisible }: RootProps) {
   }
 
   return (
-    <div className="flex justify-center items-center bg-black/70 fixed w-full h-full z-10 top-0 left-0 md:left-56">
+    <div className="flex justify-center items-center bg-black/70 fixed w-full h-full z-10 top-0 left-0 md:left-56 overflow-auto">
       {children}
     </div>
   );

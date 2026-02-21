@@ -8,10 +8,17 @@ interface FooterProps {
 
 function Footer({ onClick, isLoading = false, disable }: FooterProps) {
   return (
-    <div className="w-full flex justify-end mt-4">
-      <Button disable={!disable ? false : disable} isLoading={isLoading} onClick={onClick} title="OK" type="button" className="text-xs"/>
+    <div className="w-fit flex justify-end mt-4">
+      <Button
+        disable={!disable ? false : disable}
+        isLoading={isLoading}
+        onClick={onClick}
+        title="OK"
+        type="button"
+        className="text-xs min-w-[80px] md:min-w-[120px]"
+      />
     </div>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

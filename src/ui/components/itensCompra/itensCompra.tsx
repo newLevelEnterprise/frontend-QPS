@@ -62,9 +62,6 @@ function ItensCompras() {
                 Material
               </th>
               <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                Un
-              </th>
-              <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                 Lead Time Médio de Entrega (dias)
               </th>
               <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
@@ -80,9 +77,6 @@ function ItensCompras() {
               // key={maquina.id}
               className="border-b border-gray-200 last:border-b-0"
             >
-              <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                teste
-              </td>
               <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                 teste
               </td>

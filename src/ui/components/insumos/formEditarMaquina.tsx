@@ -76,7 +76,11 @@ function FormEditarInsumo({
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("material")}
             />
-            <select id="un" {...register("unidade")} className="outline-none">
+            <select
+              id="un"
+              {...register("unidade")}
+              className="border border-gray-300 p-1 rounded-lg"
+            >
               <option value="kg">Kg</option>
               <option value="g">g</option>
               <option value="un">un</option>

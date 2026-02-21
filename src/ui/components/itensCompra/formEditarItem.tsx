@@ -64,12 +64,12 @@ function FormEditarItem({
             htmlFor="nome"
             className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
           >
-            Material
+            Item
           </label>
           <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
             <input
               id="nome"
-              placeholder="Nome do material"
+              placeholder="Nome do item"
               type="text"
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("item")}
