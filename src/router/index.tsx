@@ -12,6 +12,7 @@ import LoginPage from "../ui/pages/LoginPage";
 import MaquinaPages from "../ui/pages/maquina";
 import MaquinasPages from "../ui/pages/maquinas";
 import InsumosPage from "../ui/pages/materiaPrima";
+import MoldesPage from "../ui/pages/moldes";
 import ProdutosPage from "../ui/pages/produto";
 import ResetPasswordPage from "../ui/pages/ResetPassword";
 import Sequenciamento from "../ui/pages/Sequenciamento";
@@ -40,6 +41,7 @@ function Router() {
             <Route path="/cadastro/cliente" element={<ClientesPages />} />
             <Route path="/cadastro/maquinas" element={<MaquinasPages />} />
             <Route path="/cadastro/produto" element={<ProdutosPage />} />
+            <Route path="/cadastro/moldes" element={<MoldesPage />} />
             <Route path="/historico" element={<HistoryPage />} />
 
             <Route

@@ -4,7 +4,7 @@ import { BiPlus, BiUserCircle } from "react-icons/bi";
 import { CiShoppingCart } from "react-icons/ci";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { IoChevronDown, IoClose } from "react-icons/io5";
-import { LuSpline } from "react-icons/lu";
+import { LuShapes, LuSpline } from "react-icons/lu";
 import {
   MdCalendarMonth,
   MdGradient,
@@ -61,6 +61,11 @@ const menuItems: MenuItem[] = [
         title: "Máquinas",
         icon: MdOutlinePrecisionManufacturing,
         url: "/cadastro/maquinas",
+      },
+      {
+        title: "Moldes",
+        icon: LuShapes,
+        url: "/cadastro/moldes",
       },
     ],
   },
