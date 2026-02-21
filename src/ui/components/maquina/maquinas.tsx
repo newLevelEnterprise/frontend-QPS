@@ -17,6 +17,8 @@ function Maquina() {
     id: 0,
     name: "",
     disponibilidade: 0,
+    codMolde: "",
+    produto: "",
   });
 
   const maquinas = [];
@@ -155,16 +157,15 @@ function Maquina() {
               id: 0,
               name: "",
               disponibilidade: 0,
+              codMolde: "",
+              produto: "",
             });
           }}
           className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
-          Adicionar Nova Máquina
+          Adicionar Nova Linha
         </button>
-        <p className="text-gray-500 text-lg">
-          Pode ser cadastrada até 10 máquinas
-        </p>
       </div>
     </div>
   );

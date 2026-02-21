@@ -165,14 +165,14 @@ export default function Sidebar({
   useEffect(() => {
     const machines = [
       {
-        title: "Maq 1",
-        icon: MdOutlinePrecisionManufacturing,
-        url: "/linhas-producao/maq-1",
+        title: "Linhas 1",
+        icon: LuSpline,
+        url: "/linhas-producao/linhas-1",
       },
       {
-        title: "Maq 2",
-        icon: MdOutlinePrecisionManufacturing,
-        url: "/linhas-producao/maq-2",
+        title: "Linhas 2",
+        icon: LuSpline,
+        url: "/linhas-producao/linhas-2",
       },
     ];
     menuItems[1].items = machines;

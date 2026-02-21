@@ -4,9 +4,9 @@ import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import {
-  type IEditarMaquinaBody,
-  editarMaquinaSchema,
-} from "../../../schemas/maquinas";
+  editarLinhasProdSchema,
+  type IEditarLinhasProdBody,
+} from "../../../schemas/linhas";
 import type { IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
@@ -27,20 +27,19 @@ function FormEditarMaquina({
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
-  } = useForm<IEditarMaquinaBody>({
-    resolver: zodResolver(editarMaquinaSchema),
+  } = useForm<IEditarLinhasProdBody>({
+    resolver: zodResolver(editarLinhasProdSchema),
     defaultValues: {
-      name: maquina.name,
-      disponibilidade: maquina.disponibilidade.toString(),
+      codMolde: maquina.codMolde,
+      produto: maquina.produto,
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: IEditarLinhasProdBody) => {
     try {
       await apiClient.put<IMaquinas>(`/maquinas/${maquina.id}`, {
-        name: data.name,
-        disponibilidade: parseInt(data.disponibilidade),
+        name: data.codMolde,
+        disponibilidade: parseInt(data.produto),
       });
       setMaquina();
       toast.success("Máquina atualizada com sucesso!");
@@ -61,51 +60,49 @@ function FormEditarMaquina({
           htmlFor="nome"
           className="text-[#212A4F] font-semibold truncate text-ellipsis"
         >
-          Nome da máquina
+          Produto
         </label>
         <div className="flex gap-1">
           <input
             id="nome"
-            placeholder="Nome da máquina"
+            placeholder="Nome do produto"
             type="text"
             className="w-full outline-none border-b border-[#A4AABC]"
-            {...register("name")}
+            {...register("produto")}
           />
         </div>
-        {errors.name && (
+        {errors.produto && (
           <ErrorMessage
             errors={errors}
-            name="name"
+            name="produto"
             render={({ message }) => <FormErrorMessage message={message} />}
           />
         )}
       </div>
 
-      <div className="w-1/2">
-        <div className="w-full flex flex-col gap-3">
-          <label
-            htmlFor="disponibilidade"
-            className="text-[#212A4F] font-semibold truncate text-ellipsis"
-          >
-            Disponibilidade (%)
-          </label>
-          <div className="flex gap-1">
-            <input
-              id="disponibilidade"
-              placeholder="Disponibilidade (%)"
-              type="number"
-              className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("disponibilidade")}
-            />
-          </div>
-          {errors.disponibilidade && (
-            <ErrorMessage
-              errors={errors}
-              name="disponibilidade"
-              render={({ message }) => <FormErrorMessage message={message} />}
-            />
-          )}
+      <div className="w-full flex flex-col gap-3">
+        <label
+          htmlFor="codMolde"
+          className="text-[#212A4F] font-semibold truncate text-ellipsis"
+        >
+          Código do molde
+        </label>
+        <div className="flex gap-1">
+          <input
+            id="codMolde"
+            placeholder="Código do molde"
+            type="text"
+            className="w-full outline-none border-b border-[#A4AABC]"
+            {...register("codMolde")}
+          />
         </div>
+        {errors.codMolde && (
+          <ErrorMessage
+            errors={errors}
+            name="codMolde"
+            render={({ message }) => <FormErrorMessage message={message} />}
+          />
+        )}
       </div>
 
       <div className="w-full flex justify-end">
