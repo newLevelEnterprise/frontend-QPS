@@ -143,7 +143,14 @@ function Clientes() {
                       {cliente.name}
                     </td>
                     <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                      {cliente.priority}
+                      <select
+                        disabled
+                        className="border border-gray-400 rounded-md p-1 w-10 text-center"
+                      >
+                        <option value={cliente.priority} defaultChecked>
+                          {cliente.priority}
+                        </option>
+                      </select>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="w-full flex justify-end gap-2">

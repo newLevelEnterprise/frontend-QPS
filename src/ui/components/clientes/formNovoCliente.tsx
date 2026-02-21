@@ -17,7 +17,10 @@ interface IFormNovoClienteProps {
   setCliente: () => void;
 }
 
-function FormNovoCliente({setNovoCliente, setCliente}: IFormNovoClienteProps) {
+function FormNovoCliente({
+  setNovoCliente,
+  setCliente,
+}: IFormNovoClienteProps) {
   const {
     register,
     handleSubmit,
@@ -82,13 +85,16 @@ function FormNovoCliente({setNovoCliente, setCliente}: IFormNovoClienteProps) {
             Prioridade do cliente
           </label>
           <div className="flex gap-1">
-            <input
+            <select
               id="prioridade"
-              placeholder="Prioridade do cliente"
-              type="number"
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("priority")}
-            />
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
           </div>
           {errors.priority && (
             <ErrorMessage

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import {
   editarClienteSchema,
-  type IEditarClienteBody
+  type IEditarClienteBody,
 } from "../../../schemas/cliente";
 import type { ICliente } from "../../../types/Cliente";
 import { apiClient } from "../../../utils/apiClient";
@@ -18,7 +18,11 @@ interface IFormNovoClienteProps {
   setCliente: () => void;
 }
 
-function FormEditarCliente({cliente, setEditarCliente, setCliente}: IFormNovoClienteProps) {
+function FormEditarCliente({
+  cliente,
+  setEditarCliente,
+  setCliente,
+}: IFormNovoClienteProps) {
   const {
     register,
     handleSubmit,
@@ -28,7 +32,7 @@ function FormEditarCliente({cliente, setEditarCliente, setCliente}: IFormNovoCli
     defaultValues: {
       name: cliente.name,
       priority: cliente.priority.toString(),
-    }
+    },
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -86,13 +90,16 @@ function FormEditarCliente({cliente, setEditarCliente, setCliente}: IFormNovoCli
             Prioridade do cliente
           </label>
           <div className="flex gap-1">
-            <input
+            <select
               id="prioridade"
-              placeholder="Prioridade do cliente"
-              type="number"
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("priority")}
-            />
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
           </div>
           {errors.priority && (
             <ErrorMessage
