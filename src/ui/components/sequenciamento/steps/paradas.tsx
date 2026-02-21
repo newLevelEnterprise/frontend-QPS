@@ -83,7 +83,7 @@ function Paradas() {
       </div>
       {incluirParadas && (
         <div className="overflow-auto">
-          <table className="min-w-fulltext-sm mb-4">
+          <table className="min-w-full text-sm mb-4">
             <thead>
               <tr className="bg-gray-50">
                 <th className="px-3 py-2">Motivo</th>
@@ -123,7 +123,7 @@ function Paradas() {
             </tbody>
           </table>
           <button
-            className="flex items-center gap-2 bg-[#3573C9] hover:bg-[#285ca0] text-white font-medium rounded p-2 py-2 mx-auto"
+            className="flex items-center gap-2 bg-[#3573C9] hover:bg-[#285ca0] text-white font-medium rounded-lg p-2 py-2 mx-auto cursor-pointer"
             onClick={() => setModalCriarParada(true)}
           >
             <span>+</span> Adicionar nova parada

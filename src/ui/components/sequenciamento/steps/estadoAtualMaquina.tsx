@@ -1,3 +1,5 @@
+import { BiPlus } from "react-icons/bi";
+
 function EstadoAtualMaquina() {
   return (
     <div className="bg-white w-full h-full rounded-lg p-4">
@@ -31,6 +33,7 @@ function EstadoAtualMaquina() {
               <th className="px-2 py-2">Valor a ser Faturado</th>
               <th className="px-2 py-2">Data Limite de Faturamento</th>
               <th className="px-2 py-2">Horário Limite de Faturamento</th>
+              <th className="px-2 py-2">Ação</th>
             </tr>
           </thead>
           <tbody>
@@ -43,12 +46,7 @@ function EstadoAtualMaquina() {
                   </select>
                 </td>
                 <td className="px-2 py-2 border text-center">
-                  <input
-                    type="checkbox"
-                    checked={idx % 2 === 1}
-                    readOnly
-                    className="accent-[#5B85D5]"
-                  />
+                  <input type="checkbox" className="accent-[#5B85D5]" />
                 </td>
                 <td className="px-2 py-2 border">
                   <input
@@ -65,25 +63,75 @@ function EstadoAtualMaquina() {
                 </td>
                 <td className="px-2 py-2 border">
                   <select className="border rounded px-1 py-0.5">
-                    <option>
-                      {idx % 2 === 0 ? "Concluído" : "Não Concluído"}
-                    </option>
+                    <option>Concluido</option>
+                    <option>Não Concluido</option>
                   </select>
                 </td>
                 <td className="px-2 py-2 border text-center">
                   {idx % 2 === 0 ? "123" : "789"}
                 </td>
-                <td className="px-2 py-2 border">Cliente E</td>
-                <td className="px-2 py-2 border text-center">1380</td>
-                <td className="px-2 py-2 border text-center">500</td>
-                <td className="px-2 py-2 border text-center">70.000</td>
-                <td className="px-2 py-2 border text-center">R$ 20.000,00</td>
-                <td className="px-2 py-2 border text-center">13/08/2025</td>
-                <td className="px-2 py-2 border text-center">12:00</td>
+                <td className="px-2 py-2 border">
+                  <input
+                    type="text"
+                    className="border rounded px-1 py-0.5 w-full"
+                    placeholder="Cliente"
+                  />
+                </td>
+                <td className="px-2 py-2 border text-center">
+                  <input
+                    type="number"
+                    className="border rounded px-1 py-0.5 w-20 text-center"
+                    placeholder="1380"
+                  />
+                </td>
+                <td className="px-2 py-2 border text-center">
+                  <input
+                    type="number"
+                    className="border rounded px-1 py-0.5 w-20 text-center"
+                    placeholder="500"
+                  />
+                </td>
+                <td className="px-2 py-2 border text-center">
+                  <input
+                    type="text"
+                    className="border rounded px-1 py-0.5 w-24 text-center"
+                    placeholder="70.000"
+                  />
+                </td>
+                <td className="px-2 py-2 border text-center">
+                  <input
+                    type="text"
+                    className="border rounded px-1 py-0.5 w-28 text-center"
+                    placeholder="R$ 20.000,00"
+                  />
+                </td>
+                <td className="px-2 py-2 border text-center">
+                  <input
+                    type="date"
+                    className="border rounded px-1 py-0.5 w-32 text-center"
+                  />
+                </td>
+                <td className="px-2 py-2 border text-center">
+                  <input
+                    type="time"
+                    className="border rounded px-1 py-0.5 w-20 text-center"
+                  />
+                </td>
+                <td className="px-2 py-2 border text-center">
+                  <button className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
+                    Deletar
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="w-full  flex justify-center">
+        <button className="cursor-pointer flex gap-2 items-center bg-gray-500 text-white hover:bg-gray-700 transition-colors duration-200 py-2 px-4 rounded-lg mt-4">
+          <BiPlus size={20} />
+          Adicionar
+        </button>
       </div>
     </div>
   );
