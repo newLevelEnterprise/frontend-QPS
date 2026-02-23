@@ -1,4 +1,13 @@
+import { useFormContext } from "react-hook-form";
+import { useSteps } from "../../../../hooks/useStep";
+import type { ICriaStepsSequenciamentoBody } from "../../../../schemas/steps";
+
 function SequenciamentoInfo() {
+  const { register } =
+    useFormContext<ICriaStepsSequenciamentoBody["sequenciamento"]>();
+
+  const { nextStep } = useSteps();
+
   return (
     <div className="bg-white w-full overflow-y-auto max-h-full rounded-lg p-4">
       <h2 className="text-[#3573C9] text-lg font-bold mb-2">Sequenciamento</h2>
@@ -9,11 +18,19 @@ function SequenciamentoInfo() {
           <div className="flex gap-4 mt-2">
             <div className="flex gap-2 items-center">
               <label className="font-semibold text-gray-700">Dia:</label>
-              <input type="date" className="border rounded px-2 py-1 w-32" />
+              <input
+                type="date"
+                className="border rounded px-2 py-1 w-32"
+                {...register("dataInicio")}
+              />
             </div>
             <div className="flex gap-2 items-center">
               <label className="font-semibold text-gray-700">Hora:</label>
-              <input type="time" className="border rounded px-2 py-1 w-24" />
+              <input
+                type="time"
+                className="border rounded px-2 py-1 w-24"
+                {...register("horarioInicio")}
+              />
             </div>
           </div>
         </div>
@@ -28,7 +45,7 @@ function SequenciamentoInfo() {
             <input
               type="time"
               className="border rounded px-2 py-1 w-24"
-              defaultValue="16:59"
+              {...register("horarioLimiteFaturamento")}
             />
           </div>
         </div>
@@ -40,7 +57,7 @@ function SequenciamentoInfo() {
             <label className="flex items-center gap-1">
               <input
                 type="radio"
-                name="sabado"
+                {...register("sabadoTrabalha")}
                 className="accent-[#3573C9]"
                 value="sim"
               />
@@ -49,7 +66,7 @@ function SequenciamentoInfo() {
             <label className="flex items-center gap-1">
               <input
                 type="radio"
-                name="sabado"
+                {...register("sabadoTrabalha")}
                 className="accent-[#3573C9]"
                 value="nao"
               />
@@ -58,6 +75,15 @@ function SequenciamentoInfo() {
           </div>
         </div>
       </form>
+
+      <div className="flex justify-end mt-6">
+        <button
+          onClick={nextStep}
+          className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
+        >
+          Prosseguir
+        </button>
+      </div>
     </div>
   );
 }

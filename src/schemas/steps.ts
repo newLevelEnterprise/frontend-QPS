@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const criarStepsSequenciamento = z.object({
+export const criarStepsSequenciamentoschema = z.object({
   sequenciamento: z.object({
     dataInicio: z.string().min(1, "Data de início é obrigatório"),
     horarioInicio: z.string().min(1, "Horário de início é obrigatório"),
@@ -55,5 +55,5 @@ export const criarStepsSequenciamento = z.object({
 });
 
 export type ICriaStepsSequenciamentoBody = z.infer<
-  typeof criarStepsSequenciamento
+  typeof criarStepsSequenciamentoschema
 >;

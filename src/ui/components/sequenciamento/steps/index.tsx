@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useSteps } from "../../../../hooks/useStep";
 import EstadoAtualMaquina from "./estadoAtualMaquina";
 import Paradas from "./paradas";
 import SequenciamentoInfo from "./sequenciamentoInfo";
@@ -9,50 +9,12 @@ const steps = [
   { content: <Paradas /> },
 ];
 
-interface StepsProps {
-  onInit: () => void;
-  onCancel: () => void;
-}
-
-function Steps({ onInit, onCancel }: StepsProps) {
-  const [activeStep, setActiveStep] = useState(0);
+function Steps() {
+  const { activeStep } = useSteps();
 
   return (
     <div className="flex-1 flex flex-col items-end justify-center p-6">
       <div className="w-full h-full">{steps[activeStep].content}</div>
-      <div className="flex gap-4 mt-6">
-        <button
-          onClick={() => {
-            if (activeStep === 0) {
-              onCancel();
-            } else {
-              setActiveStep((prev) => Math.max(prev - 1, 0));
-            }
-          }}
-          className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
-        >
-          {activeStep === 0 ? "Cancelar" : "Voltar"}
-        </button>
-        {activeStep < steps.length - 1 ? (
-          <button
-            onClick={() =>
-              setActiveStep((prev) => Math.min(prev + 1, steps.length - 1))
-            }
-            className="px-4 py-2 rounded bg-blue-600 text-white transition-colors hover:bg-blue-700 cursor-pointer"
-          >
-            Prosseguir
-          </button>
-        ) : (
-          <button
-            onClick={() => {
-              onInit();
-            }}
-            className="px-4 py-2 rounded bg-green-600 text-white transition-colors hover:bg-green-700 cursor-pointer"
-          >
-            Iniciar
-          </button>
-        )}
-      </div>
     </div>
   );
 }

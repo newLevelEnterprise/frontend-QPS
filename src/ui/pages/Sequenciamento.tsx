@@ -1,4 +1,11 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import StepContextProvider from "../../contexts/StepContext";
+import {
+  criarStepsSequenciamentoschema,
+  type ICriaStepsSequenciamentoBody,
+} from "../../schemas/steps";
 import PedidosParaSequenciamento from "../components/sequenciamento/pedidos.paraSequencimento";
 import PedidosDisponiveis from "../components/sequenciamento/PedidosDisponiveis";
 import Steps from "../components/sequenciamento/steps";
@@ -6,6 +13,9 @@ import XlsxUpload from "../components/XlsxUpload";
 
 function Sequenciamento() {
   const [startSteps, setStartSteps] = useState(false);
+  const formProvider = useForm<ICriaStepsSequenciamentoBody>({
+    resolver: zodResolver(criarStepsSequenciamentoschema),
+  });
 
   return (
     <div className="md:h-full flex flex-col w-full gap-2 overflow-y-auto lg:overflow-hidden">
@@ -18,10 +28,11 @@ function Sequenciamento() {
           </>
         )}
         {startSteps && (
-          <Steps
-            onInit={() => setStartSteps(false)}
-            onCancel={() => setStartSteps(false)}
-          />
+          <FormProvider {...formProvider}>
+            <StepContextProvider>
+              <Steps />
+            </StepContextProvider>
+          </FormProvider>
         )}
       </div>
     </div>
