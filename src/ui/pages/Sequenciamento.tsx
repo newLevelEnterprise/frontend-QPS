@@ -17,7 +17,12 @@ function Sequenciamento() {
             <PedidosParaSequenciamento setStartSteps={setStartSteps} />
           </>
         )}
-        {startSteps && <Steps onInit={() => setStartSteps(false)} />}
+        {startSteps && (
+          <Steps
+            onInit={() => setStartSteps(false)}
+            onCancel={() => setStartSteps(false)}
+          />
+        )}
       </div>
     </div>
   );

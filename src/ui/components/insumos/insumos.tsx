@@ -59,8 +59,8 @@ function Insumos() {
       <h1 className="text-xl text-[#5B85D5] font-bold">
         Cadastrar matéria prima
       </h1>
-      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[470px] overflow-x-auto">
-        <table className="w-full overflow-x-auto overflow-y-auto">
+      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
+        <table className="w-full overflow-auto max-h-[470px]">
           <thead>
             <tr className="border-b border-gray-200">
               <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">

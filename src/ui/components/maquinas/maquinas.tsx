@@ -12,9 +12,11 @@ function Maquinas() {
   const [editarMaquina, setEditarMaquina] = useState<boolean>(false);
 
   const [maquina, setMaquina] = useState<IMaquinas>({
-    id: 0,
+    codMolde: "",
     name: "",
     disponibilidade: 0,
+    id: 0,
+    produto: "",
   });
 
   const maquinas = [];
@@ -55,8 +57,8 @@ function Maquinas() {
         </Modal.Container>
       </Modal.Root>
       <h1 className="text-xl text-[#5B85D5] font-bold">Máquinas Cadastradas</h1>
-      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[470px] overflow-x-auto">
-        <table className="w-full overflow-x-auto overflow-y-auto">
+      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
+        <table className="w-full overflow-auto max-h-[470px]">
           <thead>
             <tr className="border-b border-gray-200">
               <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
@@ -109,9 +111,11 @@ function Maquinas() {
           onClick={() => {
             setNovaMaquina(true);
             setMaquina({
-              id: 0,
+              codMolde: "",
               name: "",
               disponibilidade: 0,
+              id: 0,
+              produto: "",
             });
           }}
           className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

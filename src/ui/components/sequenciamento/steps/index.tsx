@@ -11,9 +11,10 @@ const steps = [
 
 interface StepsProps {
   onInit: () => void;
+  onCancel: () => void;
 }
 
-function Steps({ onInit }: StepsProps) {
+function Steps({ onInit, onCancel }: StepsProps) {
   const [activeStep, setActiveStep] = useState(0);
 
   return (
@@ -21,11 +22,16 @@ function Steps({ onInit }: StepsProps) {
       <div className="w-full h-full">{steps[activeStep].content}</div>
       <div className="flex gap-4 mt-6">
         <button
-          onClick={() => setActiveStep((prev) => Math.max(prev - 1, 0))}
-          disabled={activeStep === 0}
+          onClick={() => {
+            if (activeStep === 0) {
+              onCancel();
+            } else {
+              setActiveStep((prev) => Math.max(prev - 1, 0));
+            }
+          }}
           className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
         >
-          Voltar
+          {activeStep === 0 ? "Cancelar" : "Voltar"}
         </button>
         {activeStep < steps.length - 1 ? (
           <button

@@ -38,7 +38,7 @@ function Produtos() {
         (oldData: IProduto[]) => {
           if (!oldData) return oldData;
           return oldData.filter((client) => client.id !== produtoId);
-        }
+        },
       );
 
       toast.success("Produto removido com sucesso!", {
@@ -107,14 +107,20 @@ function Produtos() {
         </Modal.Container>
       </Modal.Root>
 
-            {/* Modal para o Setup */}
+      {/* Modal para o Setup */}
       <Modal.Root isVisible={uploadSetup}>
         <Modal.Container className="md:w-1/2">
           <Modal.Header
-            title='Upload Setup'
-            onClose={() => setUploadSetup(prev => !prev)}
+            title="Upload Setup"
+            onClose={() => setUploadSetup((prev) => !prev)}
           />
-          <XlsxUpload onClose={() => setUploadSetup(prev => !prev)} mainDivClassName="mt-4 shadow-none" uploaderContainerClassName="lg:w-full" endpoint="setup-matrix-xlsx" cachekey={["get", "all", "products"]}/>
+          <XlsxUpload
+            onClose={() => setUploadSetup((prev) => !prev)}
+            mainDivClassName="mt-4 shadow-none"
+            uploaderContainerClassName="lg:w-full"
+            endpoint="setup-matrix-xlsx"
+            cachekey={["get", "all", "products"]}
+          />
         </Modal.Container>
       </Modal.Root>
 
@@ -133,9 +139,18 @@ function Produtos() {
           />
         </div>
         <div className="space-x-10">
-          <button onClick={() => setUploadSetup(prev => !prev)} className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">Upload setup</button>
+          <button
+            onClick={() => setUploadSetup((prev) => !prev)}
+            className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md"
+          >
+            Upload setup
+          </button>
 
-          <a target="_top" href="https://api-quant-production.up.railway.app/template/setup-matrix" download>
+          <a
+            target="_top"
+            href="https://api-quant-production.up.railway.app/template/setup-matrix"
+            download
+          >
             <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">
               Download setup
             </button>
@@ -143,7 +158,7 @@ function Produtos() {
         </div>
       </div>
 
-      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[470px] overflow-x-auto">
+      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
         {isFetching ? (
           <div className="w-full h-full flex justify-center items-center">
             <div className="flex flex-col items-center">
@@ -160,7 +175,7 @@ function Produtos() {
             </h2>
           </div>
         ) : (
-          <table className="w-full overflow-x-auto">
+          <table className="w-full overflow-auto max-h-[470px]">
             <thead className="overflow-x-auto">
               <tr className="border-b border-gray-200">
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">

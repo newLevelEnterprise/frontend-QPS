@@ -98,7 +98,7 @@ function Clientes() {
         />
       </div>
 
-      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[470px] overflow-x-auto">
+      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
         {isFetching ? (
           <div className="w-full h-full flex justify-center items-center">
             <div className="flex flex-col items-center">
@@ -115,7 +115,7 @@ function Clientes() {
             </h2>
           </div>
         ) : (
-          <table className="w-full overflow-x-auto">
+          <table className="w-full overflow-auto max-h-[470px]">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">

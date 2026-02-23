@@ -2,7 +2,7 @@ import { BiPlus } from "react-icons/bi";
 
 function EstadoAtualMaquina() {
   return (
-    <div className="bg-white w-full h-full rounded-lg p-4">
+    <div className="bg-white w-full overflow-y-auto max-h-full rounded-lg p-4">
       <h2 className="text-xl text-[#5B85D5] font-bold mb-4">
         Estado Atual da Máquina
       </h2>

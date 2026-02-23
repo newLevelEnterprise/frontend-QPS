@@ -200,7 +200,7 @@ function PedidosParaSequenciamento({
         <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[300px] md:h-[300px] overflow-x-auto">
           {!pedidos || pedidos.length === 0 ? (
             <div className="w-full h-full flex justify-center items-center">
-              <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">
+              <h2 className="text-gray-500 font-semibold">
                 Nenhum pedido encontrado !
               </h2>
             </div>
@@ -275,7 +275,7 @@ function PedidosParaSequenciamento({
           }
           // iniciarSequenciamentoFunc();
         }}
-        className="w-1/2 md:w-full text-sm  cursor-pointer inline-flex items-center justify-center md:text-lg px-2 py-2 bg-blue-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-blue-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-1/2 md:w-full text-sm  cursor-pointer inline-flex items-center justify-center md:text-lg p-1 bg-blue-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-blue-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         {/* {processamentoEmAndamento ? "Processando..." : "Iniciar"} */}
         Avançar
