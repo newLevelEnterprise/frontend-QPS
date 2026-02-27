@@ -163,7 +163,7 @@ function TurnosRegulares() {
       <div className="flex items-end justify-end mt-4">
         <button
           type="submit"
-          disabled={isFetching || formState.isSubmitting}
+          disabled={isFetching || formState.isSubmitting || turnos.length === 0}
           className="disabled:bg-blue-300 disabled:cursor-not-allowed cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           {formState.isSubmitting ? (

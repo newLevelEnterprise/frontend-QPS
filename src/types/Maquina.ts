@@ -5,3 +5,9 @@ export interface IMaquinas {
   codMolde: string;
   disponibilidade: string | number;
 }
+
+export interface IMaquinasType {
+  id: number;
+  name: string;
+  availability: string | number;
+}

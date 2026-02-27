@@ -7,7 +7,6 @@ import {
   criarMaquinaSchema,
   type ICriarMaquinaBody,
 } from "../../../schemas/maquinas";
-import type { IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
@@ -32,14 +31,13 @@ function FormNovaMaquina({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      const { data: res } = await apiClient.post<IMaquinas>("/maquinas", {
+      await apiClient.post("/machines", {
         name: data.name,
-        disponibilidade: parseInt(data.disponibilidade),
+        availability: parseInt(data.disponibilidade),
       });
       toast.success("Máquina criada com sucesso!");
       setMaquina();
       setNovaMaquina(false);
-      console.log(res);
     } catch (error) {
       console.error("Erro ao criar máquina:", error);
       toast.error("Erro ao criar máquina. Tente novamente.");

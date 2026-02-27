@@ -7,13 +7,13 @@ import {
   type IEditarMaquinaBody,
   editarMaquinaSchema,
 } from "../../../schemas/maquinas";
-import type { IMaquinas } from "../../../types/Maquina";
+import type { IMaquinasType } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
 
 interface IFormEditarMaquinaProps {
-  maquina: IMaquinas;
+  maquina: IMaquinasType;
   setEditarMaquina: Dispatch<SetStateAction<boolean>>;
   setMaquina: () => void;
 }
@@ -31,16 +31,16 @@ function FormEditarMaquina({
     resolver: zodResolver(editarMaquinaSchema),
     defaultValues: {
       name: maquina.name,
-      disponibilidade: maquina.disponibilidade.toString(),
+      disponibilidade: maquina.availability.toString(),
     },
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      await apiClient.put<IMaquinas>(`/maquinas/${maquina.id}`, {
+      await apiClient.put(`/machines/${maquina.id}`, {
         name: data.name,
-        disponibilidade: parseInt(data.disponibilidade),
+        availability: parseInt(data.disponibilidade),
       });
       setMaquina();
       toast.success("Máquina atualizada com sucesso!");
