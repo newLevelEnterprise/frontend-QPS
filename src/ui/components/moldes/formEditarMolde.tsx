@@ -1,7 +1,9 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import type { Dispatch, SetStateAction } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import Select from "react-select";
 import { toast } from "react-toastify";
 import {
   criarmoldesSchema,
@@ -25,38 +27,46 @@ function FormEditarMolde({
 }: IFormEditarMoldeProps) {
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
   } = useForm<ICriarMoldesBody>({
     resolver: zodResolver(criarmoldesSchema),
     defaultValues: {
-      nome: molde.nome,
-      produto: molde.produto,
-      totalCavidades: molde.totalCavidades,
-      cavidadesAbertas: molde.cavidadesAbertas,
-      refugo: molde.refugo,
-      riscoDeCavidade: molde.riscoDeCavidade,
+      name: molde.name,
+      products: molde.products,
+      total_cavities: Number(molde.total_cavities || 0),
+      open_cavities: Number(molde.open_cavities || 0),
+      scrap: Number(molde.scrap || 0),
+      closed_cavity_risk: Number(molde.closed_cavity_risk || 0),
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const { data: products, isFetching } = useQuery({
+    queryKey: ["get", "all", "products"],
+    queryFn: async () => {
+      const { data } =
+        await apiClient.get<{ id: number; name: string }[]>("/products/");
+      return data;
+    },
+  });
+
+  const onSubmit = async (data: ICriarMoldesBody) => {
     try {
-      const { data: res } = await apiClient.post<IMoldes>("/moldes", {
-        nome: data.nome,
-        produtos: data.produtos,
-        totalCavidades: Number(data.totalCavidades),
-        cavidadesAbertas: Number(data.cavidadesAbertas),
-        refugo: Number(data.refugo),
-        riscoDeCavidade: Number(data.riscoDeCavidade),
+      await apiClient.put<IMoldes>(`/molds/${molde.id}`, {
+        name: data.name,
+        products: data.products,
+        total_cavities: Number(data.total_cavities),
+        open_cavities: Number(data.open_cavities),
+        scrap: Number(data.scrap),
+        closed_cavity_risk: Number(data.closed_cavity_risk),
       });
       setMolde();
-      toast.success("Molde criado com sucesso!");
+      toast.success("Molde atualizado com sucesso!");
       setEditarMolde(false);
-      console.log(res);
     } catch (error) {
-      console.error("Erro ao criar molde:", error);
-      toast.error("Erro ao criar molde. Tente novamente.");
+      console.error("Erro ao atualizar molde:", error);
+      toast.error("Erro ao atualizar molde. Tente novamente.");
     }
   };
 
@@ -79,13 +89,13 @@ function FormEditarMolde({
               placeholder="Nome do molde"
               type="text"
               className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("nome")}
+              {...register("name")}
             />
           </div>
-          {errors.nome && (
+          {errors.name && (
             <ErrorMessage
               errors={errors}
-              name="nome"
+              name="name"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}
@@ -100,18 +110,39 @@ function FormEditarMolde({
               Produto
             </label>
             <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-              <input
-                id="produto"
-                placeholder="Produto"
-                type="text"
-                className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("produto")}
+              <Controller
+                name="products"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    options={
+                      products?.map((product) => ({
+                        value: product.id,
+                        label: product.name,
+                      })) || []
+                    }
+                    isLoading={isFetching}
+                    placeholder="Selecione os produtos"
+                    onChange={(value) =>
+                      field.onChange(value.map((v) => v?.value).filter(Boolean))
+                    }
+                    defaultValue={molde.products
+                      .map((prodId) => {
+                        const prod = products?.find((p) => p.id === prodId);
+                        return prod
+                          ? { value: prod.id, label: prod.name }
+                          : null;
+                      })
+                      .filter(Boolean)}
+                    isMulti
+                  />
+                )}
               />
             </div>
-            {errors.produto && (
+            {errors.products && (
               <ErrorMessage
                 errors={errors}
-                name="produto"
+                name="products"
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             )}
@@ -129,13 +160,13 @@ function FormEditarMolde({
                 placeholder="Total de Cavidades"
                 type="number"
                 className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("totalCavidades")}
+                {...register("total_cavities")}
               />
             </div>
-            {errors.totalCavidades && (
+            {errors.total_cavities && (
               <ErrorMessage
                 errors={errors}
-                name="totalCavidades"
+                name="total_cavities"
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             )}
@@ -156,13 +187,13 @@ function FormEditarMolde({
                 placeholder="Cavidades Abertas"
                 type="number"
                 className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("cavidadesAbertas")}
+                {...register("open_cavities")}
               />
             </div>
-            {errors.cavidadesAbertas && (
+            {errors.open_cavities && (
               <ErrorMessage
                 errors={errors}
-                name="cavidadesAbertas"
+                name="open_cavities"
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             )}
@@ -180,13 +211,13 @@ function FormEditarMolde({
                 placeholder="Refugo"
                 type="number"
                 className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("refugo")}
+                {...register("scrap")}
               />
             </div>
-            {errors.refugo && (
+            {errors.scrap && (
               <ErrorMessage
                 errors={errors}
-                name="refugo"
+                name="scrap"
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             )}
@@ -202,17 +233,17 @@ function FormEditarMolde({
           </label>
           <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
             <input
-              id="riscoDeCavidade"
+              id="cavityRisk"
               placeholder="Risco de Cavidade"
               type="number"
               className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("riscoDeCavidade")}
+              {...register("closed_cavity_risk")}
             />
           </div>
-          {errors.riscoDeCavidade && (
+          {errors.closed_cavity_risk && (
             <ErrorMessage
               errors={errors}
-              name="riscoDeCavidade"
+              name="closed_cavity_risk"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}

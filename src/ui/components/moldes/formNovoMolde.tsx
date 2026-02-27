@@ -1,7 +1,9 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import type { Dispatch, SetStateAction } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import Select from "react-select";
 import { toast } from "react-toastify";
 import {
   criarmoldesSchema,
@@ -21,21 +23,31 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting, isValid },
   } = useForm<ICriarMoldesBody>({
     resolver: zodResolver(criarmoldesSchema),
+  });
+
+  const { data: products, isFetching } = useQuery({
+    queryKey: ["get", "all", "products"],
+    queryFn: async () => {
+      const { data } =
+        await apiClient.get<{ id: number; name: string }[]>("/products/");
+      return data;
+    },
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
       const { data: res } = await apiClient.post<IMoldes>("/moldes", {
-        nome: data.nome,
-        produtos: data.produtos,
-        totalCavidades: Number(data.totalCavidades),
-        cavidadesAbertas: Number(data.cavidadesAbertas),
-        refugo: Number(data.refugo),
-        riscoDeCavidade: Number(data.riscoDeCavidade),
+        name: data.name,
+        products: data.products,
+        total_cavities: Number(data.total_cavities),
+        open_cavities: Number(data.open_cavities),
+        scrap: Number(data.scrap),
+        closed_cavity_risk: Number(data.closed_cavity_risk),
       });
       toast.success("Molde criado com sucesso!");
       setMolde();
@@ -66,13 +78,13 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
               placeholder="Nome do molde"
               type="text"
               className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("nome")}
+              {...register("name")}
             />
           </div>
-          {errors.nome && (
+          {errors.name && (
             <ErrorMessage
               errors={errors}
-              name="nome"
+              name="name"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}
@@ -87,18 +99,31 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
               Produto
             </label>
             <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-              <input
-                id="produto"
-                placeholder="Produto"
-                type="text"
-                className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("produto")}
+              <Controller
+                name="products"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    options={
+                      products?.map((product) => ({
+                        value: product.id,
+                        label: product.name,
+                      })) || []
+                    }
+                    isLoading={isFetching}
+                    placeholder="Selecione os produtos"
+                    onChange={(value) =>
+                      field.onChange(value.map((v) => v.value))
+                    }
+                    isMulti
+                  />
+                )}
               />
             </div>
-            {errors.produto && (
+            {errors.products && (
               <ErrorMessage
                 errors={errors}
-                name="produto"
+                name="products"
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             )}
@@ -116,13 +141,13 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
                 placeholder="Total de Cavidades"
                 type="number"
                 className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("totalCavidades")}
+                {...register("total_cavities")}
               />
             </div>
-            {errors.totalCavidades && (
+            {errors.total_cavities && (
               <ErrorMessage
                 errors={errors}
-                name="totalCavidades"
+                name="total_cavities"
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             )}
@@ -139,17 +164,17 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
             </label>
             <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
               <input
-                id="cavidadesAbertas"
+                id="openCavities"
                 placeholder="Cavidades Abertas"
                 type="number"
                 className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("cavidadesAbertas")}
+                {...register("open_cavities")}
               />
             </div>
-            {errors.cavidadesAbertas && (
+            {errors.open_cavities && (
               <ErrorMessage
                 errors={errors}
-                name="cavidadesAbertas"
+                name="open_cavities"
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             )}
@@ -167,13 +192,13 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
                 placeholder="Refugo"
                 type="number"
                 className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("refugo")}
+                {...register("scrap")}
               />
             </div>
-            {errors.refugo && (
+            {errors.scrap && (
               <ErrorMessage
                 errors={errors}
-                name="refugo"
+                name="scrap"
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             )}
@@ -182,24 +207,24 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
 
         <div className="w-full flex flex-col gap-3">
           <label
-            htmlFor="riscoDeCavidade"
+            htmlFor="closedCavityRisk"
             className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
           >
             Risco de Cavidade
           </label>
           <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
             <input
-              id="riscoDeCavidade"
+              id="closedCavityRisk"
               placeholder="Risco de Cavidade"
               type="number"
               className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("riscoDeCavidade")}
+              {...register("closed_cavity_risk")}
             />
           </div>
-          {errors.riscoDeCavidade && (
+          {errors.closed_cavity_risk && (
             <ErrorMessage
               errors={errors}
-              name="riscoDeCavidade"
+              name="closed_cavity_risk"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}

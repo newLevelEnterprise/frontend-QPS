@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
+import { toast } from "react-toastify";
 import type { IMaquinasType } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Modal from "../modal";
@@ -21,6 +22,10 @@ function Maquinas() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (id: number) => {
       await apiClient.delete(`/machines/${id}`);
+    },
+    onError: (error) => {
+      toast.error("Erro ao deletar máquina. Tente novamente.");
+      console.error("Erro ao deletar máquina:", error);
     },
   });
 

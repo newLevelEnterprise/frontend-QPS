@@ -1,21 +1,21 @@
 import { z } from "zod";
 
 export const criarmoldesSchema = z.object({
-  nome: z.string(),
-  produto: z.string(),
-  totalCavidades: z.number(),
-  cavidadesAbertas: z.number(),
-  refugo: z.number(),
-  riscoDeCavidade: z.number(),
+  name: z.string(),
+  products: z.number().array(),
+  total_cavities: z.number(),
+  open_cavities: z.number(),
+  scrap: z.number(),
+  closed_cavity_risk: z.number(),
 });
 
 export const editarmoldesSchema = z.object({
-  nome: z.string(),
-  produto: z.string(),
-  totalCavidades: z.number(),
-  cavidadesAbertas: z.number(),
-  refugo: z.number(),
-  riscoDeCavidade: z.number(),
+  name: z.string(),
+  products: z.number().array(),
+  total_cavities: z.number(),
+  open_cavities: z.number(),
+  scrap: z.number(),
+  closed_cavity_risk: z.number(),
 });
 
 export type IEditarMoldesBody = z.infer<typeof editarmoldesSchema>;
