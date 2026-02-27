@@ -1,15 +1,15 @@
 export interface ITurnosRegulares {
   id: number;
-  turno:
-    | "segunda"
-    | "terca"
-    | "quarta"
-    | "quinta"
-    | "sexta"
-    | "sabado"
-    | "domingo";
+  dia_semana:
+    | "Segunda-feira"
+    | "Terça-feira"
+    | "Quarta-feira"
+    | "Quinta-feira"
+    | "Sexta-feira"
+    | "Sábado"
+    | "Domingo";
   manha: boolean;
   tarde: boolean;
   noite: boolean;
-  frequencia: "diario" | "semanal" | "quinzenal" | "mensal" | "n/a";
+  frequencia: "Diário" | "Semanal" | "Quinzenal" | "Mensal" | "Não Trabalha";
 }
