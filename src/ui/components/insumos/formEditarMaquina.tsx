@@ -13,7 +13,12 @@ import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
 
 interface IFormEditarInsumoProps {
-  insumo: IInsumos;
+  insumo: {
+    id: number;
+    nome: string;
+    lead_time_medio_entrega: number;
+    custo_medio: string;
+  };
   setEditarInsumo: Dispatch<SetStateAction<boolean>>;
   setInsumo: () => void;
 }
@@ -30,21 +35,19 @@ function FormEditarInsumo({
   } = useForm<IEditarInsumosBody>({
     resolver: zodResolver(editarInsumosSchema),
     defaultValues: {
-      custoMedio: insumo.custoMedio,
-      leadTimeEntrega: insumo.leadTimeEntrega,
-      material: insumo.material,
-      unidade: insumo.unidade,
+      custoMedio: insumo.custo_medio,
+      leadTimeEntrega: insumo.lead_time_medio_entrega,
+      nome: insumo.nome,
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+   
+  const onSubmit = async (data: IEditarInsumosBody) => {
     try {
-      await apiClient.put<IInsumos>(`/insumos/${insumo.id}`, {
-        material: data.material,
-        unidade: data.unidade,
-        leadTimeEntrega: Number(data.leadTimeEntrega),
-        custoMedio: Number(data.custoMedio),
+      await apiClient.put<IInsumos>(`/materia-prima/${insumo.id}`, {
+        nome: data.nome,
+        lead_time_medio_entrega: Number(data.leadTimeEntrega),
+        custo_medio: Number(data.custoMedio),
       });
       setInsumo();
       toast.success("Insumo atualizado com sucesso!");
@@ -74,22 +77,13 @@ function FormEditarInsumo({
               placeholder="Nome do material"
               type="text"
               className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("material")}
+              {...register("nome")}
             />
-            <select
-              id="un"
-              {...register("unidade")}
-              className="border border-gray-300 p-1 rounded-lg"
-            >
-              <option value="kg">Kg</option>
-              <option value="g">g</option>
-              <option value="un">un</option>
-            </select>
           </div>
-          {errors.material && (
+          {errors.nome && (
             <ErrorMessage
               errors={errors}
-              name="material"
+              name="nome"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}

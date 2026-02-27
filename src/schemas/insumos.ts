@@ -1,17 +1,15 @@
 import { z } from "zod";
 
 export const criarInsumosSchema = z.object({
-  material: z.string().min(1, "Nome é obrigatório"),
-  unidade: z.enum(["kg", "g", "un"]),
+  nome: z.string().min(1, "Nome é obrigatório"),
   leadTimeEntrega: z.number().min(0, "Lead time é obrigatório"),
-  custoMedio: z.number().min(0, "Custo médio é obrigatório"),
+  custoMedio: z.string().min(1, "Custo médio é obrigatório"),
 });
 
 export const editarInsumosSchema = z.object({
-  material: z.string().min(1, "Nome é obrigatório"),
-  unidade: z.enum(["kg", "g", "un"]),
+  nome: z.string().min(1, "Nome é obrigatório"),
   leadTimeEntrega: z.number().min(0, "Lead time é obrigatório"),
-  custoMedio: z.number().min(0, "Custo médio é obrigatório"),
+  custoMedio: z.string().min(1, "Custo médio é obrigatório"),
 });
 
 export type IEditarInsumosBody = z.infer<typeof editarInsumosSchema>;

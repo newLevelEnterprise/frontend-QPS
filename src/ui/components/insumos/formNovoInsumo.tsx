@@ -26,14 +26,12 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
     resolver: zodResolver(criarInsumosSchema),
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ICriarInsumosBody) => {
     try {
-      const { data: res } = await apiClient.post<IInsumos>("/insumos", {
-        material: data.material,
-        unidade: data.unidade,
-        leadTimeEntrega: Number(data.leadTimeEntrega),
-        custoMedio: Number(data.custoMedio),
+      const { data: res } = await apiClient.post<IInsumos>("/materia-prima", {
+        nome: data.nome,
+        lead_time_medio_entrega: Number(data.leadTimeEntrega),
+        custo_medio: Number(data.custoMedio),
       });
       toast.success("Insumo criado com sucesso!");
       setInsumo();
@@ -64,22 +62,13 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
               placeholder="Nome do material"
               type="text"
               className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("material")}
+              {...register("nome")}
             />
-            <select
-              id="un"
-              {...register("unidade")}
-              className="border border-gray-300 p-1 rounded-lg"
-            >
-              <option value="kg">Kg</option>
-              <option value="g">g</option>
-              <option value="un">un</option>
-            </select>
           </div>
-          {errors.material && (
+          {errors.nome && (
             <ErrorMessage
               errors={errors}
-              name="material"
+              name="nome"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}
@@ -87,7 +76,7 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
 
         <div className="w-full flex flex-col gap-3">
           <label
-            htmlFor="disponibilidade"
+            htmlFor="leadTimeEntrega"
             className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
           >
             Lead Time Médio de Entrega (dias)
