@@ -32,33 +32,33 @@ function FormCadastrarFeriado({
         <label className="block text-sm font-medium text-gray-700">Dia</label>
         <input
           type="text"
-          {...register("dia")}
+          {...register("date")}
           className="w-full border rounded px-2 py-1 mt-1"
         />
-        {errors.dia && (
-          <span className="text-xs text-red-500">{errors.dia.message}</span>
+        {errors.date && (
+          <span className="text-xs text-red-500">{errors.date.message}</span>
         )}
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">Nome</label>
         <input
           type="text"
-          {...register("nome")}
+          {...register("name")}
           className="w-full border rounded px-2 py-1 mt-1"
         />
-        {errors.nome && (
-          <span className="text-xs text-red-500">{errors.nome.message}</span>
+        {errors.name && (
+          <span className="text-xs text-red-500">{errors.name.message}</span>
         )}
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">Tipo</label>
         <input
           type="text"
-          {...register("tipo")}
+          {...register("level")}
           className="w-full border rounded px-2 py-1 mt-1"
         />
-        {errors.tipo && (
-          <span className="text-xs text-red-500">{errors.tipo.message}</span>
+        {errors.level && (
+          <span className="text-xs text-red-500">{errors.level.message}</span>
         )}
       </div>
       <div className="flex gap-2 justify-end mt-2">

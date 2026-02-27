@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
+import { toast } from "react-toastify";
 import type { ICriarFeriadoBody } from "../../../schemas/feriado";
+import { apiClient } from "../../../utils/apiClient";
 import Modal from "../modal";
 import FeriadosEstaduais from "./components/feriadosEstaduais";
 import FeriadosMunicipais from "./components/feriadosMunicipais";
@@ -13,10 +15,14 @@ function Feriados() {
   const handleOpen = () => setModalOpen(true);
   const handleClose = () => setModalOpen(false);
 
-  const handleSubmit = (data: ICriarFeriadoBody) => {
-    // Aqui você pode adicionar lógica para salvar o feriado
-    console.log(data);
-    handleClose();
+  const handleSubmit = async (data: ICriarFeriadoBody) => {
+    try {
+      await apiClient.post(`/feriados`, data);
+      handleClose();
+    } catch (error) {
+      console.log("Erro ao cadastrar feriado:", error);
+      toast.error("Erro ao cadastrar feriado. Tente novamente mais tarde.");
+    }
   };
 
   return (
