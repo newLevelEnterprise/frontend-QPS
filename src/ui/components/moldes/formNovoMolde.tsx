@@ -38,10 +38,9 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ICriarMoldesBody) => {
     try {
-      const { data: res } = await apiClient.post<IMoldes>("/moldes", {
+      const { data: res } = await apiClient.post<IMoldes>("/molds", {
         name: data.name,
         products: data.products,
         total_cavities: Number(data.total_cavities),
@@ -89,20 +88,19 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
             />
           )}
         </div>
-
-        <div className="flex gap-6">
-          <div className="w-full flex flex-col gap-3">
-            <label
-              htmlFor="totalCavidades"
-              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-            >
-              Produto
-            </label>
-            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-              <Controller
-                name="products"
-                control={control}
-                render={({ field }) => (
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="totalCavidades"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+          >
+            Produto
+          </label>
+          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+            <Controller
+              name="products"
+              control={control}
+              render={({ field }) => (
+                <div className="w-full">
                   <Select
                     options={
                       products?.map((product) => ({
@@ -112,18 +110,44 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
                     }
                     isLoading={isFetching}
                     placeholder="Selecione os produtos"
-                    onChange={(value) =>
-                      field.onChange(value.map((v) => v.value))
-                    }
+                    onChange={(value) => {
+                      field.onChange(value.map((v) => v.value));
+                    }}
                     isMulti
                   />
-                )}
+                </div>
+              )}
+            />
+          </div>
+          {errors.products && (
+            <ErrorMessage
+              errors={errors}
+              name="products"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+        <div className="flex gap-6">
+          <div className="w-full flex flex-col gap-3">
+            <label
+              htmlFor="closedCavityRisk"
+              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+            >
+              Risco de Cavidade
+            </label>
+            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+              <input
+                id="closedCavityRisk"
+                placeholder="Risco de Cavidade"
+                type="number"
+                className="w-full outline-none border-b border-[#A4AABC]"
+                {...register("closed_cavity_risk")}
               />
             </div>
-            {errors.products && (
+            {errors.closed_cavity_risk && (
               <ErrorMessage
                 errors={errors}
-                name="products"
+                name="closed_cavity_risk"
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             )}
@@ -203,31 +227,6 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
               />
             )}
           </div>
-        </div>
-
-        <div className="w-full flex flex-col gap-3">
-          <label
-            htmlFor="closedCavityRisk"
-            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-          >
-            Risco de Cavidade
-          </label>
-          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-            <input
-              id="closedCavityRisk"
-              placeholder="Risco de Cavidade"
-              type="number"
-              className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("closed_cavity_risk")}
-            />
-          </div>
-          {errors.closed_cavity_risk && (
-            <ErrorMessage
-              errors={errors}
-              name="closed_cavity_risk"
-              render={({ message }) => <FormErrorMessage message={message} />}
-            />
-          )}
         </div>
       </div>
 

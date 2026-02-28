@@ -24,7 +24,7 @@ function Moldes() {
     total_cavities: 0,
   });
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutateAsync } = useMutation({
     mutationFn: async (id: number) => {
       await apiClient.delete(`/molds/${id}`);
     },
@@ -32,16 +32,22 @@ function Moldes() {
       toast.error("Erro ao deletar molde. Tente novamente.");
       console.error("Erro ao deletar molde:", error);
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "all", "moldes"],
+      });
+      toast.success("Molde deletado com sucesso!");
+    },
   });
 
   const { data: moldes, isFetching } = useQuery({
     queryKey: ["get", "all", "moldes"],
     queryFn: async () => {
-      const { data } = await apiClient.get<IMoldes[]>("/molds");
+      const { data } = await apiClient.get<IMoldes[]>("/molds/");
       return data;
     },
   });
-
+  console.log(moldes);
   return (
     <div className="w-full bg-white rounded-md shadow p-4">
       <Modal.Root isVisible={novoMolde}>
@@ -117,7 +123,7 @@ function Moldes() {
                     {molde.name}
                   </td>
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    {molde.products.join(", ")}
+                    {molde.products.map((product) => product.name).join(", ")}
                   </td>
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                     {molde.total_cavities}
@@ -146,11 +152,7 @@ function Moldes() {
                         onClick={() => mutateAsync(molde.id)}
                         className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
                       >
-                        {isPending ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
-                        ) : (
-                          "Excluir"
-                        )}
+                        Excluir
                       </button>
                     </div>
                   </td>

@@ -1,7 +1,7 @@
 export interface IMoldes {
   id: number;
   name: string;
-  products: number[];
+  products: { id: number; name: string }[];
   total_cavities: number;
   open_cavities: number;
   scrap: number | string;

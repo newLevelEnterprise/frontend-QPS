@@ -8,6 +8,7 @@ import FeriadosPage from "../ui/pages/feriados";
 import ForgotPasswordPage from "../ui/pages/ForgotPassword";
 import HistoryPage from "../ui/pages/historyPage";
 import ItensCompraPage from "../ui/pages/itensCompra";
+import LinhaProducaoPage from "../ui/pages/linha-producao";
 import LoginPage from "../ui/pages/LoginPage";
 import MaquinaPages from "../ui/pages/maquina";
 import MaquinasPages from "../ui/pages/maquinas";
@@ -42,6 +43,10 @@ function Router() {
             <Route path="/cadastro/maquinas" element={<MaquinasPages />} />
             <Route path="/cadastro/produto" element={<ProdutosPage />} />
             <Route path="/cadastro/moldes" element={<MoldesPage />} />
+            <Route
+              path="/cadastro/linhas-producao"
+              element={<LinhaProducaoPage />}
+            />
             <Route path="/historico" element={<HistoryPage />} />
 
             <Route

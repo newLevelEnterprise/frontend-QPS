@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { BiPlus, BiUserCircle } from "react-icons/bi";
@@ -66,6 +67,11 @@ const menuItems: MenuItem[] = [
         title: "Moldes",
         icon: LuShapes,
         url: "/cadastro/moldes",
+      },
+      {
+        title: "Linhas de Produção",
+        icon: LuSpline,
+        url: "/cadastro/linhas-producao",
       },
     ],
   },
@@ -180,19 +186,25 @@ export default function Sidebar({
     );
   };
 
+  const { data: productionLines, isFetching } = useQuery({
+    queryKey: ["productionLines"],
+    queryFn: async () => {
+      const { data } =
+        await apiClient.get<{ name: string; id: number }[]>(
+          "/production-lines",
+        );
+      return data;
+    },
+  });
+
   useEffect(() => {
-    const machines = [
-      {
-        title: "Linhas 1",
+    const machines =
+      productionLines?.map((line) => ({
+        title: line.name,
         icon: LuSpline,
-        url: "/linhas-producao/linhas-1",
-      },
-      {
-        title: "Linhas 2",
-        icon: LuSpline,
-        url: "/linhas-producao/linhas-2",
-      },
-    ];
+        url: `/linhas-producao/${line.id}`,
+      })) || [];
+
     menuItems[1].items = machines;
     apiClient
       .get(`/enterprises/${enterprise_id}/`)
@@ -201,7 +213,7 @@ export default function Sidebar({
         console.log(err);
         setEnterpriseName("");
       });
-  }, []);
+  }, [isFetching]);
 
   return (
     <div

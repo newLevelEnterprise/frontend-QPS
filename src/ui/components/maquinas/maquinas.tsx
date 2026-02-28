@@ -28,12 +28,18 @@ function Maquinas() {
       toast.error("Erro ao deletar máquina. Tente novamente.");
       console.error("Erro ao deletar máquina:", error);
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "all", "maquinas"],
+      });
+      toast.success("Máquina deletada com sucesso!");
+    },
   });
 
   const { data: maquinas, isFetching } = useQuery({
     queryKey: ["get", "all", "maquinas"],
     queryFn: async () => {
-      const { data } = await apiClient.get<IMaquinasType[]>("/machines");
+      const { data } = await apiClient.get<IMaquinasType[]>("/machines/");
       return data;
     },
   });
@@ -119,11 +125,7 @@ function Maquinas() {
                         onClick={() => mutateAsync(maq.id)}
                         className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
                       >
-                        {isPending ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
-                        ) : (
-                          "Excluir"
-                        )}
+                        Excluir
                       </button>
                     </div>
                   </td>
@@ -133,25 +135,27 @@ function Maquinas() {
           </table>
         </div>
       )}
-      <div className="flex flex-col gap-4 items-center justify-center mt-4">
-        <button
-          onClick={() => {
-            setNovaMaquina(true);
-            setMaquina({
-              name: "",
-              availability: 0,
-              id: 0,
-            });
-          }}
-          className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
-          Adicionar Nova Máquina
-        </button>
-        <p className="text-gray-500 text-lg">
-          Pode ser cadastrada até 10 máquinas
-        </p>
-      </div>
+      {!isFetching && (maquinas?.length || 0) < 10 && (
+        <div className="flex flex-col gap-4 items-center justify-center mt-4">
+          <button
+            onClick={() => {
+              setNovaMaquina(true);
+              setMaquina({
+                name: "",
+                availability: 0,
+                id: 0,
+              });
+            }}
+            className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
+            Adicionar Nova Máquina
+          </button>
+          <p className="text-gray-500 text-lg">
+            Pode ser cadastrada até 10 máquinas
+          </p>
+        </div>
+      )}
     </div>
   );
 }

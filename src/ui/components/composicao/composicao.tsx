@@ -80,41 +80,13 @@ function ComposicaoTable() {
           <thead>
             <tr>
               <th className="px-4 py-2 text-left">Produto</th>
-              <th className="px-4 py-2 text-center">
-                PP Virgem
-                <br />
-                <span className="text-xs text-gray-400">(kg)</span>
-              </th>
-              <th className="px-4 py-2 text-center">
-                PE Virgem
-                <br />
-                <span className="text-xs text-gray-400">(kg)</span>
-              </th>
-              <th className="px-4 py-2 text-center">
-                PEAD Virgem
-                <br />
-                <span className="text-xs text-gray-400">(kg)</span>
-              </th>
-              <th className="px-4 py-2 text-center">
-                Master
-                <br />
-                <span className="text-xs text-gray-400">(kg)</span>
-              </th>
-              <th className="px-4 py-2 text-center">
-                PP Reciclado
-                <br />
-                <span className="text-xs text-gray-400">(kg)</span>
-              </th>
-              <th className="px-4 py-2 text-center">
-                Garras metálicas
-                <br />
-                <span className="text-xs text-gray-400">(mg)</span>
-              </th>
-              <th className="px-4 py-2 text-center">
-                Suporte de aço
-                <br />
-                <span className="text-xs text-gray-400">(mg)</span>
-              </th>
+              <th className="px-4 py-2 text-center">PP Virgem</th>
+              <th className="px-4 py-2 text-center">PE Virgem</th>
+              <th className="px-4 py-2 text-center">PEAD Virgem</th>
+              <th className="px-4 py-2 text-center">Master</th>
+              <th className="px-4 py-2 text-center">PP Reciclado</th>
+              <th className="px-4 py-2 text-center">Garras metálicas</th>
+              <th className="px-4 py-2 text-center">Suporte de aço</th>
             </tr>
           </thead>
           <tbody>

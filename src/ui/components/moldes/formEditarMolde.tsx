@@ -34,11 +34,13 @@ function FormEditarMolde({
     resolver: zodResolver(criarmoldesSchema),
     defaultValues: {
       name: molde.name,
-      products: molde.products,
-      total_cavities: Number(molde.total_cavities || 0),
-      open_cavities: Number(molde.open_cavities || 0),
-      scrap: Number(molde.scrap || 0),
-      closed_cavity_risk: Number(molde.closed_cavity_risk || 0),
+      products: molde.products.map((prod) => prod.id) || [],
+      total_cavities: molde.total_cavities ? String(molde.total_cavities) : "",
+      open_cavities: molde.open_cavities ? String(molde.open_cavities) : "",
+      scrap: molde.scrap ? String(molde.scrap) : "",
+      closed_cavity_risk: molde.closed_cavity_risk
+        ? String(molde.closed_cavity_risk)
+        : "",
     },
   });
 
@@ -128,7 +130,7 @@ function FormEditarMolde({
                     }
                     defaultValue={molde.products
                       .map((prodId) => {
-                        const prod = products?.find((p) => p.id === prodId);
+                        const prod = products?.find((p) => p.id === prodId.id);
                         return prod
                           ? { value: prod.id, label: prod.name }
                           : null;
