@@ -17,7 +17,7 @@ function Feriados() {
 
   const handleSubmit = async (data: ICriarFeriadoBody) => {
     try {
-      await apiClient.post(`/feriados`, data);
+      await apiClient.post(`/holidays`, data);
       handleClose();
     } catch (error) {
       console.log("Erro ao cadastrar feriado:", error);

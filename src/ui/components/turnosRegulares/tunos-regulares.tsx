@@ -24,7 +24,7 @@ function TurnosRegulares() {
     queryKey: ["get", "turnos", "regulares"],
     queryFn: async () => {
       const { data } =
-        await apiClient.get<ITurnosRegulares[]>("/turnos-regulares");
+        await apiClient.get<ITurnosRegulares[]>("/regular-shifts");
       return data;
     },
   });
@@ -41,7 +41,7 @@ function TurnosRegulares() {
     try {
       await Promise.all(
         formData.turnos.map((turno) =>
-          apiClient.put(`/turnos-regulares/${turno.id}`, {
+          apiClient.put(`/regular-shifts/${turno.id}`, {
             dia_semana: turno.dia_semana,
             manha: turno.manha,
             tarde: turno.tarde,

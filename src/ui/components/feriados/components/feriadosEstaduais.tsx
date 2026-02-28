@@ -22,7 +22,7 @@ function FeriadosEstaduais() {
   const { data: feriadosData, isFetching } = useQuery({
     queryKey: ["get", "all", "feriados"],
     queryFn: async () => {
-      const { data } = await apiClient.get<IFeriadoType[]>("/feriados/");
+      const { data } = await apiClient.get<IFeriadoType[]>("/holidays/");
       return data;
     },
   });
@@ -53,7 +53,7 @@ function FeriadosEstaduais() {
 
   const handleSubmit = async (data: IFeriadoType) => {
     try {
-      await apiClient.put(`/feriados/${data.id}`, data);
+      await apiClient.put(`/holidays/${data.id}`, data);
       handleClose();
     } catch (error) {
       console.log("Erro ao atualizar feriado:", error);
