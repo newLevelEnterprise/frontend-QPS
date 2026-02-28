@@ -1,86 +1,56 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { CiCirclePlus } from "react-icons/ci";
 import { toast } from "react-toastify";
 import type { ITurnosRegulares } from "../../../types/TurnosRegulares";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
+import Modal from "../modal";
+import FormEditarTurno from "./formEditarTurno";
+import FormNovoTurno from "./formNovoTurno";
 
-type TurnosRegularesFormValues = {
-  turnos: ITurnosRegulares[];
-};
+function TurnosRegulares() {
+  const ordemDiasSemana: ITurnosRegulares["dia_semana"][] = [
+    "Segunda-feira",
+    "Terça-feira",
+    "Quarta-feira",
+    "Quinta-feira",
+    "Sexta-feira",
+    "Sábado",
+    "Domingo",
+  ];
 
-const default_shifts: ITurnosRegulares[] = [
-  {
+  const queryClient = useQueryClient();
+  const [novoTurno, setNovoTurno] = useState<boolean>(false);
+  const [editarTurno, setEditarTurno] = useState<boolean>(false);
+
+  const [turno, setTurno] = useState<ITurnosRegulares>({
     id: 0,
     dia_semana: "Segunda-feira",
     manha: false,
     tarde: false,
     noite: false,
-    frequencia: "Diário",
-  },
-  {
-    id: 1,
-    dia_semana: "Terça-feira",
-    manha: false,
-    tarde: false,
-    noite: false,
-    frequencia: "Diário",
-  },
-  {
-    id: 2,
-    dia_semana: "Quarta-feira",
-    manha: false,
-    tarde: false,
-    noite: false,
-    frequencia: "Diário",
-  },
-  {
-    id: 3,
-    dia_semana: "Quinta-feira",
-    manha: false,
-    tarde: false,
-    noite: false,
-    frequencia: "Diário",
-  },
-  {
-    id: 4,
-    dia_semana: "Sexta-feira",
-    manha: false,
-    tarde: false,
-    noite: false,
-    frequencia: "Diário",
-  },
-  {
-    id: 5,
-    dia_semana: "Sábado",
-    manha: false,
-    tarde: false,
-    noite: false,
-    frequencia: "Diário",
-  },
-  {
-    id: 6,
-    dia_semana: "Domingo",
-    manha: false,
-    tarde: false,
-    noite: false,
-    frequencia: "Diário",
-  },
-];
+    frequencia: "Semanal",
+  });
 
-function TurnosRegulares() {
-  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.delete(`/regular-shifts/${id}`);
+    },
+    onError: (error) => {
+      toast.error("Erro ao deletar turno. Tente novamente.");
+      console.error("Erro ao deletar turno:", error);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "all", "turnos-regulares"],
+      });
+      toast.success("Turno deletado com sucesso!");
+    },
+  });
 
-  const { register, reset, watch, handleSubmit, formState } =
-    useForm<TurnosRegularesFormValues>({
-      defaultValues: {
-        turnos: [],
-      },
-    });
-
-  const { data: turnosData, isFetching } = useQuery({
-    queryKey: ["get", "turnos", "regulares"],
+  const { data: turnos, isFetching } = useQuery({
+    queryKey: ["get", "all", "turnos-regulares"],
     queryFn: async () => {
       const { data } =
         await apiClient.get<ITurnosRegulares[]>("/regular-shifts/");
@@ -88,164 +58,144 @@ function TurnosRegulares() {
     },
   });
 
-  useEffect(() => {
-    if (turnosData) {
-      reset({ turnos: turnosData.length > 0 ? turnosData : default_shifts });
-    }
-  }, [reset, turnosData]);
+  const formatPeriodo = (value: boolean) => (value ? "Sim" : "Não");
 
-  const turnos = watch("turnos");
+  const turnosOrdenados = [...(turnos ?? [])].sort((turnoA, turnoB) => {
+    const indexA = ordemDiasSemana.indexOf(turnoA.dia_semana);
+    const indexB = ordemDiasSemana.indexOf(turnoB.dia_semana);
 
-  const onSubmit = async (formData: TurnosRegularesFormValues) => {
-    try {
-      if (turnosData && turnosData.length > 0) {
-        await Promise.all(
-          formData.turnos.map((turno) =>
-            apiClient.put(`/regular-shifts/${turno.id}`, {
-              manha: turno.manha,
-              tarde: turno.tarde,
-              noite: turno.noite,
-              frequencia: turno.frequencia,
-            }),
-          ),
-        );
-      } else {
-        await Promise.all(
-          formData.turnos.map((turno) =>
-            apiClient.post(`/regular-shifts`, {
-              dia_semana: turno.dia_semana,
-              manha: turno.manha,
-              tarde: turno.tarde,
-              noite: turno.noite,
-              frequencia: turno.frequencia,
-            }),
-          ),
-        );
-      }
-
-      if (turnosData && turnosData.length > 0) {
-        toast.success("Turnos regulares atualizados com sucesso!");
-      } else {
-        toast.success("Turnos regulares cadastrados com sucesso!");
-      }
-      await queryClient.invalidateQueries({
-        queryKey: ["get", "turnos", "regulares"],
-      });
-    } catch (error) {
-      console.error("Erro nos turnos regulares:", error);
-      if (turnosData && turnosData.length > 0) {
-        toast.error("Erro ao atualizar turnos regulares. Tente novamente.");
-      } else {
-        toast.error("Erro ao cadastrar turnos regulares. Tente novamente.");
-      }
-    }
-  };
+    return indexA - indexB;
+  });
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full flex flex-col justify-between bg-white rounded-md shadow p-4"
-    >
-      <div className="shadow-sm p-6 rounded-lg bg-white border border-gray-200">
-        <h1 className="text-xl text-[#5B85D5] font-bold">Turnos Regulares</h1>
-        {isFetching && <Loader message="Carregando turnos regulares" />}
-        {!isFetching && (
-          <div className="rounded-lg overflow-y-auto mt-10 h-fit max-h-[470px] overflow-x-auto">
-            <table className="w-full min-w-max">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 text-left">Turnos Regulares</th>
-                  <th className="px-4 py-2 text-center">
-                    Manhã
-                    <br />
-                    <span className="text-xs text-gray-400">(06h - 14h)</span>
-                  </th>
-                  <th className="px-4 py-2 text-center">
-                    Tarde
-                    <br />
-                    <span className="text-xs text-gray-400">(14h às 22h)</span>
-                  </th>
-                  <th className="px-4 py-2 text-center">
-                    Noite
-                    <br />
-                    <span className="text-xs text-gray-400">(22h às 06h)</span>
-                  </th>
-                  <th className="px-4 py-2 text-center">Frequência</th>
-                </tr>
-              </thead>
-              <tbody>
-                {turnos?.map((turno, index) => (
-                  <tr
-                    key={turno.id}
-                    className="bg-white rounded-lg border border-gray-200 overflow-hidden"
-                  >
-                    <td className="px-4 py-2">
-                      {turno.dia_semana}
-                      <input
-                        type="hidden"
-                        {...register(`turnos.${index}.id`, {
-                          valueAsNumber: true,
-                        })}
-                      />
-                      <input
-                        type="hidden"
-                        {...register(`turnos.${index}.dia_semana`)}
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <input
-                        type="checkbox"
-                        {...register(`turnos.${index}.manha`)}
-                        className="accent-blue-600 w-5 h-5"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <input
-                        type="checkbox"
-                        {...register(`turnos.${index}.tarde`)}
-                        className="accent-blue-600 w-5 h-5"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <input
-                        type="checkbox"
-                        {...register(`turnos.${index}.noite`)}
-                        className="accent-blue-600 w-5 h-5"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <select
-                        {...register(`turnos.${index}.frequencia`)}
-                        className="border rounded p-1"
+    <div className="w-full bg-white rounded-md shadow p-4">
+      <Modal.Root isVisible={novoTurno}>
+        <Modal.Container>
+          <Modal.Header
+            title="Adicionar Novo Turno"
+            onClose={() => setNovoTurno(false)}
+          />
+          <FormNovoTurno
+            setTurno={() =>
+              queryClient.invalidateQueries({
+                queryKey: ["get", "all", "turnos-regulares"],
+              })
+            }
+            setNovoTurno={setNovoTurno}
+          />
+        </Modal.Container>
+      </Modal.Root>
+      <Modal.Root isVisible={editarTurno}>
+        <Modal.Container>
+          <Modal.Header
+            title="Editar Turno"
+            onClose={() => setEditarTurno(false)}
+          />
+          <FormEditarTurno
+            setTurno={() =>
+              queryClient.invalidateQueries({
+                queryKey: ["get", "all", "turnos-regulares"],
+              })
+            }
+            setNovoTurno={setEditarTurno}
+            turno={turno}
+          />
+        </Modal.Container>
+      </Modal.Root>
+      <h1 className="text-xl text-[#5B85D5] font-bold">Turnos Regulares</h1>
+      {isFetching && <Loader message="Carregando turnos regulares" />}
+      {!isFetching && (
+        <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
+          <table className="w-full overflow-auto max-h-[470px]">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  Dia da Semana
+                </th>
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  Manhã
+                </th>
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  Tarde
+                </th>
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  Noite
+                </th>
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  Frequência
+                </th>
+                <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
+                  Ações
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {turnosOrdenados.map((itemTurno) => (
+                <tr
+                  key={itemTurno.id}
+                  className="border-b border-gray-200 last:border-b-0"
+                >
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    {itemTurno.dia_semana}
+                  </td>
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    {formatPeriodo(itemTurno.manha)}
+                  </td>
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    {formatPeriodo(itemTurno.tarde)}
+                  </td>
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    {formatPeriodo(itemTurno.noite)}
+                  </td>
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    {itemTurno.frequencia}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="w-full flex justify-end gap-2">
+                      <button
+                        onClick={() => {
+                          setTurno(itemTurno);
+                          setEditarTurno(true);
+                        }}
+                        className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"
                       >
-                        <option>Diário</option>
-                        <option>Semanal</option>
-                        <option>Quinzenal</option>
-                        <option>Mensal</option>
-                        <option>Não Trabalha</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-      <div className="flex items-end justify-end mt-4">
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => mutateAsync(itemTurno.id)}
+                        className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <div className="flex flex-col gap-4 items-center justify-center mt-4">
         <button
-          type="submit"
-          disabled={isFetching || formState.isSubmitting || turnos.length === 0}
+          disabled={isFetching || isPending}
+          onClick={() => {
+            setNovoTurno(true);
+            setTurno({
+              id: 0,
+              dia_semana: "Segunda-feira",
+              manha: false,
+              tarde: false,
+              noite: false,
+              frequencia: "Semanal",
+            });
+          }}
           className="disabled:bg-blue-300 disabled:cursor-not-allowed cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          {formState.isSubmitting ? (
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          ) : (
-            "Cadastrar Turnos"
-          )}
+          <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
+          Adicionar Novo Turno
         </button>
       </div>
-    </form>
+    </div>
   );
 }
 
