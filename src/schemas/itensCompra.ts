@@ -2,16 +2,16 @@ import { z } from "zod";
 
 export const criarItensCompraSchema = z.object({
   item: z.string().min(1, "Nome é obrigatório"),
-  leadTimeEntrega: z.number().min(0, "Lead time é obrigatório"),
-  custoMedio: z.number().min(0, "Custo médio é obrigatório"),
-  refugo: z.number().min(0, "Refugo é obrigatório"),
+  leadTimeEntrega: z.string().min(1, "Lead time é obrigatório"),
+  custoMedio: z.string().min(1, "Custo médio é obrigatório"),
+  refugo: z.string().min(1, "Refugo é obrigatório"),
 });
 
 export const editarItensCompraSchema = z.object({
   item: z.string().min(1, "Nome é obrigatório"),
-  leadTimeEntrega: z.number().min(0, "Lead time é obrigatório"),
-  custoMedio: z.number().min(0, "Custo médio é obrigatório"),
-  refugo: z.number().min(0, "Refugo é obrigatório"),
+  leadTimeEntrega: z.string().min(1, "Lead time é obrigatório"),
+  custoMedio: z.string().min(1, "Custo médio é obrigatório"),
+  refugo: z.string().min(1, "Refugo é obrigatório"),
 });
 
 export type IEditarItensCompraBody = z.infer<typeof editarItensCompraSchema>;

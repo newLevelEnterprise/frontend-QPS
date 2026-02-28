@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
-import { LuLoaderCircle } from "react-icons/lu";
+import { toast } from "react-toastify";
 import type { IItensCompra } from "../../../types/ItensCompra";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
@@ -26,12 +26,21 @@ function ItensCompras() {
     mutationFn: async (id: number) => {
       await apiClient.delete(`/purchase-items/${id}`);
     },
+    onError: (error) => {
+      console.error("Erro ao deletar item:", error);
+      toast.error("Erro ao deletar item. Por favor, tente novamente.");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "all", "itens_compra"],
+      });
+    },
   });
 
   const { data: itensCompra, isFetching } = useQuery({
     queryKey: ["get", "all", "itens_compra"],
     queryFn: async () => {
-      const { data } = await apiClient.get<IItensCompra[]>("/purchase-items");
+      const { data } = await apiClient.get<IItensCompra[]>("/purchase-items/");
       return data;
     },
   });
@@ -126,10 +135,10 @@ function ItensCompras() {
                       </button>
                       <button
                         onClick={() => mutateAsync(item.id)}
-                        disabled={isPending}
+                        disabled={isPending || isFetching}
                         className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
                       >
-                        {isPending ? <LuLoaderCircle /> : "Excluir"}
+                        Excluir
                       </button>
                     </div>
                   </td>
@@ -139,24 +148,26 @@ function ItensCompras() {
           </table>
         </div>
       )}
-      <div className="flex flex-col gap-4 items-center justify-center mt-4">
-        <button
-          onClick={() => {
-            setNovoItem(true);
-            setItem({
-              id: 0,
-              name: "",
-              lead_time: 0,
-              cost: 0,
-              scrap: 0,
-            });
-          }}
-          className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
-          Adicionar Novo Item
-        </button>
-      </div>
+      {!isFetching && (
+        <div className="flex flex-col gap-4 items-center justify-center mt-4">
+          <button
+            onClick={() => {
+              setNovoItem(true);
+              setItem({
+                id: 0,
+                name: "",
+                lead_time: 0,
+                cost: 0,
+                scrap: 0,
+              });
+            }}
+            className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
+            Adicionar Novo Item
+          </button>
+        </div>
+      )}
     </div>
   );
 }

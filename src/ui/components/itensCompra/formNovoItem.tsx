@@ -49,7 +49,7 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
       onSubmit={handleSubmit(onSubmit)}
       className="w-full flex flex-col gap-10 my-6"
     >
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4">
         <div className="w-full flex flex-col gap-3">
           <label
             htmlFor="nome"
@@ -75,53 +75,55 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
           )}
         </div>
 
-        <div className="w-full flex flex-col gap-3">
-          <label
-            htmlFor="leadTimeEntrega"
-            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-          >
-            Lead Time Médio de Entrega (dias)
-          </label>
-          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-            <input
-              id="leadTimeEntrega"
-              placeholder="Lead Time Médio de Entrega (dias)"
-              type="number"
-              className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("leadTimeEntrega")}
-            />
+        <div className="flex gap-2">
+          <div className="w-full flex flex-col gap-3">
+            <label
+              htmlFor="leadTimeEntrega"
+              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+            >
+              Lead Time Médio de Entrega (dias)
+            </label>
+            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+              <input
+                id="leadTimeEntrega"
+                placeholder="Lead Time Médio de Entrega (dias)"
+                type="number"
+                className="w-full outline-none border-b border-[#A4AABC]"
+                {...register("leadTimeEntrega")}
+              />
+            </div>
+            {errors.leadTimeEntrega && (
+              <ErrorMessage
+                errors={errors}
+                name="leadTimeEntrega"
+                render={({ message }) => <FormErrorMessage message={message} />}
+              />
+            )}
           </div>
-          {errors.leadTimeEntrega && (
-            <ErrorMessage
-              errors={errors}
-              name="leadTimeEntrega"
-              render={({ message }) => <FormErrorMessage message={message} />}
-            />
-          )}
-        </div>
-        <div className="w-full flex flex-col gap-3">
-          <label
-            htmlFor="custoMedio"
-            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-          >
-            Custo Médio (R$/Kg)
-          </label>
-          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-            <input
-              id="custoMedio"
-              placeholder="Custo Médio (R$/Kg)"
-              type="number"
-              className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("custoMedio")}
-            />
+          <div className="w-full flex flex-col gap-3">
+            <label
+              htmlFor="custoMedio"
+              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+            >
+              Custo Médio (R$/Kg)
+            </label>
+            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+              <input
+                id="custoMedio"
+                placeholder="Custo Médio (R$/Kg)"
+                type="number"
+                className="w-full outline-none border-b border-[#A4AABC]"
+                {...register("custoMedio")}
+              />
+            </div>
+            {errors.custoMedio && (
+              <ErrorMessage
+                errors={errors}
+                name="custoMedio"
+                render={({ message }) => <FormErrorMessage message={message} />}
+              />
+            )}
           </div>
-          {errors.custoMedio && (
-            <ErrorMessage
-              errors={errors}
-              name="custoMedio"
-              render={({ message }) => <FormErrorMessage message={message} />}
-            />
-          )}
         </div>
         <div className="w-full flex flex-col gap-3">
           <label

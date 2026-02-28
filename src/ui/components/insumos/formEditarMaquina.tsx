@@ -36,7 +36,7 @@ function FormEditarInsumo({
     resolver: zodResolver(editarInsumosSchema),
     defaultValues: {
       custoMedio: insumo.custo_medio,
-      leadTimeEntrega: insumo.lead_time_medio_entrega,
+      leadTimeEntrega: String(insumo.lead_time_medio_entrega) || "0",
       nome: insumo.nome,
     },
   });

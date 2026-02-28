@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
-import { LuLoaderCircle } from "react-icons/lu";
 import { toast } from "react-toastify";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
@@ -36,7 +35,7 @@ function Insumos() {
           lead_time_medio_entrega: number;
           custo_medio: string;
         }[]
-      >("/raw-material");
+      >("/raw-material/");
       return data;
     },
   });
@@ -48,6 +47,12 @@ function Insumos() {
     onError: (error) => {
       console.error("Erro ao deletar insumo:", error);
       toast.error("Erro ao deletar insumo. Por favor, tente novamente.");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "all", "insumos"],
+      });
+      toast.success("Insumo deletado com sucesso!");
     },
   });
 
@@ -140,11 +145,7 @@ function Insumos() {
                         disabled={isFetching || isPending}
                         className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
                       >
-                        {isPending ? (
-                          <LuLoaderCircle className="animate-spin size-4" />
-                        ) : (
-                          "Deletar"
-                        )}
+                        Deletar
                       </button>
                     </div>
                   </td>
