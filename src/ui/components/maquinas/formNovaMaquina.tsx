@@ -28,9 +28,9 @@ function FormNovaMaquina({
     resolver: zodResolver(criarMaquinaSchema),
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ICriarMaquinaBody) => {
     try {
+      console.log("Dados do formulário:", data);
       await apiClient.post("/machines", {
         name: data.name,
         availability: parseInt(data.disponibilidade),

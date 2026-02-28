@@ -41,10 +41,9 @@ function FormEditarInsumo({
     },
   });
 
-   
   const onSubmit = async (data: IEditarInsumosBody) => {
     try {
-      await apiClient.put<IInsumos>(`/materia-prima/${insumo.id}`, {
+      await apiClient.put<IInsumos>(`/raw-material/${insumo.id}`, {
         nome: data.nome,
         lead_time_medio_entrega: Number(data.leadTimeEntrega),
         custo_medio: Number(data.custoMedio),

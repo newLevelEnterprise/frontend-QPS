@@ -35,14 +35,14 @@ function Insumos() {
           lead_time_medio_entrega: number;
           custo_medio: string;
         }[]
-      >("/materia-prima");
+      >("/raw-material");
       return data;
     },
   });
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (id: number) => {
-      await apiClient.delete(`/materia-prima/${id}`);
+      await apiClient.delete(`/raw-material/${id}`);
     },
     onError: (error) => {
       console.error("Erro ao deletar insumo:", error);

@@ -39,9 +39,7 @@ function Maquinas() {
 
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
-      <Modal.Root
-        isVisible={novaMaquina && !!maquinas && maquinas?.length < 10}
-      >
+      <Modal.Root isVisible={novaMaquina && (maquinas?.length || 0) < 10}>
         <Modal.Container>
           <Modal.Header
             title="Adicionar Nova Máquina"

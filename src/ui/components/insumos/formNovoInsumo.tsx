@@ -28,7 +28,7 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
 
   const onSubmit = async (data: ICriarInsumosBody) => {
     try {
-      const { data: res } = await apiClient.post<IInsumos>("/materia-prima", {
+      const { data: res } = await apiClient.post<IInsumos>("/raw-material", {
         nome: data.nome,
         lead_time_medio_entrega: Number(data.leadTimeEntrega),
         custo_medio: Number(data.custoMedio),

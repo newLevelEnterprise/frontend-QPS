@@ -30,19 +30,21 @@ function FormEditarItem({
   } = useForm<IEditarItensCompraBody>({
     resolver: zodResolver(editarItensCompraSchema),
     defaultValues: {
-      custoMedio: item.custoMedio,
-      leadTimeEntrega: item.leadTimeEntrega,
-      item: item.item,
+      custoMedio: item.cost,
+      leadTimeEntrega: item.lead_time,
+      item: item.name,
+      refugo: item.scrap,
     },
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
-      await apiClient.put<IItensCompra>(`/itens_compra/${item.id}`, {
-        item: data.item,
-        leadTimeEntrega: Number(data.leadTimeEntrega),
-        custoMedio: Number(data.custoMedio),
+      await apiClient.put<IItensCompra>(`/purchase-items/${item.id}`, {
+        name: data.item,
+        lead_time: Number(data.leadTimeEntrega),
+        cost: Number(data.custoMedio),
+        scrap: Number(data.refugo),
       });
       setItem();
       toast.success("Item atualizado com sucesso!");
@@ -128,6 +130,30 @@ function FormEditarItem({
             <ErrorMessage
               errors={errors}
               name="custoMedio"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="refugo"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+          >
+            Refugo
+          </label>
+          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+            <input
+              id="refugo"
+              placeholder="Custo Médio (R$/Kg)"
+              type="number"
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("refugo")}
+            />
+          </div>
+          {errors.refugo && (
+            <ErrorMessage
+              errors={errors}
+              name="refugo"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}

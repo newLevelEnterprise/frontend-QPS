@@ -26,13 +26,13 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
     resolver: zodResolver(criarItensCompraSchema),
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ICriarItensCompraBody) => {
     try {
-      const { data: res } = await apiClient.post<IInsumos>("/itens_compra", {
-        item: data.item,
-        leadTimeEntrega: Number(data.leadTimeEntrega),
-        custoMedio: Number(data.custoMedio),
+      const { data: res } = await apiClient.post<IInsumos>("/purchase-items", {
+        name: data.item,
+        lead_time: Number(data.leadTimeEntrega),
+        cost: Number(data.custoMedio),
+        scrap: Number(data.refugo),
       });
       toast.success("Insumo criado com sucesso!");
       setItem();
@@ -119,6 +119,30 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
             <ErrorMessage
               errors={errors}
               name="custoMedio"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="refugo"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+          >
+            Refugo
+          </label>
+          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+            <input
+              id="refugo"
+              placeholder="Refugo"
+              type="number"
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("refugo")}
+            />
+          </div>
+          {errors.refugo && (
+            <ErrorMessage
+              errors={errors}
+              name="refugo"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}
