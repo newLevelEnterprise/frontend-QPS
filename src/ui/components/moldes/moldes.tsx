@@ -47,7 +47,7 @@ function Moldes() {
       return data;
     },
   });
-  console.log(moldes);
+
   return (
     <div className="w-full bg-white rounded-md shadow p-4">
       <Modal.Root isVisible={novoMolde}>
