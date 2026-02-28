@@ -4,6 +4,7 @@ import { CiCirclePlus } from "react-icons/ci";
 import { LuLoaderCircle } from "react-icons/lu";
 import { toast } from "react-toastify";
 import { apiClient } from "../../../utils/apiClient";
+import Loader from "../Loader";
 import Modal from "../modal";
 import FormEditarInsumo from "./formEditarMaquina";
 import FormNovoInsumo from "./formNovoInsumo";
@@ -88,12 +89,7 @@ function Insumos() {
       <h1 className="text-xl text-[#5B85D5] font-bold">
         Cadastrar matéria prima
       </h1>
-      {isFetching && (
-        <div className="w-full flex gap-4 items-center justify-center mt-4">
-          <LuLoaderCircle className="animate-spin size-6" />
-          <p className="text-gray-500 text-sm">Carregando insumos...</p>
-        </div>
-      )}
+      {isFetching && <Loader message="Carregando insumos" />}
       {!isFetching && (
         <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
           <table className="w-full overflow-auto max-h-[470px]">

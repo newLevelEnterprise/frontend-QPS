@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { BiLoaderCircle } from "react-icons/bi";
 import { CiCirclePlus } from "react-icons/ci";
 import { LuLoaderCircle } from "react-icons/lu";
 import type { IItensCompra } from "../../../types/ItensCompra";
 import { apiClient } from "../../../utils/apiClient";
+import Loader from "../Loader";
 import Modal from "../modal";
 import FormEditarItem from "./formEditarItem";
 import FormNovoItem from "./formNovoItem";
@@ -72,12 +72,7 @@ function ItensCompras() {
         </Modal.Container>
       </Modal.Root>
       <h1 className="text-xl text-[#5B85D5] font-bold">Itens de Compra</h1>
-      {isFetching && (
-        <div className="w-full flex items-center justify-center mt-4">
-          <BiLoaderCircle />
-          <p className="text-gray-500 text-sm">Carregando itens de compra...</p>
-        </div>
-      )}
+      {isFetching && <Loader message="Carregando itens de compra" />}
       {!isFetching && (
         <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
           <table className="w-full overflow-auto max-h-[470px]">

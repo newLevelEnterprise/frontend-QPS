@@ -4,6 +4,7 @@ import { FiEdit2 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import type { IFeriadoType } from "../../../../types/Feriado";
 import { apiClient } from "../../../../utils/apiClient";
+import Loader from "../../Loader";
 import Modal from "../../modal";
 import EditarFeriadoForm from "../formEditarFeriado";
 
@@ -63,14 +64,7 @@ function FeriadosMunicipais() {
   return (
     <div className="bg-white rounded-xl shadow p-4 w-full min-w-fit">
       <h2 className="text-base font-semibold mb-3">Feriados Municipais</h2>
-      {isFetching && (
-        <div className="w-full h-full flex justify-center items-center">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-sm text-gray-500">Carregando feriados...</p>
-          </div>
-        </div>
-      )}
+      {isFetching && <Loader message="Carregando feriados municipais" />}
       {!isFetching && (
         <>
           <ul className="flex flex-col gap-1">

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import type { ITurnosRegulares } from "../../../types/TurnosRegulares";
 import { apiClient } from "../../../utils/apiClient";
+import Loader from "../Loader";
 
 type TurnosRegularesFormValues = {
   turnos: ITurnosRegulares[];
@@ -67,16 +68,7 @@ function TurnosRegulares() {
     >
       <div className="shadow-sm p-6 rounded-lg bg-white border border-gray-200">
         <h1 className="text-xl text-[#5B85D5] font-bold">Turnos Regulares</h1>
-        {isFetching && (
-          <div className="w-full h-full flex justify-center items-center">
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-sm text-gray-500">
-                Carregando turnos regulares...
-              </p>
-            </div>
-          </div>
-        )}
+        {isFetching && <Loader message="Carregando turnos regulares" />}
         {!isFetching && (
           <div className="rounded-lg overflow-y-auto mt-10 h-[470px] overflow-x-auto">
             <table className="w-full min-w-max">

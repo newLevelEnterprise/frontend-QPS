@@ -6,6 +6,7 @@ import { VscLoading } from "react-icons/vsc";
 import { toast } from "react-toastify";
 import type { IPedido } from "../../../types/Pedido";
 import { apiClient } from "../../../utils/apiClient";
+import Loader from "../Loader";
 
 function PedidosDisponiveis() {
   const queryClient = useQueryClient();
@@ -52,16 +53,16 @@ function PedidosDisponiveis() {
         if (!actualData) {
           localStorage.setItem(
             "jobs_para_sequenciamento",
-            JSON.stringify([pedido])
+            JSON.stringify([pedido]),
           );
           return [pedido];
         }
         localStorage.setItem(
           "jobs_para_sequenciamento",
-          JSON.stringify([...actualData, pedido])
+          JSON.stringify([...actualData, pedido]),
         );
         return [...actualData, pedido];
-      }
+      },
     );
   };
 
@@ -87,7 +88,7 @@ function PedidosDisponiveis() {
     mutationFn: async () => {
       if (jobs) {
         for (const job of jobs) {
-          console.log('deletado', job.id);
+          console.log("deletado", job.id);
           await apiClient.delete(`/jobs/${job.id}`);
         }
       }
@@ -147,14 +148,7 @@ function PedidosDisponiveis() {
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[400px] md:h-[470px] overflow-x-scroll">
         {isFetching ? (
-          <div className="w-full h-full flex justify-center items-center">
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-sm text-gray-500">
-                Carregando produtos...
-              </p>
-            </div>
-          </div>
+          <Loader message="Carregando pedidos" />
         ) : !jobs || jobs.length === 0 ? (
           <div className="w-full h-full flex justify-center items-center">
             <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">
@@ -198,10 +192,10 @@ function PedidosDisponiveis() {
                     className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                   >
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.name.split(' - ')[0]}
+                      {pedido.name.split(" - ")[0]}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.name.split(' - ')[1]}
+                      {pedido.name.split(" - ")[1]}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {Intl.NumberFormat("pt-br").format(pedido.demand)}
@@ -217,7 +211,10 @@ function PedidosDisponiveis() {
                       }).format(new Date(pedido.promised_date))}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {Intl.NumberFormat("pt-br", {style: 'currency', currency: 'BRL'}).format(pedido.product_value)}
+                      {Intl.NumberFormat("pt-br", {
+                        style: "currency",
+                        currency: "BRL",
+                      }).format(pedido.product_value)}
                     </td>
 
                     <td className="px-2 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">

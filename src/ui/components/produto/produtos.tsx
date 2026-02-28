@@ -5,6 +5,7 @@ import { IoSearchSharp } from "react-icons/io5";
 import { toast } from "react-toastify";
 import type { IProduto } from "../../../types/Produto";
 import { apiClient } from "../../../utils/apiClient";
+import Loader from "../Loader";
 import Modal from "../modal";
 import XlsxUpload from "../XlsxUpload";
 import FormEditarProduto from "./formEditProduto";
@@ -160,14 +161,7 @@ function Produtos() {
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
         {isFetching ? (
-          <div className="w-full h-full flex justify-center items-center">
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-sm text-gray-500">
-                Carregando produtos...
-              </p>
-            </div>
-          </div>
+          <Loader message="Carregando produtos" />
         ) : !products || products.length === 0 ? (
           <div className="w-full h-full flex justify-center items-center">
             <h2 className="text-lg md:text-2xl text-gray-500 font-semibold">

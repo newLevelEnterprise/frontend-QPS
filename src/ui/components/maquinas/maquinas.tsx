@@ -4,6 +4,7 @@ import { CiCirclePlus } from "react-icons/ci";
 import { toast } from "react-toastify";
 import type { IMaquinasType } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
+import Loader from "../Loader";
 import Modal from "../modal";
 import FormEditarMaquina from "./formEditarMaquina";
 import FormNovaMaquina from "./formNovaMaquina";
@@ -73,14 +74,7 @@ function Maquinas() {
         </Modal.Container>
       </Modal.Root>
       <h1 className="text-xl text-[#5B85D5] font-bold">Máquinas Cadastradas</h1>
-      {isFetching && (
-        <div className="w-full flex items-center justify-center mt-6">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-sm text-gray-500">Carregando máquinas...</p>
-          </div>
-        </div>
-      )}
+      {isFetching && <Loader message="Carregando máquinas" />}
       {!isFetching && (
         <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
           <table className="w-full overflow-auto max-h-[470px]">
