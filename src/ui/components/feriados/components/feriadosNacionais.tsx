@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { FiEdit2 } from "react-icons/fi";
 import { toast } from "react-toastify";
@@ -8,7 +8,23 @@ import Loader from "../../Loader";
 import Modal from "../../modal";
 import EditarFeriadoForm from "../formEditarFeriado";
 
+const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit",
+  month: "long",
+});
+
+function formatHolidayDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+
+  if (!year || !month || !day) {
+    return date;
+  }
+
+  return dateFormatter.format(new Date(Date.UTC(year, month - 1, day)));
+}
+
 function FeriadosNacionais() {
+  const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [feriadoSelecionado, setFeriadoSelecionado] = useState<IFeriadoType>({
     date: "",
@@ -55,6 +71,7 @@ function FeriadosNacionais() {
     try {
       await apiClient.put(`/holidays/${data.id}`, data);
       handleClose();
+      queryClient.invalidateQueries({ queryKey: ["get", "all", "feriados"] });
     } catch (error) {
       console.log("Erro ao atualizar feriado:", error);
       toast.error("Erro ao atualizar feriado. Tente novamente mais tarde.");
@@ -75,8 +92,8 @@ function FeriadosNacionais() {
                   key={feriado.date + feriado.name}
                   className="flex items-center justify-between bg-white rounded-lg border border-gray-200 px-3 py-2"
                 >
-                  <span className="w-20 font-medium text-gray-700">
-                    {feriado.date}
+                  <span className="w-28 font-medium text-gray-700">
+                    {formatHolidayDate(feriado.date)}
                   </span>
                   <span className="flex-1 ml-2 text-gray-700 text-sm truncate">
                     {feriado.name}

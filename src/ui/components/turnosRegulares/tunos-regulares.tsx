@@ -10,6 +10,65 @@ type TurnosRegularesFormValues = {
   turnos: ITurnosRegulares[];
 };
 
+const default_shifts: ITurnosRegulares[] = [
+  {
+    id: 0,
+    dia_semana: "Segunda-feira",
+    manha: false,
+    tarde: false,
+    noite: false,
+    frequencia: "Diário",
+  },
+  {
+    id: 1,
+    dia_semana: "Terça-feira",
+    manha: false,
+    tarde: false,
+    noite: false,
+    frequencia: "Diário",
+  },
+  {
+    id: 2,
+    dia_semana: "Quarta-feira",
+    manha: false,
+    tarde: false,
+    noite: false,
+    frequencia: "Diário",
+  },
+  {
+    id: 3,
+    dia_semana: "Quinta-feira",
+    manha: false,
+    tarde: false,
+    noite: false,
+    frequencia: "Diário",
+  },
+  {
+    id: 4,
+    dia_semana: "Sexta-feira",
+    manha: false,
+    tarde: false,
+    noite: false,
+    frequencia: "Diário",
+  },
+  {
+    id: 5,
+    dia_semana: "Sábado",
+    manha: false,
+    tarde: false,
+    noite: false,
+    frequencia: "Diário",
+  },
+  {
+    id: 6,
+    dia_semana: "Domingo",
+    manha: false,
+    tarde: false,
+    noite: false,
+    frequencia: "Diário",
+  },
+];
+
 function TurnosRegulares() {
   const queryClient = useQueryClient();
 
@@ -24,14 +83,14 @@ function TurnosRegulares() {
     queryKey: ["get", "turnos", "regulares"],
     queryFn: async () => {
       const { data } =
-        await apiClient.get<ITurnosRegulares[]>("/regular-shifts");
+        await apiClient.get<ITurnosRegulares[]>("/regular-shifts/");
       return data;
     },
   });
 
   useEffect(() => {
     if (turnosData) {
-      reset({ turnos: turnosData });
+      reset({ turnos: turnosData.length > 0 ? turnosData : default_shifts });
     }
   }, [reset, turnosData]);
 
@@ -39,25 +98,46 @@ function TurnosRegulares() {
 
   const onSubmit = async (formData: TurnosRegularesFormValues) => {
     try {
-      await Promise.all(
-        formData.turnos.map((turno) =>
-          apiClient.put(`/regular-shifts/${turno.id}`, {
-            dia_semana: turno.dia_semana,
-            manha: turno.manha,
-            tarde: turno.tarde,
-            noite: turno.noite,
-            frequencia: turno.frequencia,
-          }),
-        ),
-      );
+      if (turnosData && turnosData.length > 0) {
+        await Promise.all(
+          formData.turnos.map((turno) =>
+            apiClient.put(`/regular-shifts/${turno.id}`, {
+              manha: turno.manha,
+              tarde: turno.tarde,
+              noite: turno.noite,
+              frequencia: turno.frequencia,
+            }),
+          ),
+        );
+      } else {
+        await Promise.all(
+          formData.turnos.map((turno) =>
+            apiClient.post(`/regular-shifts`, {
+              dia_semana: turno.dia_semana,
+              manha: turno.manha,
+              tarde: turno.tarde,
+              noite: turno.noite,
+              frequencia: turno.frequencia,
+            }),
+          ),
+        );
+      }
 
-      toast.success("Turnos regulares atualizados com sucesso!");
+      if (turnosData && turnosData.length > 0) {
+        toast.success("Turnos regulares atualizados com sucesso!");
+      } else {
+        toast.success("Turnos regulares cadastrados com sucesso!");
+      }
       await queryClient.invalidateQueries({
         queryKey: ["get", "turnos", "regulares"],
       });
     } catch (error) {
-      console.error("Erro ao atualizar turnos regulares:", error);
-      toast.error("Erro ao atualizar turnos regulares. Tente novamente.");
+      console.error("Erro nos turnos regulares:", error);
+      if (turnosData && turnosData.length > 0) {
+        toast.error("Erro ao atualizar turnos regulares. Tente novamente.");
+      } else {
+        toast.error("Erro ao cadastrar turnos regulares. Tente novamente.");
+      }
     }
   };
 
@@ -70,7 +150,7 @@ function TurnosRegulares() {
         <h1 className="text-xl text-[#5B85D5] font-bold">Turnos Regulares</h1>
         {isFetching && <Loader message="Carregando turnos regulares" />}
         {!isFetching && (
-          <div className="rounded-lg overflow-y-auto mt-10 h-[470px] overflow-x-auto">
+          <div className="rounded-lg overflow-y-auto mt-10 h-fit max-h-[470px] overflow-x-auto">
             <table className="w-full min-w-max">
               <thead>
                 <tr>
@@ -161,7 +241,7 @@ function TurnosRegulares() {
           {formState.isSubmitting ? (
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           ) : (
-            "Prosseguir"
+            "Cadastrar Turnos"
           )}
         </button>
       </div>

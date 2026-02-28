@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { toast } from "react-toastify";
@@ -10,6 +11,7 @@ import FeriadosNacionais from "./components/feriadosNacionais";
 import FormCadastrarFeriado from "./formCadastrarFeriado";
 
 function Feriados() {
+  const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleOpen = () => setModalOpen(true);
@@ -19,6 +21,7 @@ function Feriados() {
     try {
       await apiClient.post(`/holidays`, data);
       handleClose();
+      queryClient.invalidateQueries({ queryKey: ["get", "all", "feriados"] });
     } catch (error) {
       console.log("Erro ao cadastrar feriado:", error);
       toast.error("Erro ao cadastrar feriado. Tente novamente mais tarde.");
