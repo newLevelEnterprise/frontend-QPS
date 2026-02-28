@@ -191,7 +191,7 @@ export default function Sidebar({
     queryFn: async () => {
       const { data } =
         await apiClient.get<{ name: string; id: number }[]>(
-          "/production-lines",
+          "/production-lines/",
         );
       return data;
     },

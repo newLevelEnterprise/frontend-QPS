@@ -19,7 +19,7 @@ function LinhaProducao() {
     name: "",
   });
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutateAsync } = useMutation({
     mutationFn: async (id: number) => {
       await apiClient.delete(`/production-lines/${id}`);
     },
@@ -27,13 +27,17 @@ function LinhaProducao() {
       toast.error("Erro ao deletar linha. Tente novamente.");
       console.error("Erro ao deletar linha:", error);
     },
+    onSuccess: () => {
+      toast.success("Linha deletada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["productionLines"] });
+    },
   });
 
   const { data: linhas, isFetching } = useQuery({
-    queryKey: ["get", "all", "linhas"],
+    queryKey: ["productionLines"],
     queryFn: async () => {
       const { data } =
-        await apiClient.get<ILinhasProducao[]>("/production-lines");
+        await apiClient.get<ILinhasProducao[]>("/production-lines/");
       return data;
     },
   });
@@ -108,11 +112,7 @@ function LinhaProducao() {
                         onClick={() => mutateAsync(linha.id)}
                         className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
                       >
-                        {isPending ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
-                        ) : (
-                          "Excluir"
-                        )}
+                        Excluir
                       </button>
                     </div>
                   </td>

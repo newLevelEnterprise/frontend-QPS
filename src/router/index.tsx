@@ -50,7 +50,7 @@ function Router() {
             <Route path="/historico" element={<HistoryPage />} />
 
             <Route
-              path="/linhas-producao/:maquinaId"
+              path="/linhas-producao/:linhaId"
               element={<MaquinaPages />}
             />
             <Route path="/insumos/materia-prima" element={<InsumosPage />} />
