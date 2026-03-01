@@ -6,14 +6,66 @@ import {
   type ICriaStepsSequenciamentoBody,
 } from "../../../../schemas/steps";
 import type { IParadas } from "../../../../types/Paradas";
+import { apiClient } from "../../../../utils/apiClient";
 import Modal from "../../modal";
+import Loading from "../loading";
 import FormEditarParada from "./formEditarParada";
 import FormNovaParada from "./formNovaParada";
 
 const SEQUENCIAMENTO_INFO_STORAGE_KEY = "sequenciamento_info";
 const ESTADO_ATUAL_MAQUINA_STORAGE_KEY = "estado_atual_maquina";
 
+const formatBillingDeadlineTime = (time: string) => {
+  const value = (time || "").trim();
+
+  if (/^\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) {
+    return value;
+  }
+
+  if (/^\d{2}:\d{2}:\d{2}$/.test(value)) {
+    return `${value}.000Z`;
+  }
+
+  if (/^\d{2}:\d{2}$/.test(value)) {
+    return `${value}:00.000Z`;
+  }
+
+  return value;
+};
+
+const formatTimeToHHMMSS = (time: string) => {
+  const value = (time || "").trim();
+
+  if (/^\d{2}:\d{2}:\d{2}$/.test(value)) {
+    return value;
+  }
+
+  if (/^\d{2}:\d{2}$/.test(value)) {
+    return `${value}:00`;
+  }
+
+  return value;
+};
+
+const toNumberOrZero = (value: string | number | undefined) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const inferMachineId = (machineName: string) => {
+  const matches = (machineName || "").match(/\d+/g);
+
+  if (!matches || matches.length === 0) {
+    return 0;
+  }
+
+  const parsed = Number(matches[matches.length - 1]);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 function Paradas() {
+  const { resetSteps } = useSteps();
+  const [processing, setProcessing] = useState<boolean>(false);
   const [modalCriarParada, setModalCriarParada] = useState<boolean>(false);
   const [modalEditarParada, setModalEditarParada] = useState<boolean>(false);
   const { prevStep } = useSteps();
@@ -83,96 +135,169 @@ function Paradas() {
     }
   };
 
-  const onInitiSequenciamento = () => {
-    const sequenciamento = safeParseStorage<
-      ICriaStepsSequenciamentoBody["sequenciamento"]
-    >(SEQUENCIAMENTO_INFO_STORAGE_KEY);
-    const estadoAtualMaquina = safeParseStorage<
-      ICriaStepsSequenciamentoBody["estadoAtualMaquina"]
-    >(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
+  const onInitiSequenciamento = async () => {
+    setProcessing(true);
+    try {
+      const jobs_ids = safeParseStorage<number[]>("jobs_ids");
+      const sequenciamento = safeParseStorage<
+        ICriaStepsSequenciamentoBody["sequenciamento"]
+      >(SEQUENCIAMENTO_INFO_STORAGE_KEY);
+      const estadoAtualMaquina = safeParseStorage<
+        ICriaStepsSequenciamentoBody["estadoAtualMaquina"]
+      >(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
 
-    if (!sequenciamento || !estadoAtualMaquina) {
-      toast.error(
-        "Não foi possível encontrar os dados dos passos anteriores. Volte e preencha novamente.",
-      );
-      return;
-    }
-
-    const payload: ICriaStepsSequenciamentoBody = {
-      sequenciamento,
-      estadoAtualMaquina,
-      paradasSequenciamento: incluirParadas
-        ? paradas.map((paradaAtual) => ({
-            motivo: paradaAtual.motivo,
-            maquina: paradaAtual.maquina,
-            dataInicio: paradaAtual.dataInicio,
-            horarioInicio: paradaAtual.horaInicio,
-            dataFim: paradaAtual.dataFim,
-            horarioFim: paradaAtual.horaFim,
-          }))
-        : [],
-    };
-
-    if (incluirParadas) {
-      const validacaoPayload =
-        criarStepsSequenciamentoschema.safeParse(payload);
-
-      if (!validacaoPayload.success) {
-        const fieldLabels: Record<string, string> = {
-          sequenciamento: "Informações de sequenciamento",
-          estadoAtualMaquina: "Estado atual da máquina",
-          paradasSequenciamento: "Paradas do sequenciamento",
-          dataInicio: "Data de início",
-          horarioInicio: "Horário de início",
-          regimeFaturamento: "Regime de faturamento",
-          horarioLimiteFaturamento: "Horário limite de faturamento",
-          sabadoTrabalha: "Sábado é dia útil",
-          maquina: "Máquina",
-          utilizacao: "Utilização",
-          codMolde: "Código do molde",
-          prodMaquinaInicioSequenciamento: "Produto na máquina",
-          status: "Status do pedido",
-          numeroPedido: "Número do pedido",
-          nome_cliente: "Nome do cliente",
-          tempoRestanteProdInjetora: "Tempo restante na injetora",
-          tempoRestanteProdPosInjetora: "Tempo restante pós injetora",
-          demanda: "Demanda",
-          valorAFAturar: "Valor a faturar",
-          motivo: "Motivo da parada",
-          dataFim: "Data de finalização",
-          horarioFim: "Horário de finalização",
-        };
-
-        const detalhes = validacaoPayload.error.issues.map((issue) => {
-          const path = issue.path.map((item) => String(item));
-          const sectionKey = path[0] ?? "";
-          const fieldKey = path[path.length - 1] ?? "";
-
-          const sectionLabel = fieldLabels[sectionKey] ?? sectionKey;
-          const fieldLabel = fieldLabels[fieldKey] ?? fieldKey;
-
-          const indexNumber = issue.path.find(
-            (item) => typeof item === "number",
-          );
-          const indexLabel =
-            typeof indexNumber === "number" ? ` #${indexNumber + 1}` : "";
-
-          return `• ${sectionLabel}${indexLabel} - ${fieldLabel}: ${issue.message}`;
-        });
-
+      if (!sequenciamento || !estadoAtualMaquina) {
         toast.error(
-          `Encontramos inconsistências nos dados:\n${detalhes.join("\n")}`,
+          "Não foi possível encontrar os dados dos passos anteriores. Volte e preencha novamente.",
         );
         return;
       }
-    }
 
-    console.log("Payload final do sequenciamento:", payload);
-    toast.success("Dados prontos para iniciar o sequenciamento.");
+      const payload: ICriaStepsSequenciamentoBody = {
+        sequenciamento,
+        estadoAtualMaquina,
+        paradasSequenciamento: incluirParadas
+          ? paradas.map((paradaAtual) => ({
+              motivo: paradaAtual.motivo,
+              maquina: paradaAtual.maquina,
+              dataInicio: paradaAtual.dataInicio,
+              horarioInicio: paradaAtual.horaInicio,
+              dataFim: paradaAtual.dataFim,
+              horarioFim: paradaAtual.horaFim,
+            }))
+          : [],
+      };
+
+      if (incluirParadas) {
+        if (
+          !payload.paradasSequenciamento ||
+          payload.paradasSequenciamento.length === 0
+        ) {
+          toast.error("Cadastre pelo menos uma parada para prosseguir.");
+          return;
+        }
+
+        const validacaoPayload =
+          criarStepsSequenciamentoschema.safeParse(payload);
+
+        if (!validacaoPayload.success) {
+          const fieldLabels: Record<string, string> = {
+            sequenciamento: "Informações de sequenciamento",
+            estadoAtualMaquina: "Estado atual da máquina",
+            paradasSequenciamento: "Paradas do sequenciamento",
+            dataInicio: "Data de início",
+            horarioInicio: "Horário de início",
+            regimeFaturamento: "Regime de faturamento",
+            horarioLimiteFaturamento: "Horário limite de faturamento",
+            sabadoTrabalha: "Sábado é dia útil",
+            maquina: "Máquina",
+            utilizacao: "Utilização",
+            codMolde: "Código do molde",
+            prodMaquinaInicioSequenciamento: "Produto na máquina",
+            status: "Status do pedido",
+            numeroPedido: "Número do pedido",
+            nome_cliente: "Nome do cliente",
+            tempoRestanteProdInjetora: "Tempo restante na injetora",
+            tempoRestanteProdPosInjetora: "Tempo restante pós injetora",
+            demanda: "Demanda",
+            valorAFAturar: "Valor a faturar",
+            motivo: "Motivo da parada",
+            dataFim: "Data de finalização",
+            horarioFim: "Horário de finalização",
+          };
+
+          const detalhes = validacaoPayload.error.issues.map((issue) => {
+            const path = issue.path.map((item) => String(item));
+            const sectionKey = path[0] ?? "";
+            const fieldKey = path[path.length - 1] ?? "";
+
+            const sectionLabel = fieldLabels[sectionKey] ?? sectionKey;
+            const fieldLabel = fieldLabels[fieldKey] ?? fieldKey;
+
+            const indexNumber = issue.path.find(
+              (item) => typeof item === "number",
+            );
+            const indexLabel =
+              typeof indexNumber === "number" ? ` #${indexNumber + 1}` : "";
+
+            return `• ${sectionLabel}${indexLabel} - ${fieldLabel}: ${issue.message}`;
+          });
+
+          toast.error(
+            `Encontramos inconsistências nos dados:\n${detalhes.join("\n")}`,
+          );
+          return;
+        }
+      }
+
+      await apiClient.post("/billing-configuration", {
+        rule_type: sequenciamento.regimeFaturamento,
+        billing_deadline_time: formatBillingDeadlineTime(
+          sequenciamento.horarioLimiteFaturamento,
+        ),
+      });
+
+      await apiClient.post("/solver/solver", {
+        jobs_ids: jobs_ids || [],
+        sequencing_date: `${sequenciamento.dataInicio}T${sequenciamento.horarioInicio}:00`,
+        next_saturday_is_working: sequenciamento.sabadoTrabalha,
+        machine_states_json: payload.estadoAtualMaquina.map((estadoAtual) => ({
+          production_line_id: 1,
+          machine_id: inferMachineId(estadoAtual.maquina),
+          used: estadoAtual.utilizacao,
+          mold_name: estadoAtual.codMolde,
+          product_name: estadoAtual.prodMaquinaInicioSequenciamento,
+          completed: estadoAtual.status === "Concluido",
+          order_number: estadoAtual.numeroPedido || "",
+          client_name: estadoAtual.nome_cliente || "",
+          remaining_injection_hours: toNumberOrZero(
+            estadoAtual.tempoRestanteProdInjetora,
+          ),
+          remaining_post_injection_hours: toNumberOrZero(
+            estadoAtual.tempoRestanteProdPosInjetora,
+          ),
+          demand: toNumberOrZero(estadoAtual.demanda),
+          billing_value: toNumberOrZero(estadoAtual.valorAFAturar),
+          billing_deadline_date: estadoAtual.dataLimiteFaturamento || "",
+          billing_deadline_time: formatTimeToHHMMSS(
+            estadoAtual.horarioLimiteFaturamento || "",
+          ),
+        })),
+        programmed_stops_json:
+          incluirParadas && payload.paradasSequenciamento
+            ? payload.paradasSequenciamento.map((paradaAtual) => ({
+                reason: paradaAtual.motivo,
+                machine_id: inferMachineId(paradaAtual.maquina),
+                start_date: paradaAtual.dataInicio,
+                start_time: formatTimeToHHMMSS(paradaAtual.horarioInicio),
+                end_date: paradaAtual.dataFim,
+                end_time: formatTimeToHHMMSS(paradaAtual.horarioFim),
+              }))
+            : [],
+      });
+
+      toast.success("Dados prontos para iniciar o sequenciamento.");
+      localStorage.removeItem(SEQUENCIAMENTO_INFO_STORAGE_KEY);
+      localStorage.removeItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
+      localStorage.removeItem("jobs_ids");
+      resetSteps();
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        "Ocorreu um erro ao iniciar o sequenciamento. Tente novamente.",
+      );
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
     <div className="bg-white w-full overflow-y-auto max-h-full rounded-lg p-4">
+      <Modal.Root isVisible={processing}>
+        <Modal.Container>
+          <Loading />
+        </Modal.Container>
+      </Modal.Root>
       <Modal.Root isVisible={modalCriarParada}>
         <Modal.Container>
           <Modal.Header
@@ -284,6 +409,7 @@ function Paradas() {
           Voltar
         </button>
         <button
+          disabled={processing}
           onClick={onInitiSequenciamento}
           className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
         >

@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import clsx from "clsx";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useSteps } from "../../../../hooks/useStep";
@@ -5,6 +7,7 @@ import {
   criarStepsSequenciamentoschema,
   type ICriaStepsSequenciamentoBody,
 } from "../../../../schemas/steps";
+import { apiClient } from "../../../../utils/apiClient";
 
 const SEQUENCIAMENTO_INFO_STORAGE_KEY = "sequenciamento_info";
 
@@ -18,6 +21,7 @@ const defaultSequenciamentoInfo: ICriaStepsSequenciamentoBody["sequenciamento"] 
   };
 
 function SequenciamentoInfo() {
+  const { resetSteps } = useSteps();
   const [sequenciamentoInfo, setSequenciamentoInfo] = useState<
     ICriaStepsSequenciamentoBody["sequenciamento"]
   >(() => {
@@ -37,6 +41,17 @@ function SequenciamentoInfo() {
     } catch {
       return defaultSequenciamentoInfo;
     }
+  });
+
+  const { data: billingActivated, isFetching } = useQuery({
+    queryKey: ["sequenciamentoInfo"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{
+        rule_type: string;
+        billing_deadline_time: string;
+      }>("/billing-configuration/active");
+      return data;
+    },
   });
 
   const { nextStep } = useSteps();
@@ -120,8 +135,15 @@ function SequenciamentoInfo() {
           <div className="flex gap-2 w-full items-center mt-1">
             <div className="flex items-center gap-2">
               <select
-                className="border rounded px-2 py-1 w-full max-w-xs"
-                value={sequenciamentoInfo.regimeFaturamento}
+                disabled={isFetching}
+                className={clsx(
+                  "border rounded px-2 py-1 w-full max-w-xs",
+                  isFetching && "bg-gray-50 animate-pulse",
+                )}
+                value={
+                  billingActivated?.rule_type ??
+                  sequenciamentoInfo.regimeFaturamento
+                }
                 onChange={(event) =>
                   setSequenciamentoInfo((prev) => ({
                     ...prev,
@@ -149,8 +171,15 @@ function SequenciamentoInfo() {
             <div className="flex items-center gap-2 mt-1">
               <input
                 type="time"
-                className="border rounded px-2 py-1 w-24"
-                value={sequenciamentoInfo.horarioLimiteFaturamento}
+                className={clsx(
+                  "border rounded px-2 py-1 w-24",
+                  isFetching && "bg-gray-50 animate-pulse",
+                )}
+                disabled={isFetching}
+                value={
+                  billingActivated?.billing_deadline_time ??
+                  sequenciamentoInfo.horarioLimiteFaturamento
+                }
                 onChange={(event) =>
                   setSequenciamentoInfo((prev) => ({
                     ...prev,
@@ -198,8 +227,15 @@ function SequenciamentoInfo() {
         </div>
       </form>
 
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-between mt-6">
         <button
+          onClick={resetSteps}
+          className={`px-4 py-2 rounded bg-gray-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
+        >
+          Cancelar Sequenciamento
+        </button>
+        <button
+          disabled={isFetching}
           onClick={handleProsseguir}
           className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
         >

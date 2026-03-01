@@ -1,12 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
-import { toast } from "react-toastify";
 import { useAuth } from "../../../hooks/useAuth";
 import type { IPedido } from "../../../types/Pedido";
-import { apiClient } from "../../../utils/apiClient";
-import Modal from "../modal";
-import Loading from "./loading";
 
 interface PedidosParaSequenciamentoProps {
   setStartSteps?: (value: boolean) => void;
@@ -16,14 +12,7 @@ function PedidosParaSequenciamento({
   setStartSteps,
 }: PedidosParaSequenciamentoProps) {
   const queryClient = useQueryClient();
-  const [isLoading, setIsloading] = useState<boolean>(false);
-  const [pedidoFinalizado, setPedidoFinalizado] = useState<boolean>(false);
-  const [processamentoEmAndamento, setProcessamentoEmAndamento] =
-    useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
-  const [dataDoPedido] = useState<string>(new Date().toISOString());
-  const [horario] = useState<string>("");
-  const [maquinasDisponiveis] = useState<string>("100");
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const { user_id } = useAuth();
 
@@ -44,14 +33,8 @@ function PedidosParaSequenciamento({
           const data = event.data;
           const isFinished = data === "true";
           if (isFinished) {
-            setPedidoFinalizado(true);
-            setProcessamentoEmAndamento(false);
-
             newEventSource.close();
             setEventSource(null);
-          } else {
-            setPedidoFinalizado(false);
-            setProcessamentoEmAndamento(true);
           }
         } catch (error) {
           console.error("Erro ao processar mensagem SSE:", error);
@@ -62,15 +45,11 @@ function PedidosParaSequenciamento({
         console.error("SSE connection error:", error);
         newEventSource.close();
         setEventSource(null);
-        setProcessamentoEmAndamento(false);
-        setPedidoFinalizado(false);
       };
 
       setEventSource(newEventSource);
     } catch (error) {
       console.error("Erro ao conectar ao SSE:", error);
-      setProcessamentoEmAndamento(false);
-      setPedidoFinalizado(true);
     }
   };
 
@@ -121,64 +100,8 @@ function PedidosParaSequenciamento({
     );
   };
 
-  const iniciarSequenciamentoFunc = async () => {
-    try {
-      setIsloading(true);
-      const regex = /^\d+(\.\d{1,2})?$/;
-
-      if (!regex.test(maquinasDisponiveis)) {
-        toast.error(
-          "O valor das máquinas disponíveis deve ser um número decimal",
-        );
-        return;
-      }
-
-      if (!pedidoFinalizado) {
-        toast.error("O processamento ainda não foi finalizado !");
-        return;
-      }
-
-      if (
-        parseFloat(maquinasDisponiveis) > 100 ||
-        parseFloat(maquinasDisponiveis) < 1
-      ) {
-        toast.error("O número de máquinas disponíveis deve ser entre 0 e 100.");
-        return;
-      }
-
-      const dataPedido = `${dataDoPedido}T${horario}`;
-      await apiClient.post(
-        `/sequenciamento/sequenciamento/solve?sequencing_date=${dataPedido}&machine_availability=${parseFloat(maquinasDisponiveis)}`,
-        pedidos?.map((p) => p.id),
-      );
-
-      if (!eventSource) {
-        connectToSSE();
-      }
-      setPedidoFinalizado(false);
-      setProcessamentoEmAndamento(true);
-      queryClient.setQueryData(["jobs", "para", "sequenciamento"], () => {
-        return [];
-      });
-      localStorage.removeItem("jobs_para_sequenciamento");
-      toast.success("Sequenciamento iniciado com sucesso!");
-    } catch (error) {
-      console.log(error);
-      setProcessamentoEmAndamento(false);
-      toast.error("Erro ao iniciar o sequenciamento. Tente novamente.");
-    } finally {
-      setIsloading(false);
-    }
-  };
-
   return (
     <div className="max-w-full md:flex-1 flex flex-col justify-between bg-white rounded-md shadow p-4 overflow-y-auto overflow-x-auto">
-      <Modal.Root isVisible={isLoading}>
-        <Modal.Container>
-          <Loading />
-        </Modal.Container>
-      </Modal.Root>
-
       <div className="flex flex-col gap-4">
         <h1 className="text-lg md:text-xl text-[#5B85D5] font-bold">
           Pedidos Para o Sequenciamento
@@ -263,21 +186,18 @@ function PedidosParaSequenciamento({
       </div>
 
       <button
-        // disabled={
-        //   !pedidos ||
-        //   pedidos.length === 0 ||
-        //   processamentoEmAndamento ||
-        //   !pedidoFinalizado
-        // }
+        disabled={!pedidos || pedidos.length === 0}
         onClick={() => {
           if (setStartSteps) {
+            localStorage.setItem(
+              "jobs_ids",
+              JSON.stringify(pedidos?.map((p) => p.id)),
+            );
             setStartSteps(true);
           }
-          // iniciarSequenciamentoFunc();
         }}
         className="w-1/2 md:w-full text-sm  cursor-pointer inline-flex items-center justify-center md:text-lg p-1 bg-blue-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-blue-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
-        {/* {processamentoEmAndamento ? "Processando..." : "Iniciar"} */}
         Avançar
       </button>
     </div>

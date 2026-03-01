@@ -4,6 +4,9 @@ interface StepContextType {
   activeStep: number;
   nextStep: () => void;
   prevStep: () => void;
+  startSteps: boolean;
+  setStartSteps: (value: boolean) => void;
+  resetSteps: () => void;
 }
 
 export const StepContext = createContext<StepContextType>(
@@ -12,6 +15,7 @@ export const StepContext = createContext<StepContextType>(
 
 function StepContextProvider({ children }: { children: ReactNode }) {
   const [activeStep, setActiveStep] = useState(0);
+  const [startSteps, setStartSteps] = useState<boolean>(false);
 
   const nextStep = () => {
     if (activeStep > 2) {
@@ -29,10 +33,18 @@ function StepContextProvider({ children }: { children: ReactNode }) {
     setActiveStep((prev) => prev - 1);
   };
 
+  const resetSteps = () => {
+    setActiveStep(0);
+    setStartSteps(false);
+  };
+
   const values = {
     activeStep,
     nextStep,
     prevStep,
+    startSteps,
+    setStartSteps,
+    resetSteps,
   };
 
   return <StepContext.Provider value={values}>{children}</StepContext.Provider>;
