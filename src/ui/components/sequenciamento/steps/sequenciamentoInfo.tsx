@@ -35,18 +35,40 @@ function SequenciamentoInfo() {
           </div>
         </div>
         <div>
-          <label className="block mb-4 font-semibold">
-            Horário Limite de Faturamento no Dia
+          <label className="block mb-2 font-semibold">
+            Regime de Faturamento
           </label>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-gray-700 max-w-40 font-semibold">
-              Hora limite de faturamento no dia
-            </span>
-            <input
-              type="time"
-              className="border rounded px-2 py-1 w-24"
-              {...register("horarioLimiteFaturamento")}
-            />
+          <div className="flex gap-2 w-full items-center mt-1">
+            <div className="flex items-center gap-2">
+              <select
+                className="border rounded px-2 py-1 w-full max-w-xs"
+                defaultValue=""
+                {...register("regimeFaturamento")}
+              >
+                <option value="" disabled>
+                  Selecione uma opção
+                </option>
+                <option value="Segunda a Sexta (sem feriados)">
+                  Segunda a Sexta (sem feriados)
+                </option>
+                <option value="Todos os dias (incluindo feriados)">
+                  Todos os dias (incluindo feriados)
+                </option>
+                <option value="Todos os dias (sem feriados)">
+                  Todos os dias (sem feriados)
+                </option>
+                <option value="24/7 (sempre disponível)">
+                  24/7 (sempre disponível)
+                </option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <input
+                type="time"
+                className="border rounded px-2 py-1 w-24"
+                {...register("horarioLimiteFaturamento")}
+              />
+            </div>
           </div>
         </div>
         <div className="mt-2">

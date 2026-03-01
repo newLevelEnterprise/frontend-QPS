@@ -4,6 +4,7 @@ export const criarStepsSequenciamentoschema = z.object({
   sequenciamento: z.object({
     dataInicio: z.string().min(1, "Data de início é obrigatório"),
     horarioInicio: z.string().min(1, "Horário de início é obrigatório"),
+    regimeFaturamento: z.string().min(1, "Regime de faturamento é obrigatório"),
     horarioLimiteFaturamento: z
       .string()
       .min(1, "Horário limite de faturamento é obrigatório"),
