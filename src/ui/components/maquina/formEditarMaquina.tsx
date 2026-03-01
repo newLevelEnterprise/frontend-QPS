@@ -1,19 +1,39 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import type { Dispatch, SetStateAction } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useMemo, useRef } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import {
-  editarLinhasProdSchema,
-  type IEditarLinhasProdBody,
+  criarLinhasProdSchema,
+  type ICriarLinhasProdBody,
 } from "../../../schemas/linhas";
-import type { IMaquinas } from "../../../types/Maquina";
+import type { IMaquinas, IMaquinasType } from "../../../types/Maquina";
+import type { IMoldes } from "../../../types/Moldes";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
 
+type IMaquinaEdicao = IMaquinas & {
+  linhaId?: string | number;
+  mold_id?: number;
+  product_id?: number;
+  machine_id?: number;
+  tempoPosInjecao?: number | string;
+  post_injection_cycle_time?: number | string;
+  tempoCiclo?: number | string;
+  tempo_ciclo?: number | string;
+  machines?: Array<{
+    id?: number;
+    machine_id?: number;
+    tempoCiclo?: number | string;
+    tempo_ciclo?: number | string;
+  }>;
+};
+
 interface IFormEditarMaquinaProps {
-  maquina: IMaquinas;
+  maquina: IMaquinaEdicao;
   setEditarMaquina: Dispatch<SetStateAction<boolean>>;
   setMaquina: () => void;
 }
@@ -23,26 +43,118 @@ function FormEditarMaquina({
   setEditarMaquina,
   setMaquina,
 }: IFormEditarMaquinaProps) {
+  const defaultCodMolde = maquina.mold_id
+    ? String(maquina.mold_id)
+    : String(maquina.codMolde || "");
+
+  const defaultProduto = maquina.product_id
+    ? String(maquina.product_id)
+    : String(maquina.produto || "");
+
+  const defaultTempoPosInjecao =
+    maquina.post_injection_cycle_time ??
+    maquina.tempoPosInjecao ??
+    maquina.disponibilidade ??
+    "";
+
+  const defaultMaquinas =
+    maquina.machines && maquina.machines.length > 0
+      ? maquina.machines.map((m) => ({
+          machineId: String(m.machine_id ?? m.id ?? ""),
+          tempoCiclo: String(m.tempo_ciclo ?? m.tempoCiclo ?? ""),
+        }))
+      : [
+          {
+            machineId: String(maquina.machine_id ?? maquina.id ?? ""),
+            tempoCiclo: String(maquina.tempo_ciclo ?? maquina.tempoCiclo ?? ""),
+          },
+        ];
+
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
+    control,
     formState: { errors, isSubmitting, isValid },
-  } = useForm<IEditarLinhasProdBody>({
-    resolver: zodResolver(editarLinhasProdSchema),
+  } = useForm<ICriarLinhasProdBody>({
+    resolver: zodResolver(criarLinhasProdSchema),
     defaultValues: {
-      codMolde: maquina.codMolde,
-      produto: maquina.produto,
+      codMolde: defaultCodMolde,
+      produto: defaultProduto,
+      tempoPosInjecao: String(defaultTempoPosInjecao),
+      maquinas: defaultMaquinas,
     },
   });
 
-  const onSubmit = async (data: IEditarLinhasProdBody) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "maquinas",
+  });
+
+  const { data: moldes, isFetching: isFetchingMoldes } = useQuery({
+    queryKey: ["get", "all", "moldes"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IMoldes[]>("/molds/");
+      return data;
+    },
+  });
+
+  const { data: maquinasExistentes, isFetching: isFetchingMaquinas } = useQuery(
+    {
+      queryKey: ["get", "all", "machines"],
+      queryFn: async () => {
+        const { data } = await apiClient.get<IMaquinasType[]>("/machines/");
+        return data;
+      },
+    },
+  );
+
+  const moldeSelecionadoId = watch("codMolde");
+  const isFirstRender = useRef(true);
+
+  const moldeSelecionado = useMemo(
+    () => moldes?.find((molde) => String(molde.id) === moldeSelecionadoId),
+    [moldes, moldeSelecionadoId],
+  );
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setValue("produto", "");
+  }, [moldeSelecionadoId, setValue]);
+
+  const onSubmit = async (data: ICriarLinhasProdBody) => {
     try {
-      await apiClient.put<IMaquinas>(`/maquinas/${maquina.id}`, {
-        name: data.codMolde,
-        disponibilidade: parseInt(data.produto),
-      });
-      setMaquina();
+      for (const item of data.maquinas) {
+        await apiClient.post("/production-time", {
+          tempo_ciclo: parseFloat(item.tempoCiclo),
+          machine_id: parseInt(item.machineId),
+          product_id: parseInt(data.produto),
+          mold_id: parseInt(data.codMolde),
+        });
+      }
+
+      const payload = {
+        mold_id: parseInt(data.codMolde),
+        product_id: parseInt(data.produto),
+        post_injection_cycle_time: parseFloat(data.tempoPosInjecao),
+        machines: data.maquinas.map((m) => parseInt(m.machineId)),
+      };
+
+      if (maquina.id) {
+        await apiClient.put(`/composition-lines/${maquina.id}`, payload);
+      } else {
+        await apiClient.post("/composition-lines", {
+          production_line_id: Number(maquina.linhaId || 0),
+          ...payload,
+        });
+      }
+
       toast.success("Máquina atualizada com sucesso!");
+      setMaquina();
       setEditarMaquina(false);
     } catch (error) {
       console.error("Erro ao atualizar máquina:", error);
@@ -57,44 +169,27 @@ function FormEditarMaquina({
     >
       <div className="w-full flex flex-col gap-3">
         <label
-          htmlFor="nome"
-          className="text-[#212A4F] font-semibold truncate text-ellipsis"
-        >
-          Produto
-        </label>
-        <div className="flex gap-1">
-          <input
-            id="nome"
-            placeholder="Nome do produto"
-            type="text"
-            className="w-full outline-none border-b border-[#A4AABC]"
-            {...register("produto")}
-          />
-        </div>
-        {errors.produto && (
-          <ErrorMessage
-            errors={errors}
-            name="produto"
-            render={({ message }) => <FormErrorMessage message={message} />}
-          />
-        )}
-      </div>
-
-      <div className="w-full flex flex-col gap-3">
-        <label
           htmlFor="codMolde"
           className="text-[#212A4F] font-semibold truncate text-ellipsis"
         >
-          Código do molde
+          Molde
         </label>
         <div className="flex gap-1">
-          <input
+          <select
             id="codMolde"
-            placeholder="Código do molde"
-            type="text"
             className="w-full outline-none border-b border-[#A4AABC]"
             {...register("codMolde")}
-          />
+            disabled={isFetchingMoldes}
+          >
+            <option value="" disabled>
+              {isFetchingMoldes ? "Carregando moldes..." : "Selecione um molde"}
+            </option>
+            {moldes?.map((molde) => (
+              <option key={molde.id} value={String(molde.id)}>
+                {molde.name}
+              </option>
+            ))}
+          </select>
         </div>
         {errors.codMolde && (
           <ErrorMessage
@@ -102,6 +197,153 @@ function FormEditarMaquina({
             name="codMolde"
             render={({ message }) => <FormErrorMessage message={message} />}
           />
+        )}
+      </div>
+
+      {moldeSelecionado && (
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="produto"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis"
+          >
+            Produtos
+          </label>
+          <div className="flex gap-1">
+            <select
+              id="produto"
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("produto")}
+            >
+              <option value="" disabled>
+                Selecione um produto
+              </option>
+              {moldeSelecionado.products.map((produto) => (
+                <option key={produto.id} value={String(produto.id)}>
+                  {produto.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {errors.produto && (
+            <ErrorMessage
+              errors={errors}
+              name="produto"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+      )}
+
+      <div className="w-full flex flex-col gap-3">
+        <label
+          htmlFor="tempoPosInjecao"
+          className="text-[#212A4F] font-semibold truncate text-ellipsis"
+        >
+          Tempo pós injeção (s)
+        </label>
+        <div className="flex gap-1">
+          <input
+            id="tempoPosInjecao"
+            placeholder="Tempo pós injeção"
+            type="number"
+            min="0"
+            step="0.01"
+            className="w-full outline-none border-b border-[#A4AABC]"
+            {...register("tempoPosInjecao")}
+          />
+        </div>
+        {errors.tempoPosInjecao && (
+          <ErrorMessage
+            errors={errors}
+            name="tempoPosInjecao"
+            render={({ message }) => <FormErrorMessage message={message} />}
+          />
+        )}
+      </div>
+
+      <div className="w-full flex flex-col gap-4">
+        <div className="w-full flex items-center justify-between">
+          <label className="text-[#212A4F] font-semibold truncate text-ellipsis">
+            Máquinas
+          </label>
+          <button
+            type="button"
+            onClick={() => append({ machineId: "", tempoCiclo: "" })}
+            className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
+          >
+            + Adicionar máquina
+          </button>
+        </div>
+
+        {fields.map((field, index) => (
+          <div key={field.id} className="w-full flex gap-4 items-start">
+            <div className="w-full flex flex-col gap-2">
+              <label
+                htmlFor={`maquina-id-${field.id}`}
+                className="text-[#212A4F] font-semibold truncate text-ellipsis"
+              >
+                Máquina
+              </label>
+              <select
+                id={`maquina-id-${field.id}`}
+                className="w-full outline-none border-b border-[#A4AABC]"
+                {...register(`maquinas.${index}.machineId`)}
+                disabled={isFetchingMaquinas}
+              >
+                <option value="" disabled>
+                  {isFetchingMaquinas
+                    ? "Carregando máquinas..."
+                    : "Selecione uma máquina"}
+                </option>
+                {maquinasExistentes?.map((machine) => (
+                  <option key={machine.id} value={String(machine.id)}>
+                    {machine.name}
+                  </option>
+                ))}
+              </select>
+              <ErrorMessage
+                errors={errors}
+                name={`maquinas.${index}.machineId`}
+                render={({ message }) => <FormErrorMessage message={message} />}
+              />
+            </div>
+
+            <div className="w-full flex flex-col gap-2">
+              <label
+                htmlFor={`maquina-ciclo-${field.id}`}
+                className="text-[#212A4F] font-semibold truncate text-ellipsis"
+              >
+                Tempo de ciclo (s)
+              </label>
+              <input
+                id={`maquina-ciclo-${field.id}`}
+                placeholder="Tempo de ciclo"
+                type="number"
+                min="0"
+                step="0.01"
+                className="w-full outline-none border-b border-[#A4AABC]"
+                {...register(`maquinas.${index}.tempoCiclo`)}
+              />
+              <ErrorMessage
+                errors={errors}
+                name={`maquinas.${index}.tempoCiclo`}
+                render={({ message }) => <FormErrorMessage message={message} />}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              disabled={fields.length === 1}
+              className="mt-8 text-sm text-red-500 hover:text-red-700 disabled:text-gray-300 disabled:cursor-not-allowed cursor-pointer"
+            >
+              Remover
+            </button>
+          </div>
+        ))}
+
+        {errors.maquinas?.message && (
+          <FormErrorMessage message={errors.maquinas.message} />
         )}
       </div>
 

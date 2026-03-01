@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
@@ -19,9 +20,11 @@ function Maquina() {
   const { data: linhaProd, isFetching } = useQuery({
     queryKey: ["get", "all", "linhaprod", linhaId],
     queryFn: async () => {
-      const { data } = await apiClient.get<{ name: string; id: number }>(
-        `/production-lines/${linhaId}`,
-      );
+      const { data } = await apiClient.get<{
+        name: string;
+        id: number;
+        composition_lines: any[];
+      }>(`/production-lines/${linhaId}`);
       return data;
     },
   });
@@ -33,9 +36,6 @@ function Maquina() {
     codMolde: "",
     produto: "",
   });
-
-  console.log(linhaProd);
-
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root isVisible={novaMaquina && maquinas.length < 10}>
@@ -45,9 +45,10 @@ function Maquina() {
             onClose={() => setNovaMaquina(false)}
           />
           <FormNovaMaquina
+            linhaId={linhaId}
             setMaquina={() =>
               queryClient.invalidateQueries({
-                queryKey: ["get", "all", "maquinas"],
+                queryKey: ["get", "all", "linhaprod", linhaId],
               })
             }
             setNovaMaquina={setNovaMaquina}
@@ -104,12 +105,6 @@ function Maquina() {
                     Temp. de Ciclo Pós Injeção (s)
                   </th>
                   <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                    Temp. de Ciclo(s) Maq1
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                    Temp. de Ciclo(s) Maq2
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                     Refugo
                   </th>
                   <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
@@ -125,12 +120,6 @@ function Maquina() {
                   // key={maquina.id}
                   className="border-b border-gray-200 last:border-b-0"
                 >
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    teste
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    teste
-                  </td>
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                     teste
                   </td>
