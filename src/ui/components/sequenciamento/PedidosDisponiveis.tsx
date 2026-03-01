@@ -184,7 +184,7 @@ function PedidosDisponiveis() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 overflow-y-auto">
               {jobs
-                .filter((pedido) => pedido.name.includes(busca))
+                .filter((pedido) => pedido.product_name.includes(busca))
                 .map((pedido) => (
                   <tr
                     key={pedido.id}
@@ -192,10 +192,10 @@ function PedidosDisponiveis() {
                     className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                   >
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.name.split(" - ")[0]}
+                      {pedido.product_name.split(" - ")[0]}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.name.split(" - ")[1]}
+                      {pedido.product_name.split(" - ")[1]}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {Intl.NumberFormat("pt-br").format(pedido.demand)}
