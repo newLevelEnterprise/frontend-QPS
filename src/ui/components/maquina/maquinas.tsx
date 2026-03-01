@@ -17,7 +17,7 @@ function Maquina() {
   const [editarMaquina, setEditarMaquina] = useState<boolean>(false);
 
   const { data: linhaProd, isFetching } = useQuery({
-    queryKey: ["get", "all", "linhaprod"],
+    queryKey: ["get", "all", "linhaprod", linhaId],
     queryFn: async () => {
       const { data } = await apiClient.get<{ name: string; id: number }>(
         `/production-lines/${linhaId}`,
@@ -33,6 +33,8 @@ function Maquina() {
     codMolde: "",
     produto: "",
   });
+
+  console.log(linhaProd);
 
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
