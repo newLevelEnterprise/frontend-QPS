@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { useSteps } from "../../../../hooks/useStep";
+import type { ICriaStepsSequenciamentoBody } from "../../../../schemas/steps";
 import type { IParadas } from "../../../../types/Paradas";
 import Modal from "../../modal";
 import FormEditarParada from "./formEditarParada";
 import FormNovaParada from "./formNovaParada";
 
 function Paradas() {
+  const { handleSubmit } = useFormContext<ICriaStepsSequenciamentoBody>();
   const [modalCriarParada, setModalCriarParada] = useState<boolean>(false);
   const [modalEditarParada, setModalEditarParada] = useState<boolean>(false);
   const { prevStep } = useSteps();
@@ -32,6 +35,10 @@ function Paradas() {
   ];
 
   const [incluirParadas, setIncluirParadas] = useState(true);
+
+  const onSubmit = (data: ICriaStepsSequenciamentoBody) => {
+    console.log("Dados do formulário:", data);
+  };
 
   return (
     <div className="bg-white w-full overflow-y-auto max-h-full rounded-lg p-4">
@@ -142,7 +149,7 @@ function Paradas() {
           Voltar
         </button>
         <button
-          // onClick={nextStep}
+          onClick={handleSubmit(onSubmit)}
           className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
         >
           Iniciar

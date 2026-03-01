@@ -19,7 +19,14 @@ export const criarStepsSequenciamentoschema = z.object({
         .string()
         .min(1, "Produto da máquina no início do sequenciamento é obrigatório"),
       status: z.enum(["Concluido", "Não concluido"]),
-      numeroPedido: z.string().min(1, "Número do pedido é obrigatório"),
+      numeroPedido: z
+        .string()
+        .min(1, "Número do pedido é obrigatório")
+        .optional(),
+      nome_cliente: z
+        .string()
+        .min(1, "Nome do cliente é obrigatório")
+        .optional(),
       tempoRestanteProdInjetora: z
         .string()
         .min(1, "Tempo restante de produção na injetora é obrigatório")

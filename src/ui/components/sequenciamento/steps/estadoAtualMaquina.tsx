@@ -1,27 +1,10 @@
 import { useState } from "react";
-import { useForm, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { BiPlus } from "react-icons/bi";
 import { useSteps } from "../../../../hooks/useStep";
 import type { ICriaStepsSequenciamentoBody } from "../../../../schemas/steps";
 import Modal from "../../modal";
-
-type IEstadoAtualMaquinaItem =
-  ICriaStepsSequenciamentoBody["estadoAtualMaquina"][number];
-
-const defaultNovoEstado: IEstadoAtualMaquinaItem = {
-  maquina: "",
-  utilizacao: false,
-  codMolde: "",
-  prodMaquinaInicioSequenciamento: "",
-  status: "Concluido",
-  numeroPedido: "",
-  tempoRestanteProdInjetora: "",
-  tempoRestanteProdPosInjetora: "",
-  demanda: "",
-  valorAFAturar: "",
-  dataLimiteFaturamento: "",
-  horarioLimiteFaturamento: "",
-};
+import FormNovoEstado from "./formNovoEstadoMaquina";
 
 function EstadoAtualMaquina() {
   const [estadoAtualMaquina, setEstadoAtualMaquina] = useState<
@@ -30,23 +13,8 @@ function EstadoAtualMaquina() {
   const [isModalNovoEstadoVisible, setIsModalNovoEstadoVisible] =
     useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { isSubmitting },
-  } = useForm<IEstadoAtualMaquinaItem>({
-    defaultValues: defaultNovoEstado,
-  });
-
   const { setValue } = useFormContext<ICriaStepsSequenciamentoBody>();
   const { nextStep, prevStep } = useSteps();
-
-  const adicionarEstadoAtualMaquina = (data: IEstadoAtualMaquinaItem) => {
-    setEstadoAtualMaquina((prev) => [...prev, data]);
-    reset(defaultNovoEstado);
-    setIsModalNovoEstadoVisible(false);
-  };
 
   const removerEstadoAtualMaquina = (index: number) => {
     setEstadoAtualMaquina((prev) => prev.filter((_, idx) => idx !== index));
@@ -59,159 +27,13 @@ function EstadoAtualMaquina() {
           <Modal.Header
             title="Novo Estado da Máquina"
             onClose={() => {
-              reset(defaultNovoEstado);
               setIsModalNovoEstadoVisible(false);
             }}
           />
-          <form
-            onSubmit={handleSubmit(adicionarEstadoAtualMaquina)}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">Máquina</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1"
-                {...register("maquina", { required: true })}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">Código do Molde</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1"
-                {...register("codMolde", { required: true })}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">
-                Produto na Máquina
-              </label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1"
-                {...register("prodMaquinaInicioSequenciamento", {
-                  required: true,
-                })}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">Status do Pedido</label>
-              <select
-                className="border rounded px-2 py-1"
-                {...register("status", { required: true })}
-              >
-                <option value="Concluido">Concluido</option>
-                <option value="Não concluido">Não concluido</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">Número do Pedido</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1"
-                {...register("numeroPedido", { required: true })}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">Utilização</label>
-              <label className="flex items-center gap-2 h-[34px]">
-                <input
-                  type="checkbox"
-                  className="accent-[#5B85D5]"
-                  {...register("utilizacao")}
-                />
-                Em utilização
-              </label>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">
-                Tempo restante na Injetora (min)
-              </label>
-              <input
-                type="number"
-                className="border rounded px-2 py-1"
-                {...register("tempoRestanteProdInjetora")}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">
-                Tempo restante pós Injetora (min)
-              </label>
-              <input
-                type="number"
-                className="border rounded px-2 py-1"
-                {...register("tempoRestanteProdPosInjetora")}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">Demanda</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1"
-                {...register("demanda")}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">Valor a Faturar</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1"
-                {...register("valorAFAturar")}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">
-                Data Limite de Faturamento
-              </label>
-              <input
-                type="date"
-                className="border rounded px-2 py-1"
-                {...register("dataLimiteFaturamento")}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-semibold text-sm">
-                Horário Limite de Faturamento
-              </label>
-              <input
-                type="time"
-                className="border rounded px-2 py-1"
-                {...register("horarioLimiteFaturamento")}
-              />
-            </div>
-
-            <div className="md:col-span-2 flex justify-end gap-2 mt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  reset(defaultNovoEstado);
-                  setIsModalNovoEstadoVisible(false);
-                }}
-                className="px-4 py-2 rounded bg-gray-600 text-white cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-4 py-2 rounded bg-blue-600 text-white disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer"
-              >
-                Salvar
-              </button>
-            </div>
-          </form>
+          <FormNovoEstado
+            setEstadoAtualMaquina={setEstadoAtualMaquina}
+            setIsModalNovoEstadoVisible={setIsModalNovoEstadoVisible}
+          />
         </Modal.Container>
       </Modal.Root>
 
@@ -275,10 +97,21 @@ function EstadoAtualMaquina() {
                     {row.tempoRestanteProdPosInjetora || "-"}
                   </td>
                   <td className="px-2 py-2 border text-center">
-                    {row.demanda || "-"}
+                    {row.demanda
+                      ? Intl.NumberFormat("pt-BR", {
+                          style: "decimal",
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        }).format(Number(row.demanda))
+                      : "-"}
                   </td>
                   <td className="px-2 py-2 border text-center">
-                    {row.valorAFAturar || "-"}
+                    {row.valorAFAturar
+                      ? Intl.NumberFormat("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        }).format(Number(row.valorAFAturar))
+                      : "-"}
                   </td>
                   <td className="px-2 py-2 border text-center">
                     {row.dataLimiteFaturamento || "-"}
