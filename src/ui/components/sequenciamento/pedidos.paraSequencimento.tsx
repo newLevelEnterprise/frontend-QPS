@@ -227,7 +227,7 @@ function PedidosParaSequenciamento({
               </thead>
               <tbody className="bg-white divide-y divide-gray-200 overflow-y-auto overflow-x-scroll">
                 {pedidos
-                  .filter((p) => p.name.includes(busca))
+                  .filter((p) => p.product_name.includes(busca))
                   .map((pedido) => (
                     <tr
                       key={pedido.id}
@@ -235,10 +235,10 @@ function PedidosParaSequenciamento({
                       className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                        {pedido.name.split(" - ")[0]}
+                        {pedido.product_name.split(" - ")[0]}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                        {pedido.name.split(" - ")[1]}
+                        {pedido.product_name.split(" - ")[1]}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                         {Intl.NumberFormat("pt-br").format(pedido.demand)}
