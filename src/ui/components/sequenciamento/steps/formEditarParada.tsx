@@ -2,22 +2,25 @@ import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Dispatch, type SetStateAction } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import {
   criarParadaSchema,
   type ICriarParadaBody,
 } from "../../../../schemas/paradas";
 import type { IParadas } from "../../../../types/Paradas";
-import { apiClient } from "../../../../utils/apiClient";
 import Button from "../../Button";
 import FormErrorMessage from "../../forms/FormErrorMessage";
 
 interface FormEditarParadaProps {
   setEditarParada: Dispatch<SetStateAction<boolean>>;
   parada: IParadas;
+  onEditarParada: (paradaAtualizada: IParadas) => void;
 }
 
-function FormEditarParada({ setEditarParada, parada }: FormEditarParadaProps) {
+function FormEditarParada({
+  setEditarParada,
+  parada,
+  onEditarParada,
+}: FormEditarParadaProps) {
   const {
     register,
     handleSubmit,
@@ -34,23 +37,18 @@ function FormEditarParada({ setEditarParada, parada }: FormEditarParadaProps) {
     },
   });
 
-  const onSubmit = async (data: ICriarParadaBody) => {
-    try {
-      await apiClient.post<IParadas>("/paradas", {
-        motivo: data.motivo,
-        data_inicio: data.dataInicio,
-        hora_inicio: data.horaInicio,
-        data_fim: data.dataFim,
-        hora_fim: data.horaFim,
-        maquina: data.maquina,
-      });
+  const onSubmit = (data: ICriarParadaBody) => {
+    onEditarParada({
+      id: parada.id,
+      motivo: data.motivo,
+      dataInicio: data.dataInicio,
+      horaInicio: data.horaInicio,
+      dataFim: data.dataFim,
+      horaFim: data.horaFim,
+      maquina: data.maquina,
+    });
 
-      toast.success("Parada criada com sucesso!");
-      setEditarParada(false);
-    } catch (error) {
-      console.error("Erro ao criar parada:", error);
-      toast.error("Erro ao criar parada. Tente novamente.");
-    }
+    setEditarParada(false);
   };
 
   return (

@@ -1,23 +1,105 @@
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
 import { BiPlus } from "react-icons/bi";
+import { toast } from "react-toastify";
 import { useSteps } from "../../../../hooks/useStep";
-import type { ICriaStepsSequenciamentoBody } from "../../../../schemas/steps";
+import {
+  criarStepsSequenciamentoschema,
+  type ICriaStepsSequenciamentoBody,
+} from "../../../../schemas/steps";
 import Modal from "../../modal";
 import FormNovoEstado from "./formNovoEstadoMaquina";
 
+const ESTADO_ATUAL_MAQUINA_STORAGE_KEY = "estado_atual_maquina";
+
 function EstadoAtualMaquina() {
-  const [estadoAtualMaquina, setEstadoAtualMaquina] = useState<
-    ICriaStepsSequenciamentoBody["estadoAtualMaquina"]
-  >([]);
   const [isModalNovoEstadoVisible, setIsModalNovoEstadoVisible] =
     useState(false);
 
-  const { setValue } = useFormContext<ICriaStepsSequenciamentoBody>();
+  const [estadoAtualMaquina, setEstadoAtualMaquina] = useState<
+    ICriaStepsSequenciamentoBody["estadoAtualMaquina"]
+  >(() => {
+    const fromStorage = localStorage.getItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
+
+    if (!fromStorage) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(fromStorage);
+      return Array.isArray(parsed)
+        ? (parsed as ICriaStepsSequenciamentoBody["estadoAtualMaquina"])
+        : [];
+    } catch {
+      return [];
+    }
+  });
+
   const { nextStep, prevStep } = useSteps();
+
+  const adicionarEstadoAtualMaquina = (
+    data: ICriaStepsSequenciamentoBody["estadoAtualMaquina"][number],
+  ) => {
+    setEstadoAtualMaquina((prev) => [...prev, data]);
+  };
 
   const removerEstadoAtualMaquina = (index: number) => {
     setEstadoAtualMaquina((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleProsseguir = () => {
+    if (estadoAtualMaquina.length === 0) {
+      toast.error("Cadastre pelo menos uma máquina para prosseguir.");
+      return;
+    }
+
+    const isValid =
+      criarStepsSequenciamentoschema.shape.estadoAtualMaquina.safeParse(
+        estadoAtualMaquina,
+      );
+
+    if (!isValid.success) {
+      const fieldLabels: Record<string, string> = {
+        maquina: "Máquina",
+        utilizacao: "Utilização",
+        codMolde: "Código do molde",
+        prodMaquinaInicioSequenciamento: "Produto na máquina",
+        status: "Status do pedido",
+        numeroPedido: "Número do pedido",
+        nome_cliente: "Nome do cliente",
+        tempoRestanteProdInjetora: "Tempo restante na injetora",
+        tempoRestanteProdPosInjetora: "Tempo restante pós injetora",
+        demanda: "Demanda",
+        valorAFAturar: "Valor a faturar",
+        dataLimiteFaturamento: "Data limite de faturamento",
+        horarioLimiteFaturamento: "Horário limite de faturamento",
+      };
+
+      const detalhesErros = isValid.error.issues.map((issue) => {
+        const indexPath = issue.path[0];
+        const fieldPath = issue.path[1];
+
+        const linha =
+          typeof indexPath === "number"
+            ? `Máquina ${indexPath + 1}`
+            : "Registro";
+        const campoKey = String(fieldPath ?? "");
+        const campo = (fieldLabels[campoKey] ?? campoKey) || "Campo inválido";
+
+        return `• ${linha} - ${campo}: ${issue.message}`;
+      });
+
+      toast.error(
+        `Encontramos alguns campos inválidos:\n${detalhesErros.join("\n")}`,
+      );
+      return;
+    }
+
+    localStorage.setItem(
+      ESTADO_ATUAL_MAQUINA_STORAGE_KEY,
+      JSON.stringify(estadoAtualMaquina),
+    );
+
+    nextStep();
   };
 
   return (
@@ -31,7 +113,7 @@ function EstadoAtualMaquina() {
             }}
           />
           <FormNovoEstado
-            setEstadoAtualMaquina={setEstadoAtualMaquina}
+            onAddEstadoAtualMaquina={adicionarEstadoAtualMaquina}
             setIsModalNovoEstadoVisible={setIsModalNovoEstadoVisible}
           />
         </Modal.Container>
@@ -150,10 +232,8 @@ function EstadoAtualMaquina() {
           Voltar
         </button>
         <button
-          onClick={() => {
-            setValue("estadoAtualMaquina", estadoAtualMaquina);
-            nextStep();
-          }}
+          onClick={handleProsseguir}
+          disabled={estadoAtualMaquina.length === 0}
           className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
         >
           Prosseguir

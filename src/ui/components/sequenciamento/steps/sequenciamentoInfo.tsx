@@ -1,12 +1,79 @@
-import { useFormContext } from "react-hook-form";
+import { useState } from "react";
+import { toast } from "react-toastify";
 import { useSteps } from "../../../../hooks/useStep";
-import type { ICriaStepsSequenciamentoBody } from "../../../../schemas/steps";
+import {
+  criarStepsSequenciamentoschema,
+  type ICriaStepsSequenciamentoBody,
+} from "../../../../schemas/steps";
+
+const SEQUENCIAMENTO_INFO_STORAGE_KEY = "sequenciamento_info";
+
+const defaultSequenciamentoInfo: ICriaStepsSequenciamentoBody["sequenciamento"] =
+  {
+    dataInicio: "",
+    horarioInicio: "",
+    regimeFaturamento: "",
+    horarioLimiteFaturamento: "",
+    sabadoTrabalha: false,
+  };
 
 function SequenciamentoInfo() {
-  const { register } =
-    useFormContext<ICriaStepsSequenciamentoBody["sequenciamento"]>();
+  const [sequenciamentoInfo, setSequenciamentoInfo] = useState<
+    ICriaStepsSequenciamentoBody["sequenciamento"]
+  >(() => {
+    const fromStorage = localStorage.getItem(SEQUENCIAMENTO_INFO_STORAGE_KEY);
+
+    if (!fromStorage) {
+      return defaultSequenciamentoInfo;
+    }
+
+    try {
+      const parsed = JSON.parse(fromStorage);
+      return {
+        ...defaultSequenciamentoInfo,
+        ...parsed,
+        sabadoTrabalha: Boolean(parsed?.sabadoTrabalha),
+      };
+    } catch {
+      return defaultSequenciamentoInfo;
+    }
+  });
 
   const { nextStep } = useSteps();
+
+  const handleProsseguir = () => {
+    const isValid =
+      criarStepsSequenciamentoschema.shape.sequenciamento.safeParse(
+        sequenciamentoInfo,
+      );
+
+    if (!isValid.success) {
+      const fieldLabels: Record<string, string> = {
+        dataInicio: "Dia de início",
+        horarioInicio: "Hora de início",
+        regimeFaturamento: "Regime de faturamento",
+        horarioLimiteFaturamento: "Horário limite de faturamento",
+        sabadoTrabalha: "Sábado é dia de trabalho",
+      };
+
+      const errosFormatados = isValid.error.issues.map((issue) => {
+        const fieldName = String(issue.path[0] ?? "");
+        const fieldLabel = fieldLabels[fieldName] ?? fieldName;
+
+        return `• ${fieldLabel}: ${issue.message}`;
+      });
+
+      toast.error(`Confira os campos abaixo:\n${errosFormatados.join("\n")}`);
+      return;
+    }
+
+    localStorage.setItem(
+      SEQUENCIAMENTO_INFO_STORAGE_KEY,
+      JSON.stringify(isValid.data),
+    );
+
+    nextStep();
+  };
 
   return (
     <div className="bg-white w-full overflow-y-auto max-h-full rounded-lg p-4">
@@ -21,7 +88,13 @@ function SequenciamentoInfo() {
               <input
                 type="date"
                 className="border rounded px-2 py-1 w-32"
-                {...register("dataInicio")}
+                value={sequenciamentoInfo.dataInicio}
+                onChange={(event) =>
+                  setSequenciamentoInfo((prev) => ({
+                    ...prev,
+                    dataInicio: event.target.value,
+                  }))
+                }
               />
             </div>
             <div className="flex gap-2 items-center">
@@ -29,7 +102,13 @@ function SequenciamentoInfo() {
               <input
                 type="time"
                 className="border rounded px-2 py-1 w-24"
-                {...register("horarioInicio")}
+                value={sequenciamentoInfo.horarioInicio}
+                onChange={(event) =>
+                  setSequenciamentoInfo((prev) => ({
+                    ...prev,
+                    horarioInicio: event.target.value,
+                  }))
+                }
               />
             </div>
           </div>
@@ -42,8 +121,13 @@ function SequenciamentoInfo() {
             <div className="flex items-center gap-2">
               <select
                 className="border rounded px-2 py-1 w-full max-w-xs"
-                defaultValue=""
-                {...register("regimeFaturamento")}
+                value={sequenciamentoInfo.regimeFaturamento}
+                onChange={(event) =>
+                  setSequenciamentoInfo((prev) => ({
+                    ...prev,
+                    regimeFaturamento: event.target.value,
+                  }))
+                }
               >
                 <option value="" disabled>
                   Selecione uma opção
@@ -66,7 +150,13 @@ function SequenciamentoInfo() {
               <input
                 type="time"
                 className="border rounded px-2 py-1 w-24"
-                {...register("horarioLimiteFaturamento")}
+                value={sequenciamentoInfo.horarioLimiteFaturamento}
+                onChange={(event) =>
+                  setSequenciamentoInfo((prev) => ({
+                    ...prev,
+                    horarioLimiteFaturamento: event.target.value,
+                  }))
+                }
               />
             </div>
           </div>
@@ -79,18 +169,28 @@ function SequenciamentoInfo() {
             <label className="flex items-center gap-1">
               <input
                 type="radio"
-                {...register("sabadoTrabalha")}
                 className="accent-[#3573C9]"
-                value="sim"
+                checked={sequenciamentoInfo.sabadoTrabalha}
+                onChange={() =>
+                  setSequenciamentoInfo((prev) => ({
+                    ...prev,
+                    sabadoTrabalha: true,
+                  }))
+                }
               />
               <span>Sim</span>
             </label>
             <label className="flex items-center gap-1">
               <input
                 type="radio"
-                {...register("sabadoTrabalha")}
                 className="accent-[#3573C9]"
-                value="nao"
+                checked={!sequenciamentoInfo.sabadoTrabalha}
+                onChange={() =>
+                  setSequenciamentoInfo((prev) => ({
+                    ...prev,
+                    sabadoTrabalha: false,
+                  }))
+                }
               />
               <span>Não</span>
             </label>
@@ -100,7 +200,7 @@ function SequenciamentoInfo() {
 
       <div className="flex justify-end mt-6">
         <button
-          onClick={nextStep}
+          onClick={handleProsseguir}
           className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
         >
           Prosseguir

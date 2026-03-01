@@ -37,14 +37,12 @@ const disabledFieldClassName =
   "disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-300 disabled:cursor-not-allowed";
 
 interface IFormNovoEstadoProps {
-  setEstadoAtualMaquina: React.Dispatch<
-    React.SetStateAction<IEstadoAtualMaquinaItem[]>
-  >;
+  onAddEstadoAtualMaquina: (data: IEstadoAtualMaquinaItem) => void;
   setIsModalNovoEstadoVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function FormNovoEstado({
-  setEstadoAtualMaquina,
+  onAddEstadoAtualMaquina,
   setIsModalNovoEstadoVisible,
 }: IFormNovoEstadoProps) {
   const { data: moldes, isFetching: isFetchingMoldes } = useQuery({
@@ -127,7 +125,7 @@ function FormNovoEstado({
   }, [setValue, statusSelecionado]);
 
   const adicionarEstadoAtualMaquina = (data: IEstadoAtualMaquinaItem) => {
-    setEstadoAtualMaquina((prev) => [...prev, data]);
+    onAddEstadoAtualMaquina(data);
     reset(defaultNovoEstado);
     setIsModalNovoEstadoVisible(false);
   };

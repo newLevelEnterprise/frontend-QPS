@@ -1,14 +1,19 @@
 import { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { toast } from "react-toastify";
 import { useSteps } from "../../../../hooks/useStep";
-import type { ICriaStepsSequenciamentoBody } from "../../../../schemas/steps";
+import {
+  criarStepsSequenciamentoschema,
+  type ICriaStepsSequenciamentoBody,
+} from "../../../../schemas/steps";
 import type { IParadas } from "../../../../types/Paradas";
 import Modal from "../../modal";
 import FormEditarParada from "./formEditarParada";
 import FormNovaParada from "./formNovaParada";
 
+const SEQUENCIAMENTO_INFO_STORAGE_KEY = "sequenciamento_info";
+const ESTADO_ATUAL_MAQUINA_STORAGE_KEY = "estado_atual_maquina";
+
 function Paradas() {
-  const { handleSubmit } = useFormContext<ICriaStepsSequenciamentoBody>();
   const [modalCriarParada, setModalCriarParada] = useState<boolean>(false);
   const [modalEditarParada, setModalEditarParada] = useState<boolean>(false);
   const { prevStep } = useSteps();
@@ -22,7 +27,7 @@ function Paradas() {
     maquina: "",
   });
 
-  const paradas = [
+  const [paradas, setParadas] = useState<IParadas[]>([
     {
       id: 1,
       motivo: "Segunda-feira",
@@ -32,12 +37,138 @@ function Paradas() {
       horaFim: "00/00/00",
       maquina: "Maq 1",
     },
-  ];
+  ]);
+
+  const adicionarParada = (novaParada: Omit<IParadas, "id">) => {
+    setParadas((prev) => {
+      const proximoId = prev.length
+        ? Math.max(...prev.map((paradaAtual) => paradaAtual.id)) + 1
+        : 1;
+
+      return [...prev, { id: proximoId, ...novaParada }];
+    });
+
+    setModalCriarParada(false);
+  };
+
+  const editarParada = (paradaAtualizada: IParadas) => {
+    setParadas((prev) =>
+      prev.map((paradaAtual) =>
+        paradaAtual.id === paradaAtualizada.id ? paradaAtualizada : paradaAtual,
+      ),
+    );
+
+    setModalEditarParada(false);
+  };
+
+  const removerParada = (idParada: number) => {
+    setParadas((prev) =>
+      prev.filter((paradaAtual) => paradaAtual.id !== idParada),
+    );
+  };
 
   const [incluirParadas, setIncluirParadas] = useState(true);
 
-  const onSubmit = (data: ICriaStepsSequenciamentoBody) => {
-    console.log("Dados do formulário:", data);
+  const safeParseStorage = <T,>(key: string): T | null => {
+    const raw = localStorage.getItem(key);
+
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return null;
+    }
+  };
+
+  const onInitiSequenciamento = () => {
+    const sequenciamento = safeParseStorage<
+      ICriaStepsSequenciamentoBody["sequenciamento"]
+    >(SEQUENCIAMENTO_INFO_STORAGE_KEY);
+    const estadoAtualMaquina = safeParseStorage<
+      ICriaStepsSequenciamentoBody["estadoAtualMaquina"]
+    >(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
+
+    if (!sequenciamento || !estadoAtualMaquina) {
+      toast.error(
+        "Não foi possível encontrar os dados dos passos anteriores. Volte e preencha novamente.",
+      );
+      return;
+    }
+
+    const payload: ICriaStepsSequenciamentoBody = {
+      sequenciamento,
+      estadoAtualMaquina,
+      paradasSequenciamento: incluirParadas
+        ? paradas.map((paradaAtual) => ({
+            motivo: paradaAtual.motivo,
+            maquina: paradaAtual.maquina,
+            dataInicio: paradaAtual.dataInicio,
+            horarioInicio: paradaAtual.horaInicio,
+            dataFim: paradaAtual.dataFim,
+            horarioFim: paradaAtual.horaFim,
+          }))
+        : [],
+    };
+
+    if (incluirParadas) {
+      const validacaoPayload =
+        criarStepsSequenciamentoschema.safeParse(payload);
+
+      if (!validacaoPayload.success) {
+        const fieldLabels: Record<string, string> = {
+          sequenciamento: "Informações de sequenciamento",
+          estadoAtualMaquina: "Estado atual da máquina",
+          paradasSequenciamento: "Paradas do sequenciamento",
+          dataInicio: "Data de início",
+          horarioInicio: "Horário de início",
+          regimeFaturamento: "Regime de faturamento",
+          horarioLimiteFaturamento: "Horário limite de faturamento",
+          sabadoTrabalha: "Sábado é dia útil",
+          maquina: "Máquina",
+          utilizacao: "Utilização",
+          codMolde: "Código do molde",
+          prodMaquinaInicioSequenciamento: "Produto na máquina",
+          status: "Status do pedido",
+          numeroPedido: "Número do pedido",
+          nome_cliente: "Nome do cliente",
+          tempoRestanteProdInjetora: "Tempo restante na injetora",
+          tempoRestanteProdPosInjetora: "Tempo restante pós injetora",
+          demanda: "Demanda",
+          valorAFAturar: "Valor a faturar",
+          motivo: "Motivo da parada",
+          dataFim: "Data de finalização",
+          horarioFim: "Horário de finalização",
+        };
+
+        const detalhes = validacaoPayload.error.issues.map((issue) => {
+          const path = issue.path.map((item) => String(item));
+          const sectionKey = path[0] ?? "";
+          const fieldKey = path[path.length - 1] ?? "";
+
+          const sectionLabel = fieldLabels[sectionKey] ?? sectionKey;
+          const fieldLabel = fieldLabels[fieldKey] ?? fieldKey;
+
+          const indexNumber = issue.path.find(
+            (item) => typeof item === "number",
+          );
+          const indexLabel =
+            typeof indexNumber === "number" ? ` #${indexNumber + 1}` : "";
+
+          return `• ${sectionLabel}${indexLabel} - ${fieldLabel}: ${issue.message}`;
+        });
+
+        toast.error(
+          `Encontramos inconsistências nos dados:\n${detalhes.join("\n")}`,
+        );
+        return;
+      }
+    }
+
+    console.log("Payload final do sequenciamento:", payload);
+    toast.success("Dados prontos para iniciar o sequenciamento.");
   };
 
   return (
@@ -48,7 +179,7 @@ function Paradas() {
             title="Adicionar Nova Parada"
             onClose={() => setModalCriarParada(false)}
           />
-          <FormNovaParada setNovaParada={() => setModalCriarParada(false)} />
+          <FormNovaParada onCriarParada={adicionarParada} />
         </Modal.Container>
       </Modal.Root>
       <Modal.Root isVisible={modalEditarParada}>
@@ -60,6 +191,7 @@ function Paradas() {
           <FormEditarParada
             setEditarParada={() => setModalEditarParada(false)}
             parada={parada}
+            onEditarParada={editarParada}
           />
         </Modal.Container>
       </Modal.Root>
@@ -131,7 +263,10 @@ function Paradas() {
                     >
                       Editar
                     </button>
-                    <button className="text-[#F87171] hover:underline">
+                    <button
+                      onClick={() => removerParada(p.id)}
+                      className="text-[#F87171] hover:underline"
+                    >
                       Remover
                     </button>
                   </td>
@@ -149,7 +284,7 @@ function Paradas() {
           Voltar
         </button>
         <button
-          onClick={handleSubmit(onSubmit)}
+          onClick={onInitiSequenciamento}
           className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
         >
           Iniciar
