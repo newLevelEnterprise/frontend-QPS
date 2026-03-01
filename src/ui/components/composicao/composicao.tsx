@@ -1,377 +1,279 @@
-import { useQuery } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { CiCirclePlus } from "react-icons/ci";
 import { toast } from "react-toastify";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
+import Modal from "../modal";
+import FormEditComposicao from "./formEditarTurno";
+import FormNovaComposicao, {
+  type NovaComposicaoFormState,
+} from "./formNovaComposicao";
 
-interface Product {
-  id: number;
-  name: string;
-}
-
-interface RawMaterial {
-  id: number;
-  nome: string;
-}
-
-interface PurchaseItem {
-  id: number;
-  name: string;
-}
-
-interface ProductCompositionForm {
-  rawMaterials: Record<number, string>;
-  purchaseItems: Record<number, string>;
-}
-
-interface ProductCompositionPayload {
-  raw_materials: Array<{ id: number; quantity: number }>;
-  purchase_items: Array<{ id: number; quantity: number }>;
+interface ProductComposition {
   produto_id: number;
-}
-
-interface ProductCompositionResponseItem {
-  produto_id: number;
-  raw_materials: Array<{ id: number; quantity: string | number; nome: string }>;
-  purchase_items: Array<{
+  raw_materials: {
     id: number;
-    quantity: string | number;
+    quantity: string;
+    nome: string;
+  }[];
+  purchase_items: {
+    id: number;
+    quantity: string;
     name: string;
-  }>;
+  }[];
 }
 
-const COMPOSITION_ENDPOINT = "/product-composition";
+function Composicao() {
+  const queryClient = useQueryClient();
+  const [novaComposicaoAberta, setNovaComposicaoAberta] =
+    useState<boolean>(false);
+  const [edicaoComposicaoAberta, setEdicaoComposicaoAberta] =
+    useState<boolean>(false);
+  const [composicaoSelecionadaId, setComposicaoSelecionadaId] =
+    useState<number>(0);
 
-function ComposicaoTable() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [compositionsByProduct, setCompositionsByProduct] = useState<
-    Record<number, ProductCompositionForm>
-  >({});
-
-  const { data: products, isFetching } = useQuery({
-    queryKey: ["get", "all", "products"],
-    queryFn: async () => {
-      const { data } = await apiClient.get<Product[]>("/products/");
-      return data;
-    },
-  });
-
-  const { data: rawMaterials, isFetching: isFetchingRawMaterials } = useQuery({
-    queryKey: ["get", "all", "materia-prima"],
-    queryFn: async () => {
-      const { data } = await apiClient.get<RawMaterial[]>("/raw-material/");
-      return data;
-    },
-  });
-
-  const { data: purchaseItens, isFetching: isFetchingPurchaseItens } = useQuery(
-    {
-      queryKey: ["get", "all", "purchase-itens"],
-      queryFn: async () => {
-        const { data } =
-          await apiClient.get<PurchaseItem[]>("/purchase-items/");
-        return data;
-      },
-    },
-  );
-
-  const {
-    data: defaultCompositions,
-    isFetching: isFetchingDefaultCompositions,
-    isError: isErrorDefaultCompositions,
-  } = useQuery({
+  const { data: composicoes, isFetching } = useQuery({
     queryKey: ["get", "all", "product-composition"],
     queryFn: async () => {
-      const { data } = await apiClient.get<ProductCompositionResponseItem[]>(
-        `${COMPOSITION_ENDPOINT}/`,
+      const { data } = await apiClient.get<ProductComposition[]>(
+        "/product-composition/",
       );
       return data;
     },
   });
 
-  useEffect(() => {
-    if (!defaultCompositions?.length) {
-      return;
-    }
+  const { mutateAsync: deleteComposicao, isPending: isDeletingComposicao } =
+    useMutation({
+      mutationFn: async (compositionId: number) => {
+        await apiClient.delete(`/product-composition/${compositionId}`);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["get", "all", "product-composition"],
+        });
+        toast.success("Composição deletada com sucesso!");
+      },
+      onError: () => {
+        toast.error("Erro ao deletar composição. Tente novamente.");
+      },
+    });
 
-    setCompositionsByProduct((prev) => {
-      const normalized = defaultCompositions.reduce<
-        Record<number, ProductCompositionForm>
-      >((acc, composition) => {
-        if (prev[composition.produto_id]) {
-          acc[composition.produto_id] = prev[composition.produto_id];
-          return acc;
+  const { mutateAsync: criarComposicao, isPending: isCreatingComposicao } =
+    useMutation({
+      mutationFn: async (data: NovaComposicaoFormState) => {
+        await apiClient.post("/product-composition", data);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["get", "all", "product-composition"],
+        });
+        toast.success("Composição criada com sucesso!");
+      },
+      onError: () => {
+        toast.error("Erro ao criar composição. Tente novamente.");
+      },
+    });
+
+  const { mutateAsync: editarComposicao, isPending: isEditingComposicao } =
+    useMutation({
+      mutationFn: async (data: NovaComposicaoFormState) => {
+        await apiClient.put(`/product-composition/${data.productId}`, data);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["get", "all", "product-composition"],
+        });
+        toast.success("Composição editada com sucesso!");
+      },
+      onError: () => {
+        toast.error("Erro ao editar composição. Tente novamente.");
+      },
+    });
+
+  const getCompositionId = (composicao: ProductComposition) =>
+    composicao.produto_id;
+
+  const rawMaterialColumns = useMemo(() => {
+    const rawMaterialsMap = new Map<number, string>();
+
+    composicoes?.forEach((composicao) => {
+      composicao.raw_materials.forEach((rawMaterial) => {
+        if (!rawMaterialsMap.has(rawMaterial.id)) {
+          rawMaterialsMap.set(rawMaterial.id, rawMaterial.nome);
         }
-
-        const rawMaterials = composition.raw_materials.reduce<
-          Record<number, string>
-        >((rawAcc, item) => {
-          rawAcc[item.id] = String(item.quantity ?? "");
-          return rawAcc;
-        }, {});
-
-        const purchaseItems = composition.purchase_items.reduce<
-          Record<number, string>
-        >((purchaseAcc, item) => {
-          purchaseAcc[item.id] = String(item.quantity ?? "");
-          return purchaseAcc;
-        }, {});
-
-        acc[composition.produto_id] = {
-          rawMaterials,
-          purchaseItems,
-        };
-
-        return acc;
-      }, {});
-
-      return {
-        ...prev,
-        ...normalized,
-      };
+      });
     });
-  }, [defaultCompositions]);
 
-  useEffect(() => {
-    if (isErrorDefaultCompositions) {
-      toast.error("Erro ao buscar composições padrão.");
-    }
-  }, [isErrorDefaultCompositions]);
+    return Array.from(rawMaterialsMap.entries()).map(([id, nome]) => ({
+      id,
+      nome,
+    }));
+  }, [composicoes]);
 
-  const isGettingData =
-    isFetching ||
-    isFetchingRawMaterials ||
-    isFetchingPurchaseItens ||
-    isFetchingDefaultCompositions;
+  const purchaseItemColumns = useMemo(() => {
+    const purchaseItemsMap = new Map<number, string>();
 
-  const canSubmit = useMemo(() => {
-    return (
-      !isGettingData &&
-      !isSubmitting &&
-      Boolean(products?.length) &&
-      (Boolean(rawMaterials?.length) || Boolean(purchaseItens?.length))
-    );
-  }, [isGettingData, isSubmitting, products, rawMaterials, purchaseItens]);
-
-  const hasDefaultCompositions = Boolean(defaultCompositions?.length);
-
-  const handleQuantityChange = ({
-    productId,
-    itemId,
-    quantity,
-    type,
-  }: {
-    productId: number;
-    itemId: number;
-    quantity: string;
-    type: "rawMaterials" | "purchaseItems";
-  }) => {
-    setCompositionsByProduct((prev) => {
-      const productCurrent = prev[productId] ?? {
-        rawMaterials: {},
-        purchaseItems: {},
-      };
-
-      return {
-        ...prev,
-        [productId]: {
-          ...productCurrent,
-          [type]: {
-            ...productCurrent[type],
-            [itemId]: quantity,
-          },
-        },
-      };
+    composicoes?.forEach((composicao) => {
+      composicao.purchase_items.forEach((purchaseItem) => {
+        if (!purchaseItemsMap.has(purchaseItem.id)) {
+          purchaseItemsMap.set(purchaseItem.id, purchaseItem.name);
+        }
+      });
     });
-  };
 
-  const getPayloads = (): ProductCompositionPayload[] => {
-    if (!products?.length) {
-      return [];
-    }
-
-    const payloads = products
-      .map((product) => {
-        const productComposition = compositionsByProduct[product.id];
-
-        const raw_materials =
-          rawMaterials
-            ?.map((rawMaterial) => ({
-              id: rawMaterial.id,
-              quantity: Number(
-                productComposition?.rawMaterials?.[rawMaterial.id] ?? 0,
-              ),
-            }))
-            .filter((item) => item.quantity > 0) ?? [];
-
-        const purchase_items =
-          purchaseItens
-            ?.map((purchaseItem) => ({
-              id: purchaseItem.id,
-              quantity: Number(
-                productComposition?.purchaseItems?.[purchaseItem.id] ?? 0,
-              ),
-            }))
-            .filter((item) => item.quantity > 0) ?? [];
-
-        return {
-          produto_id: product.id,
-          raw_materials,
-          purchase_items,
-        };
-      })
-      .filter(
-        (payload) =>
-          payload.raw_materials.length > 0 || payload.purchase_items.length > 0,
-      );
-
-    return payloads;
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const payloads = getPayloads();
-
-      if (!payloads.length) {
-        toast.error("Preencha ao menos uma quantidade para cadastrar.");
-        return;
-      }
-
-      setIsSubmitting(true);
-
-      await Promise.all(
-        payloads.map((payload) =>
-          apiClient.post(COMPOSITION_ENDPOINT, payload),
-        ),
-      );
-
-      toast.success("Composição cadastrada com sucesso!");
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error("Erro ao cadastrar composição:", error.response?.data);
-      } else {
-        console.error("Erro ao cadastrar composição:", error);
-      }
-
-      toast.error("Erro ao cadastrar composição. Tente novamente.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    return Array.from(purchaseItemsMap.entries()).map(([id, name]) => ({
+      id,
+      name,
+    }));
+  }, [composicoes]);
 
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
-      <h1 className="text-xl text-[#5B85D5] font-bold">
-        Cadastro de Composição de produtos
-      </h1>
-
-      {isGettingData && (
-        <Loader message="Carregando os produtos, matéria-prima e itens de compra ..." />
-      )}
-      {!isGettingData && (
-        <>
-          <div className="rounded-lg overflow-y-auto mt-2 h-fit max-h-[470px] overflow-x-auto">
-            <table className="w-full min-w-max text-sm">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2 text-left">Produto</th>
-                  {rawMaterials?.map((item) => (
-                    <th key={item.id} className="px-4 py-2 text-left">
-                      {item.nome}
-                    </th>
-                  ))}
-                  {purchaseItens?.map((item) => (
-                    <th key={item.id} className="px-4 py-2 text-left">
-                      {item.name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {products?.map((item) => (
-                  <tr key={item.id} className="border">
-                    <td className="px-4 py-2">
-                      <select
-                        disabled
-                        className="w-full border rounded p-1 disabled:border disabled:border-gray-200 disabled:text-gray-500"
-                        defaultValue={item.name}
-                      >
-                        <option defaultChecked>{item.name}</option>
-                      </select>
-                    </td>
-                    {rawMaterials?.map((rawMaterial) => (
-                      <td key={rawMaterial.id} className="px-4 py-2">
-                        <input
-                          type="number"
-                          min={0}
-                          step="any"
-                          placeholder="0"
-                          value={
-                            compositionsByProduct[item.id]?.rawMaterials?.[
-                              rawMaterial.id
-                            ] ?? ""
-                          }
-                          onChange={(event) =>
-                            handleQuantityChange({
-                              productId: item.id,
-                              itemId: rawMaterial.id,
-                              quantity: event.target.value,
-                              type: "rawMaterials",
-                            })
-                          }
-                          className="w-24 border rounded p-1"
-                        />
-                      </td>
-                    ))}
-                    {purchaseItens?.map((purchaseItem) => (
-                      <td key={purchaseItem.id} className="px-4 py-2">
-                        <input
-                          type="number"
-                          min={0}
-                          step="any"
-                          placeholder="0"
-                          value={
-                            compositionsByProduct[item.id]?.purchaseItems?.[
-                              purchaseItem.id
-                            ] ?? ""
-                          }
-                          onChange={(event) =>
-                            handleQuantityChange({
-                              productId: item.id,
-                              itemId: purchaseItem.id,
-                              quantity: event.target.value,
-                              type: "purchaseItems",
-                            })
-                          }
-                          className="w-24 border rounded p-1"
-                        />
-                      </td>
-                    ))}
-                  </tr>
+      <Modal.Root isVisible={novaComposicaoAberta}>
+        <Modal.Container>
+          <Modal.Header
+            title="Adicionar Nova composição"
+            onClose={() => setNovaComposicaoAberta(false)}
+          />
+          <FormNovaComposicao
+            isSubmitting={isCreatingComposicao}
+            onSubmit={(formsState) => criarComposicao(formsState)}
+          />
+        </Modal.Container>
+      </Modal.Root>
+      <Modal.Root isVisible={edicaoComposicaoAberta}>
+        <Modal.Container>
+          <Modal.Header
+            title="Editar composição"
+            onClose={() => setEdicaoComposicaoAberta(false)}
+          />
+          <FormEditComposicao
+            compositionId={composicaoSelecionadaId}
+            isSubmitting={isEditingComposicao}
+            onSubmit={(formsState) => editarComposicao(formsState)}
+          />
+        </Modal.Container>
+      </Modal.Root>
+      <h1 className="text-xl text-[#5B85D5] font-bold">Composições</h1>
+      {isFetching && <Loader message="Carregando composições" />}
+      {!isFetching && (
+        <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
+          <table className="w-full overflow-auto max-h-[470px]">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  Produto (ID)
+                </th>
+                {rawMaterialColumns.map((rawMaterialColumn) => (
+                  <th
+                    key={`raw-material-column-${rawMaterialColumn.id}`}
+                    className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700"
+                  >
+                    {rawMaterialColumn.nome}
+                  </th>
                 ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="flex items-center justify-end mt-4">
-            <button
-              disabled={!canSubmit}
-              onClick={handleSubmit}
-              className="disabled:bg-blue-300 cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              {isSubmitting
-                ? hasDefaultCompositions
-                  ? "Atualizando..."
-                  : "Cadastrando..."
-                : hasDefaultCompositions
-                  ? "Atualizar"
-                  : "Cadastrar"}
-            </button>
-          </div>
-        </>
+                {purchaseItemColumns.map((purchaseItemColumn) => (
+                  <th
+                    key={`purchase-item-column-${purchaseItemColumn.id}`}
+                    className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700"
+                  >
+                    {purchaseItemColumn.name}
+                  </th>
+                ))}
+                <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
+                  Ações
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {composicoes?.map((composicao) => (
+                <tr
+                  key={getCompositionId(composicao) ?? composicao.produto_id}
+                  className="border-b border-gray-200 last:border-b-0"
+                >
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    {composicao.produto_id}
+                  </td>
+                  {rawMaterialColumns.map((rawMaterialColumn) => {
+                    const rawMaterial = composicao.raw_materials.find(
+                      (item) => item.id === rawMaterialColumn.id,
+                    );
+
+                    return (
+                      <td
+                        key={`raw-material-value-${composicao.produto_id}-${rawMaterialColumn.id}`}
+                        className="px-6 py-4 text-xs md:text-sm text-gray-900"
+                      >
+                        {rawMaterial?.quantity ?? "-"}
+                      </td>
+                    );
+                  })}
+                  {purchaseItemColumns.map((purchaseItemColumn) => {
+                    const purchaseItem = composicao.purchase_items.find(
+                      (item) => item.id === purchaseItemColumn.id,
+                    );
+
+                    return (
+                      <td
+                        key={`purchase-item-value-${composicao.produto_id}-${purchaseItemColumn.id}`}
+                        className="px-6 py-4 text-xs md:text-sm text-gray-900"
+                      >
+                        {purchaseItem?.quantity ?? "-"}
+                      </td>
+                    );
+                  })}
+                  <td className="px-6 py-4 text-right">
+                    <div className="w-full flex justify-end gap-2">
+                      <button
+                        onClick={() => {
+                          setComposicaoSelecionadaId(composicao.produto_id);
+                          setEdicaoComposicaoAberta(true);
+                        }}
+                        className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => {
+                          const compositionId = getCompositionId(composicao);
+
+                          if (!compositionId) {
+                            toast.error(
+                              "ID da composição não encontrado para deletar.",
+                            );
+                            return;
+                          }
+
+                          deleteComposicao(compositionId);
+                        }}
+                        disabled={
+                          isDeletingComposicao || !getCompositionId(composicao)
+                        }
+                        className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150 disabled:opacity-50"
+                      >
+                        Deletar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
+      <div className="flex flex-col gap-4 items-center justify-center mt-4">
+        <button
+          disabled={isFetching}
+          onClick={() => setNovaComposicaoAberta(true)}
+          className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
+          Adicionar Nova Composição
+        </button>
+      </div>
     </div>
   );
 }
 
-export default ComposicaoTable;
+export default Composicao;
