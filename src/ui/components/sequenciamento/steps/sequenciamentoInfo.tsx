@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useSteps } from "../../../../hooks/useStep";
 import {
@@ -53,6 +53,16 @@ function SequenciamentoInfo() {
       return data;
     },
   });
+
+  useEffect(() => {
+    if (billingActivated) {
+      setSequenciamentoInfo((prev) => ({
+        ...prev,
+        regimeFaturamento: billingActivated.rule_type,
+        horarioLimiteFaturamento: billingActivated.billing_deadline_time,
+      }));
+    }
+  }, [isFetching, billingActivated]);
 
   const { nextStep } = useSteps();
 
@@ -140,10 +150,7 @@ function SequenciamentoInfo() {
                   "border rounded px-2 py-1 w-full max-w-xs",
                   isFetching && "bg-gray-50 animate-pulse",
                 )}
-                value={
-                  billingActivated?.rule_type ??
-                  sequenciamentoInfo.regimeFaturamento
-                }
+                value={sequenciamentoInfo.regimeFaturamento}
                 onChange={(event) =>
                   setSequenciamentoInfo((prev) => ({
                     ...prev,
@@ -176,10 +183,7 @@ function SequenciamentoInfo() {
                   isFetching && "bg-gray-50 animate-pulse",
                 )}
                 disabled={isFetching}
-                value={
-                  billingActivated?.billing_deadline_time ??
-                  sequenciamentoInfo.horarioLimiteFaturamento
-                }
+                value={sequenciamentoInfo.horarioLimiteFaturamento}
                 onChange={(event) =>
                   setSequenciamentoInfo((prev) => ({
                     ...prev,
@@ -229,7 +233,12 @@ function SequenciamentoInfo() {
 
       <div className="flex justify-between mt-6">
         <button
-          onClick={resetSteps}
+          onClick={() => {
+            localStorage.removeItem(SEQUENCIAMENTO_INFO_STORAGE_KEY);
+            localStorage.removeItem("estado_atual_maquina");
+            localStorage.removeItem("jobs_ids");
+            resetSteps();
+          }}
           className={`px-4 py-2 rounded bg-gray-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
         >
           Cancelar Sequenciamento

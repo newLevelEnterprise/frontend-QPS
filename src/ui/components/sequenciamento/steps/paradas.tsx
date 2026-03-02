@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useSteps } from "../../../../hooks/useStep";
@@ -64,6 +65,7 @@ const inferMachineId = (machineName: string) => {
 };
 
 function Paradas() {
+  const queryClient = useQueryClient();
   const { resetSteps } = useSteps();
   const [processing, setProcessing] = useState<boolean>(false);
   const [modalCriarParada, setModalCriarParada] = useState<boolean>(false);
@@ -79,17 +81,7 @@ function Paradas() {
     maquina: "",
   });
 
-  const [paradas, setParadas] = useState<IParadas[]>([
-    {
-      id: 1,
-      motivo: "Segunda-feira",
-      dataInicio: "00/00/00",
-      horaInicio: "00:00",
-      dataFim: "00/00/00",
-      horaFim: "00/00/00",
-      maquina: "Maq 1",
-    },
-  ]);
+  const [paradas, setParadas] = useState<IParadas[]>([]);
 
   const adicionarParada = (novaParada: Omit<IParadas, "id">) => {
     setParadas((prev) => {
@@ -230,7 +222,7 @@ function Paradas() {
         }
       }
 
-      await apiClient.post("/billing-configuration", {
+      await apiClient.post("/billing-configuration/", {
         rule_type: sequenciamento.regimeFaturamento,
         billing_deadline_time: formatBillingDeadlineTime(
           sequenciamento.horarioLimiteFaturamento,
@@ -281,6 +273,9 @@ function Paradas() {
       localStorage.removeItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
       localStorage.removeItem("jobs_ids");
       resetSteps();
+      queryClient.setQueryData(["jobs", "para", "sequenciamento"], () => {
+        return [];
+      });
     } catch (error) {
       console.log(error);
       toast.error(
