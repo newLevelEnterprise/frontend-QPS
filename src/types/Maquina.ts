@@ -16,7 +16,6 @@ export interface ICompositionLineMachine {
   id: number;
   name: string;
   availability: number;
-  cycle_time: number;
 }
 
 export interface ICompositionLineProductionLine {
@@ -29,8 +28,8 @@ export interface ICompositionLineMold {
   name: string;
   total_cavities: number;
   open_cavities: number;
-  scrap: string;
-  closed_cavity_risk: string;
+  scrap: number;
+  closed_cavity_risk: number;
 }
 
 export interface ICompositionLineProduct {
@@ -42,10 +41,10 @@ export interface ICompositionLine {
   production_line_id: number;
   mold_id: number;
   product_id: number;
-  post_injection_cycle_time: number;
+  post_injection_cycle_time?: number;
+  mold_name: string;
+  product_name: string;
   id: number;
-  production_line: ICompositionLineProductionLine;
   mold: ICompositionLineMold;
-  product: ICompositionLineProduct;
   machines: ICompositionLineMachine[];
 }

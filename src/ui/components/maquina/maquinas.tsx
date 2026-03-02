@@ -5,10 +5,18 @@ import { useParams } from "react-router-dom";
 import type { ICompositionLine, IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
-import maquinas from "../maquinas/maquinas";
 import Modal from "../modal";
 import FormEditarMaquina from "./formEditarMaquina";
 import FormNovaMaquina from "./formNovaMaquina";
+
+type IEditMaquinaState = IMaquinas & {
+  linhaId?: string | number;
+  mold_id?: number;
+  product_id?: number;
+  product_name?: string;
+  post_injection_cycle_time?: number | string;
+  machines?: ICompositionLine["machines"];
+};
 
 function Maquina() {
   const { linhaId } = useParams();
@@ -28,17 +36,22 @@ function Maquina() {
     },
   });
 
-  const [maquina, setMaquina] = useState<IMaquinas>({
+  const [maquina, setMaquina] = useState<IEditMaquinaState>({
     id: 0,
     name: "",
     disponibilidade: 0,
     codMolde: "",
     produto: "",
   });
-  console.log(linhaProd);
+
+  console.log("linhaProd", linhaProd);
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
-      <Modal.Root isVisible={novaMaquina && maquinas.length < 10}>
+      <Modal.Root
+        isVisible={
+          novaMaquina && (linhaProd?.composition_lines.length ?? 0) < 10
+        }
+      >
         <Modal.Container>
           <Modal.Header
             title="Adicionar Nova Máquina"
@@ -64,7 +77,7 @@ function Maquina() {
           <FormEditarMaquina
             setMaquina={() =>
               queryClient.invalidateQueries({
-                queryKey: ["get", "all", "maquinas"],
+                queryKey: ["get", "all", "linhaprod", linhaId],
               })
             }
             setEditarMaquina={setEditarMaquina}
@@ -116,51 +129,71 @@ function Maquina() {
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  // key={maquina.id}
-                  className="border-b border-gray-200 last:border-b-0"
-                >
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    teste
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    teste
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    teste
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    teste
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    teste
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    teste
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    teste
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="w-full flex justify-end gap-2">
-                      <button
-                        onClick={() => {
-                          setEditarMaquina(true);
-                          setMaquina(maquina);
-                        }}
-                        className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        // onClick={() => deletarMaquinaFn(maquina.id)}
-                        className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
-                      >
-                        Remover
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                {linhaProd?.composition_lines.map((cp) => (
+                  <tr
+                    key={cp.id}
+                    className="border-b border-gray-200 last:border-b-0"
+                  >
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {cp.mold_name}
+                    </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {cp.product_name}
+                    </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {cp.mold.total_cavities}
+                    </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {cp.mold.open_cavities}
+                    </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {/* {cp.post_injection_cycle_time} */}
+                      teste
+                    </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {cp.mold.scrap}
+                    </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {cp.mold.closed_cavity_risk}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="w-full flex justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setEditarMaquina(true);
+                            setMaquina({
+                              id: cp.id,
+                              name: cp.product_name,
+                              disponibilidade:
+                                cp.machines?.[0]?.availability ?? 0,
+                              codMolde: String(cp.mold_id),
+                              produto:
+                                cp.product_id != null
+                                  ? String(cp.product_id)
+                                  : cp.product_name,
+                              linhaId,
+                              mold_id: cp.mold_id,
+                              product_id: cp.product_id,
+                              product_name: cp.product_name,
+                              post_injection_cycle_time:
+                                cp.post_injection_cycle_time,
+                              machines: cp.machines,
+                            });
+                          }}
+                          className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          // onClick={() => deletarMaquinaFn(maquina.id)}
+                          className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

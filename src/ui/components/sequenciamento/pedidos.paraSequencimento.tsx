@@ -19,7 +19,7 @@ function PedidosParaSequenciamento({
   const connectToSSE = () => {
     try {
       const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const sseUrl = `${baseURL}/sequenciamento/sequenciamento/stream?user_id=${user_id}`;
+      const sseUrl = `${baseURL}/sequenciamento/stream?user_id=${user_id}`;
 
       const newEventSource = new EventSource(sseUrl);
 
@@ -30,8 +30,8 @@ function PedidosParaSequenciamento({
       newEventSource.onmessage = (event) => {
         try {
           console.log("Evento recebido", event.data);
-          const data = event.data;
-          const isFinished = data === "true";
+          const data = JSON.parse(event.data) as { finishied: boolean };
+          const isFinished = data.finishied === true;
           if (isFinished) {
             newEventSource.close();
             setEventSource(null);

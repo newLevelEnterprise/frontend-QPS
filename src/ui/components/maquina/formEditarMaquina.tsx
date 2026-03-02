@@ -1,6 +1,7 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useMemo, useRef } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -19,6 +20,7 @@ type IMaquinaEdicao = IMaquinas & {
   linhaId?: string | number;
   mold_id?: number;
   product_id?: number;
+  product_name?: string;
   machine_id?: number;
   tempoPosInjecao?: number | string;
   post_injection_cycle_time?: number | string;
@@ -38,18 +40,56 @@ interface IFormEditarMaquinaProps {
   setMaquina: () => void;
 }
 
+function getApiErrorMessage(error: unknown, fallback: string) {
+  if (!axios.isAxiosError(error)) {
+    return fallback;
+  }
+
+  const responseData = error.response?.data;
+
+  if (typeof responseData === "string" && responseData.trim()) {
+    return responseData;
+  }
+
+  if (responseData && typeof responseData === "object") {
+    const data = responseData as {
+      message?: string;
+      error?: string;
+      detail?: string;
+    };
+
+    if (typeof data.message === "string" && data.message.trim()) {
+      return data.message;
+    }
+
+    if (typeof data.error === "string" && data.error.trim()) {
+      return data.error;
+    }
+
+    if (typeof data.detail === "string" && data.detail.trim()) {
+      return data.detail;
+    }
+  }
+
+  return fallback;
+}
+
 function FormEditarMaquina({
   maquina,
   setEditarMaquina,
   setMaquina,
 }: IFormEditarMaquinaProps) {
-  const defaultCodMolde = maquina.mold_id
-    ? String(maquina.mold_id)
-    : String(maquina.codMolde || "");
+  const defaultCodMolde =
+    maquina.mold_id != null
+      ? String(maquina.mold_id)
+      : String(maquina.codMolde || "");
 
-  const defaultProduto = maquina.product_id
-    ? String(maquina.product_id)
-    : String(maquina.produto || "");
+  const defaultProduto =
+    maquina.product_id != null
+      ? String(maquina.product_id)
+      : String(maquina.produto || "").trim() === "undefined"
+        ? ""
+        : String(maquina.produto || "");
 
   const defaultTempoPosInjecao =
     maquina.post_injection_cycle_time ??
@@ -111,6 +151,7 @@ function FormEditarMaquina({
   );
 
   const moldeSelecionadoId = watch("codMolde");
+  const produtoSelecionado = watch("produto");
   const isFirstRender = useRef(true);
 
   const moldeSelecionado = useMemo(
@@ -126,31 +167,94 @@ function FormEditarMaquina({
     setValue("produto", "");
   }, [moldeSelecionadoId, setValue]);
 
+  useEffect(() => {
+    if (!moldeSelecionado) return;
+
+    const valorProduto = String(produtoSelecionado || "").trim();
+    const ehIdNumerico = /^\d+$/.test(valorProduto);
+    if (ehIdNumerico) return;
+
+    const nomeProduto = String(
+      maquina.product_name || maquina.produto || "",
+    ).trim();
+    if (!nomeProduto) return;
+
+    const produtoPorNome = moldeSelecionado.products.find(
+      (produto) => produto.name === nomeProduto,
+    );
+
+    if (produtoPorNome) {
+      setValue("produto", String(produtoPorNome.id), {
+        shouldValidate: true,
+      });
+    }
+  }, [
+    maquina.product_name,
+    maquina.produto,
+    moldeSelecionado,
+    produtoSelecionado,
+    setValue,
+  ]);
+
   const onSubmit = async (data: ICriarLinhasProdBody) => {
     try {
+      const moldId = parseInt(data.codMolde, 10);
+      const productId = parseInt(data.produto, 10);
+
+      if (Number.isNaN(moldId) || Number.isNaN(productId)) {
+        toast.error("Selecione molde e produto válidos para salvar.");
+        return;
+      }
+
       for (const item of data.maquinas) {
-        await apiClient.post("/production-time", {
-          tempo_ciclo: parseFloat(item.tempoCiclo),
-          machine_id: parseInt(item.machineId),
-          product_id: parseInt(data.produto),
-          mold_id: parseInt(data.codMolde),
-        });
+        try {
+          await apiClient.post("/production-time", {
+            tempo_ciclo: parseFloat(item.tempoCiclo),
+            machine_id: parseInt(item.machineId),
+            product_id: productId,
+            mold_id: moldId,
+          });
+        } catch (error) {
+          const errorMessage = getApiErrorMessage(
+            error,
+            `Erro ao salvar tempo de ciclo da máquina ${item.machineId}.`,
+          );
+          toast.error(errorMessage);
+          return;
+        }
       }
 
       const payload = {
-        mold_id: parseInt(data.codMolde),
-        product_id: parseInt(data.produto),
+        mold_id: moldId,
+        product_id: productId,
         post_injection_cycle_time: parseFloat(data.tempoPosInjecao),
         machines: data.maquinas.map((m) => parseInt(m.machineId)),
       };
 
       if (maquina.id) {
-        await apiClient.put(`/composition-lines/${maquina.id}`, payload);
+        try {
+          await apiClient.put(`/composition-lines/${maquina.id}`, payload);
+        } catch (error) {
+          toast.error(
+            getApiErrorMessage(
+              error,
+              "Erro ao atualizar a linha de composição.",
+            ),
+          );
+          return;
+        }
       } else {
-        await apiClient.post("/composition-lines", {
-          production_line_id: Number(maquina.linhaId || 0),
-          ...payload,
-        });
+        try {
+          await apiClient.post("/composition-lines", {
+            production_line_id: Number(maquina.linhaId || 0),
+            ...payload,
+          });
+        } catch (error) {
+          toast.error(
+            getApiErrorMessage(error, "Erro ao criar a linha de composição."),
+          );
+          return;
+        }
       }
 
       toast.success("Máquina atualizada com sucesso!");
@@ -158,7 +262,12 @@ function FormEditarMaquina({
       setEditarMaquina(false);
     } catch (error) {
       console.error("Erro ao atualizar máquina:", error);
-      toast.error("Erro ao atualizar máquina. Tente novamente.");
+      toast.error(
+        getApiErrorMessage(
+          error,
+          "Erro ao atualizar máquina. Tente novamente.",
+        ),
+      );
     }
   };
 
