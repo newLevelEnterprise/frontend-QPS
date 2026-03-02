@@ -5,12 +5,14 @@ import { toast } from "react-toastify";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 import Modal from "../modal";
-import FormEditComposicao from "./formEditarTurno";
+import type { EditarComposicaoFormState } from "./formEditarComposicao";
+import FormEditComposicao from "./formEditarComposicao";
 import FormNovaComposicao, {
   type NovaComposicaoFormState,
 } from "./formNovaComposicao";
 
 interface ProductComposition {
+  id: number;
   produto_id: number;
   raw_materials: {
     id: number;
@@ -62,7 +64,17 @@ function Composicao() {
   const { mutateAsync: criarComposicao, isPending: isCreatingComposicao } =
     useMutation({
       mutationFn: async (data: NovaComposicaoFormState) => {
-        await apiClient.post("/product-composition", data);
+        await apiClient.post("/product-composition", {
+          produto_id: data.productId,
+          raw_materials: data.rawMaterials.map((rawMaterial) => ({
+            id: rawMaterial.id,
+            quantity: rawMaterial.quantity,
+          })),
+          purchase_items: data.purchaseItems.map((purchaseItem) => ({
+            id: purchaseItem.id,
+            quantity: purchaseItem.quantity,
+          })),
+        });
       },
       onSuccess: () => {
         queryClient.invalidateQueries({
@@ -77,8 +89,19 @@ function Composicao() {
 
   const { mutateAsync: editarComposicao, isPending: isEditingComposicao } =
     useMutation({
-      mutationFn: async (data: NovaComposicaoFormState) => {
-        await apiClient.put(`/product-composition/${data.productId}`, data);
+      mutationFn: async (data: EditarComposicaoFormState) => {
+        console.log("Dados enviados para edição:", data);
+        await apiClient.put(`/product-composition/${data.id}`, {
+          produto_id: data.productId,
+          raw_materials: data.rawMaterials.map((rawMaterial) => ({
+            id: rawMaterial.id,
+            quantity: rawMaterial.quantity,
+          })),
+          purchase_items: data.purchaseItems.map((purchaseItem) => ({
+            id: purchaseItem.id,
+            quantity: purchaseItem.quantity,
+          })),
+        });
       },
       onSuccess: () => {
         queryClient.invalidateQueries({
@@ -91,8 +114,7 @@ function Composicao() {
       },
     });
 
-  const getCompositionId = (composicao: ProductComposition) =>
-    composicao.produto_id;
+  const getCompositionId = (composicao: ProductComposition) => composicao.id;
 
   const rawMaterialColumns = useMemo(() => {
     const rawMaterialsMap = new Map<number, string>();
@@ -227,7 +249,7 @@ function Composicao() {
                     <div className="w-full flex justify-end gap-2">
                       <button
                         onClick={() => {
-                          setComposicaoSelecionadaId(composicao.produto_id);
+                          setComposicaoSelecionadaId(composicao.id);
                           setEdicaoComposicaoAberta(true);
                         }}
                         className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"

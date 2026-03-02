@@ -3,30 +3,29 @@ import { useEffect, useState, type FormEvent } from "react";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import Loader from "../Loader";
+import type { NovaComposicaoFormState } from "./formNovaComposicao";
 
 interface ProductCompositionResponse {
   produto_id: number;
   raw_materials: {
-    id: number;
+    raw_material_id: number;
     quantity: string;
     nome: string;
   }[];
   purchase_items: {
-    id: number;
+    purchase_item_id: number;
     quantity: string;
     name: string;
   }[];
 }
 
-export interface NovaComposicaoFormState {
-  productId: string;
-  rawMaterials: { id: number; quantity: number }[];
-  purchaseItems: { id: number; quantity: number }[];
+export interface EditarComposicaoFormState extends NovaComposicaoFormState {
+  id: number;
 }
 
 interface FormEditComposicaoProps {
   compositionId: number;
-  onSubmit?: (data: NovaComposicaoFormState) => void;
+  onSubmit?: (data: EditarComposicaoFormState) => void;
   isSubmitting?: boolean;
 }
 
@@ -35,7 +34,8 @@ function FormEditComposicao({
   onSubmit,
   isSubmitting,
 }: FormEditComposicaoProps) {
-  const [formState, setFormState] = useState<NovaComposicaoFormState>({
+  const [formState, setFormState] = useState<EditarComposicaoFormState>({
+    id: compositionId,
     productId: "",
     rawMaterials: [],
     purchaseItems: [],
@@ -92,7 +92,7 @@ function FormEditComposicao({
     queryKey: ["get", "product-composition", compositionId],
     queryFn: async () => {
       const { data } = await apiClient.get<ProductCompositionResponse>(
-        `/product-composition/product/${compositionId}`,
+        `/product-composition/${compositionId}`,
       );
       return data;
     },
@@ -103,19 +103,22 @@ function FormEditComposicao({
     if (!isCompositionSuccess || !composition) return;
 
     setFormState({
+      id: compositionId,
       productId: String(composition.produto_id),
       rawMaterials: composition.raw_materials.map((rawMaterial) => ({
-        id: rawMaterial.id,
+        id: rawMaterial.raw_material_id,
         quantity: Number(rawMaterial.quantity),
       })),
       purchaseItems: composition.purchase_items.map((purchaseItem) => ({
-        id: purchaseItem.id,
+        id: purchaseItem.purchase_item_id,
         quantity: Number(purchaseItem.quantity),
       })),
     });
-  }, [composition, isCompositionSuccess]);
+  }, [composition, compositionId, isCompositionSuccess]);
 
   const isGettingData = isFetchingComposition;
+
+  console.log(composition);
 
   return (
     <div className="w-full h-full">
@@ -144,9 +147,12 @@ function FormEditComposicao({
 
           <div className="w-full grid grid-cols-2 gap-3 overflow-y-auto">
             {composition?.raw_materials.map((rawMaterial) => (
-              <div key={rawMaterial.id} className="w-full flex flex-col gap-3">
+              <div
+                key={rawMaterial.raw_material_id}
+                className="w-full flex flex-col gap-3"
+              >
                 <label
-                  htmlFor={`raw-material-${rawMaterial.id}`}
+                  htmlFor={`raw-material-${rawMaterial.raw_material_id}`}
                   className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
                 >
                   {rawMaterial.nome}
@@ -154,16 +160,16 @@ function FormEditComposicao({
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input
                     type="number"
-                    id={`raw-material-${rawMaterial.id}`}
+                    id={`raw-material-${rawMaterial.raw_material_id}`}
                     className="w-full h-full outline-none"
                     value={
                       formState.rawMaterials.find(
-                        (rm) => rm.id === rawMaterial.id,
+                        (rm) => rm.id === rawMaterial.raw_material_id,
                       )?.quantity ?? "0"
                     }
                     onChange={(event) =>
                       handleRawMaterialChange(
-                        rawMaterial.id,
+                        rawMaterial.raw_material_id,
                         event.target.value,
                       )
                     }
@@ -172,9 +178,12 @@ function FormEditComposicao({
               </div>
             ))}
             {composition?.purchase_items.map((purchaseItem) => (
-              <div key={purchaseItem.id} className="w-full flex flex-col gap-3">
+              <div
+                key={purchaseItem.purchase_item_id}
+                className="w-full flex flex-col gap-3"
+              >
                 <label
-                  htmlFor={`purchase-item-${purchaseItem.id}`}
+                  htmlFor={`purchase-item-${purchaseItem.purchase_item_id}`}
                   className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
                 >
                   {purchaseItem.name}
@@ -182,16 +191,16 @@ function FormEditComposicao({
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input
                     type="number"
-                    id={`purchase-item-${purchaseItem.id}`}
+                    id={`purchase-item-${purchaseItem.purchase_item_id}`}
                     className="w-full h-full outline-none"
                     value={
                       formState.purchaseItems.find(
-                        (pi) => pi.id === purchaseItem.id,
+                        (pi) => pi.id === purchaseItem.purchase_item_id,
                       )?.quantity ?? "0"
                     }
                     onChange={(event) =>
                       handlePurchaseItemChange(
-                        purchaseItem.id,
+                        purchaseItem.purchase_item_id,
                         event.target.value,
                       )
                     }
