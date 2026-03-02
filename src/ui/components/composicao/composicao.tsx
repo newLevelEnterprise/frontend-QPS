@@ -81,6 +81,7 @@ function Composicao() {
           queryKey: ["get", "all", "product-composition"],
         });
         toast.success("Composição criada com sucesso!");
+        setNovaComposicaoAberta(false);
       },
       onError: () => {
         toast.error("Erro ao criar composição. Tente novamente.");
@@ -90,7 +91,6 @@ function Composicao() {
   const { mutateAsync: editarComposicao, isPending: isEditingComposicao } =
     useMutation({
       mutationFn: async (data: EditarComposicaoFormState) => {
-        console.log("Dados enviados para edição:", data);
         await apiClient.put(`/product-composition/${data.id}`, {
           produto_id: data.productId,
           raw_materials: data.rawMaterials.map((rawMaterial) => ({
@@ -108,6 +108,7 @@ function Composicao() {
           queryKey: ["get", "all", "product-composition"],
         });
         toast.success("Composição editada com sucesso!");
+        setEdicaoComposicaoAberta(false);
       },
       onError: () => {
         toast.error("Erro ao editar composição. Tente novamente.");

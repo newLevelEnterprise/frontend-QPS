@@ -46,7 +46,7 @@ export default function LoginForm() {
       });
       setEnterpriseId(res.user.enterprise_id);
       setUserIdFn(res.user.id);
-      return navigate("/cadastro/clientes");
+      return navigate("/cadastro/cliente");
     } catch (error) {
       console.error(error);
       toast.error("Erro ao fazer login, verifique suas credenciais.");

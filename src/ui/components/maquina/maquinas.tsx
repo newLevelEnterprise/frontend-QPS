@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { useParams } from "react-router-dom";
-import type { IMaquinas } from "../../../types/Maquina";
+import type { ICompositionLine, IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 import maquinas from "../maquinas/maquinas";
@@ -23,7 +22,7 @@ function Maquina() {
       const { data } = await apiClient.get<{
         name: string;
         id: number;
-        composition_lines: any[];
+        composition_lines: ICompositionLine[];
       }>(`/production-lines/${linhaId}`);
       return data;
     },
@@ -36,7 +35,7 @@ function Maquina() {
     codMolde: "",
     produto: "",
   });
-
+  console.log(linhaProd);
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root isVisible={novaMaquina && maquinas.length < 10}>
