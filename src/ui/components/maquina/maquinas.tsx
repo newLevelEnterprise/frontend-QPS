@@ -128,9 +128,25 @@ function Maquina() {
       )}
       {!isFetching && (
         <>
-          <h1 className="text-xl text-[#5B85D5] font-bold">
-            {linhaProd?.name}
-          </h1>
+          <div className="flex justify-between items-center">
+            <h1 className="text-xl text-[#5B85D5] font-bold">
+              {linhaProd?.name}
+            </h1>
+            <div className="space-x-4">
+              <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">
+                Upload setup
+              </button>
+              <a
+                target="_top"
+                href="https://api-quant-production.up.railway.app/template/setup-matrix"
+                download
+              >
+                <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">
+                  Download setup
+                </button>
+              </a>
+            </div>
+          </div>
           <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
             <table className="w-full overflow-auto max-h-[470px]">
               <thead>

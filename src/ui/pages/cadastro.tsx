@@ -7,6 +7,7 @@ import GantChart from "../components/cadastro/ganntChart";
 import GraficoFaturamento from "../components/cadastro/grafico";
 import HorasMaquina from "../components/cadastro/horasMaquina";
 import Info from "../components/cadastro/info";
+import RawMaterialInfoTable from "../components/cadastro/rawMaterialInfoTable";
 import Resumo from "../components/cadastro/resumo";
 import SequenciamentoTabela from "../components/cadastro/sequenciamentoTabela";
 import Modal from "../components/modal";
@@ -50,7 +51,7 @@ function CadastroPage() {
             onClick={() => setIsGanttModalOpen(true)}
           />
           <Button
-            title="Visualizar mais informações"
+            title="Necessidade de Matéria Prima"
             onClick={() => setIsMaisInfoModalOpen(true)}
           />
         </div>
@@ -93,12 +94,10 @@ function CadastroPage() {
       <Modal.Root isVisible={isMaisInfoModalOpen}>
         <Modal.Container>
           <Modal.Header
-            title="Mais informações"
+            title="Necessidade de Matéria Prima"
             onClose={() => setIsMaisInfoModalOpen(false)}
           />
-          <div className="mt-4">
-            <h1>Teste123</h1>
-          </div>
+          <RawMaterialInfoTable />
         </Modal.Container>
       </Modal.Root>
     </div>

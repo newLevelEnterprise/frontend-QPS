@@ -102,20 +102,6 @@ function Produtos() {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-        <div className="space-x-10">
-          <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">
-            Upload setup
-          </button>
-          <a
-            target="_top"
-            href="https://api-quant-production.up.railway.app/template/setup-matrix"
-            download
-          >
-            <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">
-              Download setup
-            </button>
-          </a>
-        </div>
       </div>
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
