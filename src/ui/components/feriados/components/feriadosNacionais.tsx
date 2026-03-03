@@ -31,8 +31,6 @@ function FeriadosNacionais() {
     id: 0,
     name: "",
     level: "",
-    city: "",
-    state: "",
   });
 
   const { data: feriadosData, isFetching } = useQuery({
@@ -49,8 +47,6 @@ function FeriadosNacionais() {
       date: feriado.date,
       name: feriado.name,
       level: feriado.level,
-      city: feriado.city,
-      state: feriado.state,
     });
     setModalOpen(true);
   };
@@ -62,8 +58,6 @@ function FeriadosNacionais() {
       id: 0,
       name: "",
       level: "",
-      city: "",
-      state: "",
     });
   };
 
@@ -79,7 +73,7 @@ function FeriadosNacionais() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow p-4 w-full min-w-fit">
+    <div className="bg-white rounded-xl shadow p-6 w-fit min-w-fit">
       <h2 className="text-base font-semibold mb-3">Feriados Nacionais</h2>
       {isFetching && <Loader message="Carregando feriados nacionais" />}
       {!isFetching && (
@@ -92,7 +86,7 @@ function FeriadosNacionais() {
                   key={feriado.date + feriado.name}
                   className="flex items-center justify-between bg-white rounded-lg border border-gray-200 px-3 py-2"
                 >
-                  <span className="w-28 font-medium text-gray-700">
+                  <span className="w-32 font-medium text-gray-700">
                     {formatHolidayDate(feriado.date)}
                   </span>
                   <span className="flex-1 ml-2 text-gray-700 text-sm truncate">

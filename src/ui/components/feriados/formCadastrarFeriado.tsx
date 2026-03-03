@@ -51,32 +51,6 @@ function FormCadastrarFeriado({
         )}
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Cidade
-        </label>
-        <input
-          type="text"
-          {...register("city")}
-          className="w-full border rounded px-2 py-1 mt-1"
-        />
-        {errors.city && (
-          <span className="text-xs text-red-500">{errors.city.message}</span>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Estado
-        </label>
-        <input
-          type="text"
-          {...register("state")}
-          className="w-full border rounded px-2 py-1 mt-1"
-        />
-        {errors.state && (
-          <span className="text-xs text-red-500">{errors.state.message}</span>
-        )}
-      </div>
-      <div>
         <label className="block text-sm font-medium text-gray-700">Tipo</label>
         <select
           {...register("level")}

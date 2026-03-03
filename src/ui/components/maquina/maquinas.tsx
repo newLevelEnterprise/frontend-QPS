@@ -7,9 +7,28 @@ import type { ICompositionLine, IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 import Modal from "../modal";
+import XlsxUpload from "../XlsxUpload";
 import FormEditarMaquina from "./formEditarMaquina";
 import FormNovaMaquina from "./formNovaMaquina";
 import FormSetup from "./formSetup";
+
+export interface ResponseOfProductsSetups {
+  id: number;
+  name: string;
+  setup_time: number;
+  from_composition_line: {
+    id: number;
+    mold_name: string;
+    product_name: string;
+    name: string;
+  };
+  to_composition_line: {
+    id: number;
+    mold_name: string;
+    product_name: string;
+    name: string;
+  };
+}
 
 type IEditMaquinaState = IMaquinas & {
   linhaId?: string | number;
@@ -26,6 +45,7 @@ function Maquina() {
   const [novaMaquina, setNovaMaquina] = useState<boolean>(false);
   const [editarMaquina, setEditarMaquina] = useState<boolean>(false);
   const [setup, setSetup] = useState<{ nome: string; id: number } | null>(null);
+  const [setupUploadModal, setSetupUploadModal] = useState<boolean>(false);
 
   const { data: linhaProd, isFetching } = useQuery({
     queryKey: ["get", "all", "linhaprod", linhaId],
@@ -39,6 +59,16 @@ function Maquina() {
     },
   });
 
+  const { data: setupMatrix, isFetching: isFetchingSetupMatrix } = useQuery({
+    queryKey: ["get", "all", "setupMatrix", linhaId],
+    queryFn: async () => {
+      const { data } = await apiClient.get<ResponseOfProductsSetups[]>(
+        `/setup-matrix/production-line/${linhaId}`,
+      );
+      return data;
+    },
+  });
+
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (id: number) => {
       await apiClient.delete(`/composition-lines/${id}`);
@@ -46,6 +76,9 @@ function Maquina() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["get", "all", "linhaprod", linhaId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["get", "all", "setupMatrix", linhaId],
       });
     },
     onError: () => {
@@ -115,10 +148,33 @@ function Maquina() {
             title={setup?.nome || ""}
             onClose={() => setSetup(null)}
           />
-          <FormSetup onClose={setSetup} composition_line_ref={setup?.id || 0} />
+          <FormSetup
+            onClose={setSetup}
+            setups={
+              setupMatrix?.filter(
+                (item) => item.from_composition_line.id === setup?.id,
+              ) || []
+            }
+            isLoadingProducts={isFetchingSetupMatrix}
+          />
         </Modal.Container>
       </Modal.Root>
-      {isFetching && (
+      <Modal.Root isVisible={setupUploadModal}>
+        <Modal.Container>
+          <Modal.Header
+            title="Upload setup"
+            onClose={() => setSetupUploadModal(false)}
+          />
+          <XlsxUpload
+            endpoint={`setup-matrix-xlsx/${String(linhaProd?.id ?? linhaId ?? "")}`}
+            cachekey={["get", "all", "linhaprod", String(linhaId ?? "")]}
+            onClose={() => setSetupUploadModal(false)}
+            mainDivClassName="shadow-none h-auto bg-transparent p-0"
+            uploaderContainerClassName="h-[96px]"
+          />
+        </Modal.Container>
+      </Modal.Root>
+      {(isFetching || isFetchingSetupMatrix) && (
         <Loader message="Carregando a sua linha de Produção ..." />
       )}
       {!isFetching && !linhaProd && (
@@ -133,7 +189,10 @@ function Maquina() {
               {linhaProd?.name}
             </h1>
             <div className="space-x-4">
-              <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">
+              <button
+                onClick={() => setSetupUploadModal(true)}
+                className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md"
+              >
                 Upload setup
               </button>
               <a

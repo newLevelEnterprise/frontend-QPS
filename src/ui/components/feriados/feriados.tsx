@@ -40,7 +40,7 @@ function Feriados() {
           Adicionar Feriado
         </button>
       </div>
-      <div className="grid grid-cols-3 mt-10 gap-6">
+      <div className="flex flex-wrap mt-10 gap-6">
         <FeriadosNacionais />
         <FeriadosEstaduais />
         <FeriadosMunicipais />
