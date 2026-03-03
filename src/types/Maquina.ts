@@ -16,6 +16,7 @@ export interface ICompositionLineMachine {
   id: number;
   name: string;
   availability: number;
+  cycle_time: number;
 }
 
 export interface ICompositionLineProductionLine {

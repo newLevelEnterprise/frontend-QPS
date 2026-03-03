@@ -14,6 +14,7 @@ function PedidosParaSequenciamento({
   const queryClient = useQueryClient();
   const [busca, setBusca] = useState<string>("");
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const { user_id } = useAuth();
 
   const connectToSSE = () => {
@@ -35,9 +36,13 @@ function PedidosParaSequenciamento({
           if (isFinished) {
             newEventSource.close();
             setEventSource(null);
+            setIsProcessing(false);
+          } else {
+            setIsProcessing(true);
           }
         } catch (error) {
           console.error("Erro ao processar mensagem SSE:", error);
+          setIsProcessing(false);
         }
       };
 
@@ -186,7 +191,7 @@ function PedidosParaSequenciamento({
       </div>
 
       <button
-        disabled={!pedidos || pedidos.length === 0}
+        disabled={!pedidos || pedidos.length === 0 || isProcessing}
         onClick={() => {
           if (setStartSteps) {
             localStorage.setItem(
@@ -196,9 +201,11 @@ function PedidosParaSequenciamento({
             setStartSteps(true);
           }
         }}
-        className="w-1/2 md:w-full text-sm  cursor-pointer inline-flex items-center justify-center md:text-lg p-1 bg-blue-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-blue-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="w-1/2 md:w-full text-xs  cursor-pointer inline-flex items-center justify-center md:text-lg p-1 bg-blue-600 disabled:bg-gray-400 disabled:cursor-default hover:bg-blue-700 text-white font-medium rounded-xl transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
-        Avançar
+        {isProcessing
+          ? "Sequenciamento ainda está sendo processado..."
+          : "Iniciar Sequenciamento"}
       </button>
     </div>
   );

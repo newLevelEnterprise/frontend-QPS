@@ -169,7 +169,7 @@ function Maquina() {
                           className="px-6 py-4 text-xs md:text-sm text-gray-900"
                         >
                           {machineInCompositionLine
-                            ? machineInCompositionLine.availability
+                            ? machineInCompositionLine.cycle_time
                             : "-"}
                         </td>
                       );

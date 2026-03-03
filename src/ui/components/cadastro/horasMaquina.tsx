@@ -1,15 +1,15 @@
 import type { IProductionSchedule } from "../../../types/ProductionSchedule";
-import { cn } from "../../../utils/cn";
 
 interface HorasMaquinaProps {
-  dados: Pick<
-    IProductionSchedule,
-    "max_deadline_hours" | "machine_status" | "total_machine_hours"
-  >;
+  dados?: IProductionSchedule["metrics"];
 }
 
 function HorasMaquina({ dados }: HorasMaquinaProps) {
-  const { machine_status, max_deadline_hours, total_machine_hours } = dados;
+  const {
+    hs_de_disponibilidade,
+    hs_nec_de_producao,
+    carga_de_maquina_percent,
+  } = dados || {};
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 w-full">
@@ -21,31 +21,26 @@ function HorasMaquina({ dados }: HorasMaquinaProps) {
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">Hs. Limite de Entrega</span>
           <span className="text-sm font-medium text-gray-900">
-            {new Intl.NumberFormat('pt-BR').format(max_deadline_hours)}
+            {new Intl.NumberFormat("pt-BR").format(hs_de_disponibilidade || 0)}
           </span>
         </div>
 
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">Hs. Nec. de Produção</span>
           <span className="text-sm font-medium text-gray-900">
-            {new Intl.NumberFormat('pt-BR', { style: 'decimal' }).format(total_machine_hours)}
+            {new Intl.NumberFormat("pt-BR", { style: "decimal" }).format(
+              hs_nec_de_producao || 0,
+            )}
           </span>
         </div>
       </div>
 
       <div className="border-t border-gray-200 pt-4">
         <div className="flex justify-between items-center">
-          <span className="text-sm font-medium text-gray-700">Status</span>
-          {machine_status && (
-            <span
-              className={cn(
-                "text-sm font-medium bg-red-300 px-3 py-1 rounded-4xl text-red-800",
-                machine_status === "On Time" && "bg-green-300 text-green-800"
-              )}
-            >
-              {machine_status === "On Time" ? 'No Prazo' : 'Fora do Prazo'}
-            </span>
-          )}
+          <span className="text-sm font-medium text-gray-700">
+            Carga Máquina
+          </span>
+          {carga_de_maquina_percent || 0} %
         </div>
       </div>
     </div>

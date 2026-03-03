@@ -9,13 +9,11 @@ import Loader from "../Loader";
 import Modal from "../modal";
 import FormEditarProduto from "./formEditProduto";
 import FormNovoProduto from "./formNovoProduto";
-import FormSetup from "./formSetup";
 
 function Produtos() {
   const [novoProduto, setNovoProduto] = useState<boolean>(false);
   const [editarProduto, setEditarProduto] = useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
-  const [setup, setSetup] = useState<{ nome: string; id: number } | null>(null);
   const queryClient = useQueryClient();
 
   const [produto, setProduto] = useState<Pick<IProduto, "id" | "name">>({
@@ -90,17 +88,6 @@ function Produtos() {
         </Modal.Container>
       </Modal.Root>
 
-      {/* Modal para o Setup */}
-      <Modal.Root isVisible={!!setup}>
-        <Modal.Container>
-          <Modal.Header
-            title={setup?.nome || ""}
-            onClose={() => setSetup(null)}
-          />
-          <FormSetup onClose={setSetup} produto_ref={setup?.id || 0} />
-        </Modal.Container>
-      </Modal.Root>
-
       {/* Listagem dos produtos */}
       <h1 className="text-xl text-[#5B85D5] font-bold">Produtos Cadastrados</h1>
       <div className="w-full flex flex-col gap-4 md:flex-row justify-between items-end">
@@ -116,6 +103,9 @@ function Produtos() {
           />
         </div>
         <div className="space-x-10">
+          <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">
+            Upload setup
+          </button>
           <a
             target="_top"
             href="https://api-quant-production.up.railway.app/template/setup-matrix"
@@ -170,14 +160,6 @@ function Produtos() {
                           className="text-blue-600 cursor-pointer hover:text-blue-800 text-sm font-medium transition-colors duration-150"
                         >
                           Editar
-                        </button>
-                        <button
-                          onClick={() =>
-                            setSetup({ nome: produto.name, id: produto.id })
-                          }
-                          className="text-blue-600 cursor-pointer hover:text-blue-800 text-sm font-medium transition-colors duration-150"
-                        >
-                          Setup
                         </button>
                         <button
                           onClick={() => deletarProdutoFn(produto.id)}

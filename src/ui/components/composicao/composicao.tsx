@@ -10,6 +10,7 @@ import FormEditComposicao from "./formEditarComposicao";
 import FormNovaComposicao, {
   type NovaComposicaoFormState,
 } from "./formNovaComposicao";
+import FormSetup from "./formSetup";
 
 interface ProductComposition {
   id: number;
@@ -34,6 +35,7 @@ function Composicao() {
     useState<boolean>(false);
   const [composicaoSelecionadaId, setComposicaoSelecionadaId] =
     useState<number>(0);
+  const [setup, setSetup] = useState<{ nome: string; id: number } | null>(null);
 
   const { data: composicoes, isFetching } = useQuery({
     queryKey: ["get", "all", "product-composition"],
@@ -178,6 +180,15 @@ function Composicao() {
           />
         </Modal.Container>
       </Modal.Root>
+      <Modal.Root isVisible={!!setup}>
+        <Modal.Container>
+          <Modal.Header
+            title={setup?.nome || ""}
+            onClose={() => setSetup(null)}
+          />
+          <FormSetup onClose={setSetup} composition_line_ref={setup?.id || 0} />
+        </Modal.Container>
+      </Modal.Root>
       <h1 className="text-xl text-[#5B85D5] font-bold">Composições</h1>
       {isFetching && <Loader message="Carregando composições" />}
       {!isFetching && (
@@ -259,8 +270,15 @@ function Composicao() {
                       </button>
                       <button
                         onClick={() => {
+                          setSetup({ nome: "", id: composicao.id });
+                        }}
+                        className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"
+                      >
+                        Setup
+                      </button>
+                      <button
+                        onClick={() => {
                           const compositionId = getCompositionId(composicao);
-
                           if (!compositionId) {
                             toast.error(
                               "ID da composição não encontrado para deletar.",

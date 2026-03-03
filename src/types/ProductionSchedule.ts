@@ -13,18 +13,26 @@ export interface IProductionSchedule {
     billing_date: string;
     revenue_total: number;
   }[];
+  metrics: {
+    hs_de_disponibilidade: number;
+    hs_nec_de_producao: number;
+    carga_de_maquina_percent: number;
+  };
 }
 
 export interface Results {
   job_id: number;
+  id: number;
   order_index: number;
   client_name: string;
   product_name: string;
+  machine_name: string | null;
+  mold_name: string | null;
   quantity: number;
   scheduled_date: string;
+  scheduled_time: string | null;
   actual_date: string;
-  completion_date: string;
-  completion_time: string;
+  completion_time: string | null;
   billing_date: string;
   status: string;
   expected_revenue: number;

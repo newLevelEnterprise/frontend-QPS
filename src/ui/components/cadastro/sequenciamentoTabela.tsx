@@ -2,15 +2,31 @@ import { useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import type { IProductionSchedule } from "../../../types/ProductionSchedule";
 
+const formatDate = (date?: string | null) => {
+  if (!date) return "-";
+
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return "-";
+
+  return Intl.DateTimeFormat("pt-br", { timeZone: "UTC" }).format(parsedDate);
+};
+
 function SequenciamentoTabela({
   dados,
 }: {
   dados: IProductionSchedule["results"];
 }) {
   const [busca, setBusca] = useState<string>("");
+  const dadosFiltrados = dados.filter(
+    (p) =>
+      p.client_name.toLowerCase().includes(busca.toLowerCase()) ||
+      p.product_name.toLowerCase().includes(busca.toLowerCase()) ||
+      (p.machine_name ?? "").toLowerCase().includes(busca.toLowerCase()) ||
+      (p.mold_name ?? "").toLowerCase().includes(busca.toLowerCase()),
+  );
 
   return (
-    <div className="flex-1 rounded-md bg-white shadow p-4">
+    <div className="flex-1 rounded-md bg-white shadow p-2">
       <h1 className="text-xl text-[#5B85D5] font-bold">
         Sequenciamento Planejado
       </h1>
@@ -26,11 +42,17 @@ function SequenciamentoTabela({
           className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
-      <div className="max-h-[250px] mx-auto p-4 overflow-y-auto overflow-x-auto">
+      <div className="max-h-[280px] mx-auto p-2 overflow-y-auto overflow-x-auto">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[1650px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  ID
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Job ID
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                   Ordem
                 </th>
@@ -41,7 +63,19 @@ function SequenciamentoTabela({
                   Produto
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Máquina
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Molde
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Quantidade
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                   Dt. Atend. Prog.
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                  Hr. Atend. Prog.
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                   Dt. Atend. Real
@@ -61,65 +95,71 @@ function SequenciamentoTabela({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {dados
-                .filter(
-                  (p) =>
-                    p.client_name.toLowerCase().includes(busca.toLowerCase()) ||
-                    p.product_name.toLowerCase().includes(busca.toLowerCase())
-                )
-                .map((order, index) => (
-                  <tr
-                    key={order.job_id}
-                    className={`${
-                      index % 2 === 1 ? "bg-gray-50" : "bg-white"
-                    } hover:bg-gray-100 transition-colors`}
-                  >
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                      {index + 1}º
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                      {order.client_name}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {order.product_name}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {Intl.DateTimeFormat("pt-br", { timeZone: 'UTC' }).format(
-                        new Date(order.scheduled_date)
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {Intl.DateTimeFormat("pt-br", { timeZone: 'UTC' }).format(
-                        new Date(order.completion_date)
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {order.completion_time}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700">
-                      {Intl.DateTimeFormat("pt-br", { timeZone: 'UTC' }).format(
-                        new Date(order.billing_date)
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          order.status === "On Time"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                      {Intl.NumberFormat("pt-br", {
-                        style: "currency",
-                        currency: "BRL",
-                      }).format(order.expected_revenue)}
-                    </td>
-                  </tr>
-                ))}
+              {dadosFiltrados.map((order, index) => (
+                <tr
+                  key={order.id}
+                  className={`${
+                    index % 2 === 1 ? "bg-gray-50" : "bg-white"
+                  } hover:bg-gray-100 transition-colors`}
+                >
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                    {order.id}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                    {order.job_id}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                    {order.order_index + 1}º
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    {order.client_name}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {order.product_name}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {order.machine_name ?? "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {order.mold_name ?? "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 text-right">
+                    {Intl.NumberFormat("pt-br").format(order.quantity)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {formatDate(order.scheduled_date)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {order.scheduled_time ?? "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {formatDate(order.actual_date)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {order.completion_time ?? "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {formatDate(order.billing_date)}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        order.status === "On Time"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    {Intl.NumberFormat("pt-br", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(order.expected_revenue)}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
