@@ -1,13 +1,15 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import type { ICompositionLine, IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 import Modal from "../modal";
 import FormEditarMaquina from "./formEditarMaquina";
 import FormNovaMaquina from "./formNovaMaquina";
+import FormSetup from "./formSetup";
 
 type IEditMaquinaState = IMaquinas & {
   linhaId?: string | number;
@@ -23,6 +25,7 @@ function Maquina() {
   const queryClient = useQueryClient();
   const [novaMaquina, setNovaMaquina] = useState<boolean>(false);
   const [editarMaquina, setEditarMaquina] = useState<boolean>(false);
+  const [setup, setSetup] = useState<{ nome: string; id: number } | null>(null);
 
   const { data: linhaProd, isFetching } = useQuery({
     queryKey: ["get", "all", "linhaprod", linhaId],
@@ -33,6 +36,20 @@ function Maquina() {
         composition_lines: ICompositionLine[];
       }>(`/production-lines/${linhaId}`);
       return data;
+    },
+  });
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (id: number) => {
+      await apiClient.delete(`/composition-lines/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["get", "all", "linhaprod", linhaId],
+      });
+    },
+    onError: () => {
+      toast.error("Erro ao deletar a máquina. Tente novamente mais tarde.");
     },
   });
 
@@ -90,6 +107,15 @@ function Maquina() {
             setEditarMaquina={setEditarMaquina}
             maquina={maquina}
           />
+        </Modal.Container>
+      </Modal.Root>
+      <Modal.Root isVisible={!!setup}>
+        <Modal.Container>
+          <Modal.Header
+            title={setup?.nome || ""}
+            onClose={() => setSetup(null)}
+          />
+          <FormSetup onClose={setSetup} composition_line_ref={setup?.id || 0} />
         </Modal.Container>
       </Modal.Root>
       {isFetching && (
@@ -183,6 +209,7 @@ function Maquina() {
                     <td className="px-6 py-4 text-right">
                       <div className="w-full flex justify-end gap-2">
                         <button
+                          disabled={isPending}
                           onClick={() => {
                             setEditarMaquina(true);
                             setMaquina({
@@ -209,7 +236,17 @@ function Maquina() {
                           Editar
                         </button>
                         <button
-                          // onClick={() => deletarMaquinaFn(maquina.id)}
+                          disabled={isPending}
+                          onClick={() =>
+                            setSetup({ nome: cp.product_name, id: cp.id })
+                          }
+                          className="text-blue-500 cursor-pointer hover:text-blue-700 text-xs md:text-sm font-medium transition-colors duration-150"
+                        >
+                          Setup
+                        </button>
+                        <button
+                          onClick={() => mutateAsync(cp.id)}
+                          disabled={isPending}
                           className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
                         >
                           Remover
@@ -223,6 +260,7 @@ function Maquina() {
           </div>
           <div className="flex flex-col gap-4 items-center justify-center mt-4">
             <button
+              disabled={isPending}
               onClick={() => {
                 setNovaMaquina(true);
                 setMaquina({
