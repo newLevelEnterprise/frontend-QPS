@@ -29,21 +29,17 @@ function FormNovoProduto({
     resolver: zodResolver(criarProdutoSchema),
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ICriarProdutoBody) => {
     try {
       await apiClient.post("/products", {
         name: data.name,
-        cycle: data.ciclo,
-        bottleneck: data.bottleneck,
-        scrap: data.refugo,
       });
       setProducts();
       toast.success("Produto criado com sucesso!");
       setNovoProduto(false);
     } catch (error) {
-      if(error instanceof AxiosError) {
-        console.error("Erro ao criar pedido:", error);
+      if (error instanceof AxiosError) {
+        console.error("Erro ao criar produto:", error);
       }
       toast.error("Erro ao criar produto. Tente novamente.");
     }
@@ -74,90 +70,6 @@ function FormNovoProduto({
           <ErrorMessage
             errors={errors}
             name="name"
-            render={({ message }) => <FormErrorMessage message={message} />}
-          />
-        )}
-      </div>
-
-      <div className="w-full flex flex-col md:flex-row gap-4">
-        <div className="w-1/2">
-          <div className="w-full flex flex-col gap-3">
-            <label
-              htmlFor="ciclo"
-              className="text-[#212A4F] font-semibold truncate text-ellipsis"
-            >
-              Ciclo do produto (Seg/pç)
-            </label>
-            <div className="flex gap-1 relative">
-              <input
-                id="ciclo"
-                placeholder="Ciclo do Produto"
-                type="number"
-                className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("ciclo")}
-              />
-              <span className="absolute right-4 text-xs">Seg/pç</span>
-            </div>
-            {errors.ciclo && (
-              <ErrorMessage
-                errors={errors}
-                name="ciclo"
-                render={({ message }) => <FormErrorMessage message={message} />}
-              />
-            )}
-          </div>
-        </div>
-        <div className="w-1/2">
-          <div className="w-full flex flex-col gap-3">
-            <label
-              htmlFor="refugo"
-              className="text-[#212A4F] font-semibold truncate text-ellipsis"
-            >
-              Refugo do produto (em %)
-            </label>
-            <div className="flex gap-1 relative">
-              <input
-                id="refugo"
-                placeholder="Refugo do produto"
-                min={0}
-                max={100}
-                type="tel"
-                className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("refugo")}
-              />
-               <span className="absolute right-5 text-xs">%</span>
-            </div>
-            {errors.refugo && (
-              <ErrorMessage
-                errors={errors}
-                name="refugo"
-                render={({ message }) => <FormErrorMessage message={message} />}
-              />
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full flex flex-col gap-3">
-        <label
-          htmlFor="gargalo"
-          className="text-[#212A4F] font-semibold truncate text-ellipsis"
-        >
-          Tempo Restante de Processamento
-        </label>
-        <div className="flex gap-1">
-          <input
-            id="gargalo"
-            placeholder="Tempo Restante de Processamento"
-            type="text"
-            className="w-full outline-none border-b border-[#A4AABC]"
-            {...register("bottleneck")}
-          />
-        </div>
-        {errors.bottleneck && (
-          <ErrorMessage
-            errors={errors}
-            name="bottleneck"
             render={({ message }) => <FormErrorMessage message={message} />}
           />
         )}

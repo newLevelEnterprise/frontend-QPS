@@ -8,8 +8,24 @@ import Button from "../Button";
 
 export interface ResponseOfProductsSetups {
   id: number;
+  production_line_id: number;
+  from_composition_line_id: number;
+  to_composition_line_id: number;
+  name: string;
   setup_time: number;
-  pair_product: {
+  from_product: {
+    id: number;
+    name: string;
+  };
+  from_mold: {
+    id: number;
+    name: string;
+  };
+  to_product: {
+    id: number;
+    name: string;
+  };
+  to_mold: {
     id: number;
     name: string;
   };
@@ -35,21 +51,15 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
   const adicionarSetup = async () => {
     try {
       setIsLoading(true);
-      const setupNew = setupProdutos.map((p) => ({
-        setup_id: p.setup_id,
-        product_id: p.id,
-        setup_time: p.tempo_setup,
-      }));
-      const setupOld = setupOldProdutos.map((p) => ({
-        setup_id: p.setup_id,
-        product_id: p.id,
-        setup_time: p.tempo_setup,
-      }));
-      const dirtiedFields = setupNew
-        .filter((p, index) => p.setup_time !== setupOld[index].setup_time)
-        .map((setup) => ({
-          id: setup.setup_id,
-          setup_time: setup.setup_time,
+      const oldBySetupId = new Map(
+        setupOldProdutos.map((item) => [item.setup_id, item.tempo_setup]),
+      );
+
+      const dirtiedFields = setupProdutos
+        .filter((item) => oldBySetupId.get(item.setup_id) !== item.tempo_setup)
+        .map((item) => ({
+          id: item.setup_id,
+          setup_time: item.tempo_setup,
         }));
 
       const payload = {
@@ -57,13 +67,13 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
       };
 
       if (payload.updates.length > 0) {
-        await apiClient.put("/setup_trocas/batch", payload);
+        await apiClient.put("/setups/batch", payload);
         toast.success("Setup atualizado");
       }
       onClose(null);
     } catch (error) {
       console.log(error);
-      toast.error("Erro ao criar o setup.");
+      toast.error("Erro ao atualizar o setup.");
     } finally {
       setIsLoading(false);
     }
@@ -74,19 +84,32 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
       try {
         setIsLoadingProducts(true);
         const { data } = await apiClient.get<ResponseOfProductsSetups[]>(
-          `/setup_trocas/produto/${produto_ref}/resumo`
+          `/setups/composition-line/${produto_ref}/resumo`,
         );
         if (data.length === 0) {
           setSetupProdutos([]);
+          setSetupOldProdutos([]);
         } else {
           const products = data
-            .filter((p) => p.pair_product.id !== produto_ref)
-            .map((p) => ({
-              nomeProdutoDestino: p.pair_product.name,
-              tempo_setup: p.setup_time,
-              id: p.pair_product.id,
-              setup_id: p.id,
-            }));
+            .filter(
+              (item) =>
+                item.from_product.id === produto_ref ||
+                item.to_product.id === produto_ref,
+            )
+            .map((item) => {
+              const produtoDestino =
+                item.from_product.id === produto_ref
+                  ? item.to_product
+                  : item.from_product;
+
+              return {
+                nomeProdutoDestino: produtoDestino.name,
+                tempo_setup: item.setup_time,
+                id: produtoDestino.id,
+                setup_id: item.id,
+              };
+            });
+
           setSetupProdutos(products);
           setSetupOldProdutos(products);
         }
@@ -99,7 +122,7 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
     };
 
     getProducts();
-  }, []);
+  }, [produto_ref]);
 
   return (
     <div className="w-full flex flex-col gap-10 my-6 overflow-y-auto max-h-[95%]">
@@ -121,11 +144,11 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
       ) : (
         setupProdutos
           .filter((p) =>
-            p.nomeProdutoDestino.toLowerCase().includes(busca.toLowerCase())
+            p.nomeProdutoDestino.toLowerCase().includes(busca.toLowerCase()),
           )
           .map((produto) => (
             <div
-              key={produto.id}
+              key={produto.setup_id}
               className="w-full flex justify-between items-center border-b border-gray-300"
             >
               <p>{produto.nomeProdutoDestino}</p>
@@ -136,7 +159,7 @@ function FormSetup({ produto_ref, onClose }: FormNovoProdutoProps) {
                 value={produto.tempo_setup}
                 onChange={(e) => {
                   const index = setupProdutos.findIndex(
-                    (p) => p.id === produto.id
+                    (p) => p.setup_id === produto.setup_id,
                   );
                   setSetupProdutos((prev) => {
                     const oldProducts = [...prev];

@@ -7,7 +7,6 @@ import type { IProduto } from "../../../types/Produto";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 import Modal from "../modal";
-import XlsxUpload from "../XlsxUpload";
 import FormEditarProduto from "./formEditProduto";
 import FormNovoProduto from "./formNovoProduto";
 import FormSetup from "./formSetup";
@@ -17,17 +16,11 @@ function Produtos() {
   const [editarProduto, setEditarProduto] = useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
   const [setup, setSetup] = useState<{ nome: string; id: number } | null>(null);
-  const [uploadSetup, setUploadSetup] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
-  const [produto, setProduto] = useState<
-    Pick<IProduto, "id" | "name" | "cycle" | "scrap" | "bottleneck">
-  >({
+  const [produto, setProduto] = useState<Pick<IProduto, "id" | "name">>({
     id: 0,
     name: "",
-    cycle: 0,
-    scrap: 0,
-    bottleneck: 0,
   });
 
   const deletarProdutoFn = async (produtoId: number) => {
@@ -108,23 +101,6 @@ function Produtos() {
         </Modal.Container>
       </Modal.Root>
 
-      {/* Modal para o Setup */}
-      <Modal.Root isVisible={uploadSetup}>
-        <Modal.Container className="md:w-1/2">
-          <Modal.Header
-            title="Upload Setup"
-            onClose={() => setUploadSetup((prev) => !prev)}
-          />
-          <XlsxUpload
-            onClose={() => setUploadSetup((prev) => !prev)}
-            mainDivClassName="mt-4 shadow-none"
-            uploaderContainerClassName="lg:w-full"
-            endpoint="setup-matrix-xlsx"
-            cachekey={["get", "all", "products"]}
-          />
-        </Modal.Container>
-      </Modal.Root>
-
       {/* Listagem dos produtos */}
       <h1 className="text-xl text-[#5B85D5] font-bold">Produtos Cadastrados</h1>
       <div className="w-full flex flex-col gap-4 md:flex-row justify-between items-end">
@@ -140,13 +116,6 @@ function Produtos() {
           />
         </div>
         <div className="space-x-10">
-          <button
-            onClick={() => setUploadSetup((prev) => !prev)}
-            className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md"
-          >
-            Upload setup
-          </button>
-
           <a
             target="_top"
             href="https://api-quant-production.up.railway.app/template/setup-matrix"
@@ -175,15 +144,6 @@ function Produtos() {
                 <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
                   Produto
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Ciclo (Seg/pç)
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Tempo Restante de Processamento (Seg/pç)
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
-                  Refugo (em %)
-                </th>
                 <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">
                   Ações
                 </th>
@@ -199,16 +159,6 @@ function Produtos() {
                   >
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {produto.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {produto.cycle}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {produto.bottleneck}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {produto.scrap}
-                      <span className="text-[10px] ml-1">%</span>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="w-full flex justify-end gap-2">

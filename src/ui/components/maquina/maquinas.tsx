@@ -44,7 +44,14 @@ function Maquina() {
     produto: "",
   });
 
-  console.log("linhaProd", linhaProd);
+  const machineColumns = Array.from(
+    new Map(
+      (linhaProd?.composition_lines ?? [])
+        .flatMap((compositionLine) => compositionLine.machines ?? [])
+        .map((machine) => [machine.id, machine]),
+    ).values(),
+  );
+
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root
@@ -114,9 +121,14 @@ function Maquina() {
                   <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                     Cavidades Abertas
                   </th>
-                  <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                    Temp. de Ciclo Pós Injeção (s)
-                  </th>
+                  {machineColumns.map((machine) => (
+                    <th
+                      key={machine.id}
+                      className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700"
+                    >
+                      Tempo ciclo {machine.name}
+                    </th>
+                  ))}
                   <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                     Refugo
                   </th>
@@ -146,10 +158,22 @@ function Maquina() {
                     <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                       {cp.mold.open_cavities}
                     </td>
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                      {/* {cp.post_injection_cycle_time} */}
-                      teste
-                    </td>
+                    {machineColumns.map((machine) => {
+                      const machineInCompositionLine = cp.machines.find(
+                        (item) => item.id === machine.id,
+                      );
+
+                      return (
+                        <td
+                          key={`${cp.id}-${machine.id}`}
+                          className="px-6 py-4 text-xs md:text-sm text-gray-900"
+                        >
+                          {machineInCompositionLine
+                            ? machineInCompositionLine.availability
+                            : "-"}
+                        </td>
+                      );
+                    })}
                     <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                       {cp.mold.scrap}
                     </td>

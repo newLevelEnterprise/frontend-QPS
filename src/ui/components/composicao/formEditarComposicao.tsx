@@ -92,7 +92,7 @@ function FormEditComposicao({
     queryKey: ["get", "product-composition", compositionId],
     queryFn: async () => {
       const { data } = await apiClient.get<ProductCompositionResponse>(
-        `/product-composition/${compositionId}`,
+        `/product-composition/product/${compositionId}`,
       );
       return data;
     },

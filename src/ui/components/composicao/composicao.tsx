@@ -250,7 +250,7 @@ function Composicao() {
                     <div className="w-full flex justify-end gap-2">
                       <button
                         onClick={() => {
-                          setComposicaoSelecionadaId(composicao.id);
+                          setComposicaoSelecionadaId(composicao.produto_id);
                           setEdicaoComposicaoAberta(true);
                         }}
                         className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"
