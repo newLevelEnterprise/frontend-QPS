@@ -10,7 +10,7 @@ function AppErrorFallback({ error }: FallbackProps) {
   console.error("Erro capturado pelo ErrorBoundary:", error);
 
   const handleBackToHome = () => {
-    window.location.assign("/cadastro/clientes");
+    window.location.assign("/cadastro/cliente");
   };
 
   return (
