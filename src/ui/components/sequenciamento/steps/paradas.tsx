@@ -271,7 +271,7 @@ function Paradas() {
                 end_time: formatTimeToHHMMSS(paradaAtual.horarioFim),
               }))
             : [],
-        user_id,
+        user_id: `${user_id}`,
       });
 
       toast.success("Dados prontos para iniciar o sequenciamento.");
