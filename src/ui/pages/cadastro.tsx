@@ -82,7 +82,7 @@ function CadastroPage() {
       </div>
 
       <Modal.Root isVisible={isGanttModalOpen}>
-        <Modal.Container>
+        <Modal.Container className="w-[60%] max-w-7xl max-h-[85vh] overflow-y-auto">
           <Modal.Header
             title="Visualização do gráfico de Gantt"
             onClose={() => setIsGanttModalOpen(false)}
