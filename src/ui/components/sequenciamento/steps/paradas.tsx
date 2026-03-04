@@ -234,7 +234,7 @@ function Paradas() {
       });
 
       await apiClient.post("/solver/solver", {
-        jobs_ids: jobs_ids || [],
+        job_ids: jobs_ids || [],
         sequencing_date: `${sequenciamento.dataInicio}T${sequenciamento.horarioInicio}:00`,
         next_saturday_is_working: sequenciamento.sabadoTrabalha,
         machine_states_json: payload.estadoAtualMaquina.map((estadoAtual) => ({
