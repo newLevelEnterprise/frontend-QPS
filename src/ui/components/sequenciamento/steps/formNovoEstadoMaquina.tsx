@@ -84,7 +84,11 @@ function FormNovoEstado({
       queryKey: ["get", "all", "compositionLines"],
       queryFn: async () => {
         const { data } = await apiClient.get<
-          { product_id: number; production_line_id: number }[]
+          {
+            product_id: number;
+            production_line_id: number;
+            product: { name: string; id: number };
+          }[]
         >("/composition-lines/");
         return data;
       },
@@ -147,10 +151,8 @@ function FormNovoEstado({
 
   const adicionarEstadoAtualMaquina = (data: IEstadoAtualMaquinaItem) => {
     const productLineId = compositionLines?.find(
-      (line) =>
-        line.product_id === Number(data.prodMaquinaInicioSequenciamento),
+      (line) => line.product.name === data.prodMaquinaInicioSequenciamento,
     );
-
     if (!productLineId || !productLineId.production_line_id) {
       toast.error(
         "Não foi possível encontrar a linha de produção para o produto selecionado. Verifique se o produto está corretamente associado a uma linha de produção.",

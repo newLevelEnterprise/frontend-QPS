@@ -166,7 +166,7 @@ function Maquina() {
             onClose={() => setSetupUploadModal(false)}
           />
           <XlsxUpload
-            endpoint={`setup-matrix-xlsx/${String(linhaProd?.id ?? linhaId ?? "")}`}
+            endpoint={`setup-matrix-xlsx/${String(linhaId ?? "")}`}
             cachekey={["get", "all", "linhaprod", String(linhaId ?? "")]}
             onClose={() => setSetupUploadModal(false)}
             mainDivClassName="shadow-none h-auto bg-transparent p-0"
@@ -197,7 +197,7 @@ function Maquina() {
               </button>
               <a
                 target="_top"
-                href="https://api-quant-production.up.railway.app/template/setup-matrix"
+                href={`https://api-quant-production.up.railway.app/template/setup-matrix/${linhaId}`}
                 download
               >
                 <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">

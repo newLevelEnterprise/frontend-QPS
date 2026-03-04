@@ -24,6 +24,9 @@ function FormNovaParada({ onCriarParada }: FormNovaParadaProps) {
     formState: { errors, isSubmitting, isValid },
   } = useForm<ICriarParadaBody>({
     resolver: zodResolver(criarParadaSchema),
+    defaultValues: {
+      product_line_id: "1",
+    },
   });
 
   const { data: compositionLines, isFetching: isFetchingCompositionLines } =
@@ -49,7 +52,6 @@ function FormNovaParada({ onCriarParada }: FormNovaParadaProps) {
     const productLineId = compositionLines?.find((line) =>
       line.machines.some((machine) => machine.id === Number(data.maquina)),
     )?.production_line_id;
-
     if (!productLineId) {
       toast.error(
         "Não foi possível identificar a linha de produção para a máquina selecionada.",
