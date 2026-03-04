@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useAuth } from "../../../../hooks/useAuth";
 import { useSteps } from "../../../../hooks/useStep";
 import {
   criarStepsSequenciamentoschema,
@@ -66,6 +67,7 @@ const inferMachineId = (machineName: string) => {
 
 function Paradas() {
   const queryClient = useQueryClient();
+  const { user_id } = useAuth();
   const { resetSteps } = useSteps();
   const [processing, setProcessing] = useState<boolean>(false);
   const [modalCriarParada, setModalCriarParada] = useState<boolean>(false);
@@ -73,6 +75,7 @@ function Paradas() {
   const { prevStep } = useSteps();
   const [parada, setParada] = useState<IParadas>({
     id: 0,
+    product_line_id: 0,
     motivo: "",
     dataInicio: "",
     horaInicio: "",
@@ -150,6 +153,7 @@ function Paradas() {
         estadoAtualMaquina,
         paradasSequenciamento: incluirParadas
           ? paradas.map((paradaAtual) => ({
+              production_line_id: paradaAtual.product_line_id.toString(),
               motivo: paradaAtual.motivo,
               maquina: paradaAtual.maquina,
               dataInicio: paradaAtual.dataInicio,
@@ -234,7 +238,7 @@ function Paradas() {
         sequencing_date: `${sequenciamento.dataInicio}T${sequenciamento.horarioInicio}:00`,
         next_saturday_is_working: sequenciamento.sabadoTrabalha,
         machine_states_json: payload.estadoAtualMaquina.map((estadoAtual) => ({
-          production_line_id: 1,
+          production_line_id: Number(estadoAtual.production_line_id),
           machine_id: inferMachineId(estadoAtual.maquina),
           used: estadoAtual.utilizacao,
           mold_name: estadoAtual.codMolde,
@@ -258,6 +262,7 @@ function Paradas() {
         programmed_stops_json:
           incluirParadas && payload.paradasSequenciamento
             ? payload.paradasSequenciamento.map((paradaAtual) => ({
+                production_line_id: Number(paradaAtual.production_line_id),
                 reason: paradaAtual.motivo,
                 machine_id: inferMachineId(paradaAtual.maquina),
                 start_date: paradaAtual.dataInicio,
@@ -266,6 +271,7 @@ function Paradas() {
                 end_time: formatTimeToHHMMSS(paradaAtual.horarioFim),
               }))
             : [],
+        user_id,
       });
 
       toast.success("Dados prontos para iniciar o sequenciamento.");

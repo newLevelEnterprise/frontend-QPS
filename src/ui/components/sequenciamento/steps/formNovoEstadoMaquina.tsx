@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import type { ICriaStepsSequenciamentoBody } from "../../../../schemas/steps";
 import type { IMaquinasType } from "../../../../types/Maquina";
 import type { IMoldes } from "../../../../types/Moldes";
@@ -18,6 +19,7 @@ type IEstadoAtualMaquinaItem =
   ICriaStepsSequenciamentoBody["estadoAtualMaquina"][number];
 
 const defaultNovoEstado: IEstadoAtualMaquinaItem = {
+  production_line_id: "",
   maquina: "",
   utilizacao: false,
   codMolde: "",
@@ -68,6 +70,25 @@ function FormNovoEstado({
       return data;
     },
   });
+
+  const { data: clientes, isFetching: isFetchingClients } = useQuery({
+    queryKey: ["get", "all", "clients"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IMaquinasType[]>("/clients/");
+      return data;
+    },
+  });
+
+  const { data: compositionLines, isFetching: isFetchingCompositionLines } =
+    useQuery({
+      queryKey: ["get", "all", "compositionLines"],
+      queryFn: async () => {
+        const { data } = await apiClient.get<
+          { product_id: number; production_line_id: number }[]
+        >("/composition-lines/");
+        return data;
+      },
+    });
 
   const {
     register,
@@ -125,6 +146,18 @@ function FormNovoEstado({
   }, [setValue, statusSelecionado]);
 
   const adicionarEstadoAtualMaquina = (data: IEstadoAtualMaquinaItem) => {
+    const productLineId = compositionLines?.find(
+      (line) =>
+        line.product_id === Number(data.prodMaquinaInicioSequenciamento),
+    );
+
+    if (!productLineId || !productLineId.production_line_id) {
+      toast.error(
+        "Não foi possível encontrar a linha de produção para o produto selecionado. Verifique se o produto está corretamente associado a uma linha de produção.",
+      );
+      return;
+    }
+    data.production_line_id = productLineId.production_line_id.toString() || "";
     onAddEstadoAtualMaquina(data);
     reset(defaultNovoEstado);
     setIsModalNovoEstadoVisible(false);
@@ -141,7 +174,7 @@ function FormNovoEstado({
           className={`border rounded px-2 py-1 ${disabledFieldClassName}`}
           defaultValue=""
           {...register("maquina", { required: true })}
-          disabled={isFetchingMaquinas}
+          disabled={isFetchingMaquinas || isFetchingCompositionLines}
         >
           <option value="" disabled>
             {isFetchingMaquinas
@@ -233,8 +266,7 @@ function FormNovoEstado({
 
       <div className="flex flex-col gap-1">
         <label className="font-semibold text-sm">Nome do Cliente</label>
-        <input
-          type="text"
+        <select
           className={`border rounded px-2 py-1 ${disabledFieldClassName}`}
           {...register("nome_cliente", {
             validate: (value) =>
@@ -242,8 +274,20 @@ function FormNovoEstado({
               (value || "").trim().length > 0 ||
               "Nome do Cliente é obrigatório",
           })}
-          disabled={camposBloqueadosPorConcluido}
-        />
+          defaultValue=""
+          disabled={camposBloqueadosPorConcluido || isFetchingClients}
+        >
+          <option value="" disabled>
+            {isFetchingClients
+              ? "Carregando clientes..."
+              : "Selecione um cliente"}
+          </option>
+          {clientes?.map((cliente) => (
+            <option key={cliente.id} value={cliente.name}>
+              {cliente.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex flex-col gap-1">

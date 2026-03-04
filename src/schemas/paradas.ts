@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const criarParadaSchema = z.object({
+  product_line_id: z.string().min(1, "Linha de produção é obrigatória"),
   motivo: z.string().min(1, "Produto é obrigatório"),
   dataInicio: z.string().min(1, "Data de início é obrigatória"),
   horaInicio: z.string().min(1, "Hora de início é obrigatória"),
@@ -11,6 +12,7 @@ export const criarParadaSchema = z.object({
 
 export const editarParadaSchema = z.object({
   id: z.number().min(1, "ID é obrigatório"),
+  product_line_id: z.string().min(1, "Linha de produção é obrigatória"),
   motivo: z.string().min(1, "Produto é obrigatório"),
   dataInicio: z.string().min(1, "Data de início é obrigatória"),
   horaInicio: z.string().min(1, "Hora de início é obrigatória"),

@@ -1,11 +1,15 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import {
   criarParadaSchema,
   type ICriarParadaBody,
 } from "../../../../schemas/paradas";
+import type { IMaquinasType } from "../../../../types/Maquina";
 import type { IParadas } from "../../../../types/Paradas";
+import { apiClient } from "../../../../utils/apiClient";
 import Button from "../../Button";
 import FormErrorMessage from "../../forms/FormErrorMessage";
 
@@ -22,8 +26,38 @@ function FormNovaParada({ onCriarParada }: FormNovaParadaProps) {
     resolver: zodResolver(criarParadaSchema),
   });
 
+  const { data: compositionLines, isFetching: isFetchingCompositionLines } =
+    useQuery({
+      queryKey: ["get", "all", "compositionLines"],
+      queryFn: async () => {
+        const { data } = await apiClient.get<
+          { machines: { id: number }[]; production_line_id: number }[]
+        >("/composition-lines/");
+        return data;
+      },
+    });
+
+  const { data: maquinas, isFetching: isFetchingMaquinas } = useQuery({
+    queryKey: ["get", "all", "machines"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IMaquinasType[]>("/machines/");
+      return data;
+    },
+  });
+
   const onSubmit = (data: ICriarParadaBody) => {
-    onCriarParada(data);
+    const productLineId = compositionLines?.find((line) =>
+      line.machines.some((machine) => machine.id === Number(data.maquina)),
+    )?.production_line_id;
+
+    if (!productLineId) {
+      toast.error(
+        "Não foi possível identificar a linha de produção para a máquina selecionada.",
+      );
+      return;
+    }
+
+    onCriarParada({ ...data, product_line_id: productLineId });
   };
 
   return (
@@ -167,13 +201,16 @@ function FormNovaParada({ onCriarParada }: FormNovaParadaProps) {
         </label>
         <div className="flex gap-1">
           <select
+            disabled={isFetchingMaquinas || isFetchingCompositionLines}
             id="maquina"
             className="w-full outline-none border-b border-[#A4AABC] bg-white"
             {...register("maquina")}
           >
-            <option value="">Selecione a máquina</option>
-            <option value="Maq 1">Maq 1</option>
-            <option value="Maq 2">Maq 2</option>
+            {maquinas?.map((maquina) => (
+              <option key={maquina.id} value={maquina.id}>
+                {maquina.name}
+              </option>
+            ))}
             {/* Adicione mais opções conforme necessário */}
           </select>
         </div>
