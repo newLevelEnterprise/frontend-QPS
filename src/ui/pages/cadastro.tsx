@@ -87,7 +87,7 @@ function CadastroPage() {
             title="Visualização do gráfico de Gantt"
             onClose={() => setIsGanttModalOpen(false)}
           />
-          <GantChart />
+          <GantChart id={production?.id || 0} />
         </Modal.Container>
       </Modal.Root>
 
@@ -97,7 +97,7 @@ function CadastroPage() {
             title="Necessidade de Matéria Prima"
             onClose={() => setIsMaisInfoModalOpen(false)}
           />
-          <RawMaterialInfoTable />
+          <RawMaterialInfoTable id={production?.id || 0} />
         </Modal.Container>
       </Modal.Root>
     </div>

@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
-import type { IProductionSchedule } from "../../../types/ProductionSchedule";
+import { useMemo } from "react";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 
@@ -220,53 +219,16 @@ function Chart({ id }: IRun) {
   );
 }
 
-function GantChart() {
-  const [runId, setRunId] = useState<number | null>(null);
-  const { data: runs, isFetching } = useQuery({
-    queryKey: ["rawMaterialInfo"],
-    queryFn: async () => {
-      const { data } = await apiClient.get<IProductionSchedule[]>(
-        "/production-schedule",
-      );
-      return data.map((s) => ({ startDate: s.created_at, id: s.id }));
-    },
-  });
-
-  useEffect(() => {
-    if (!runId && runs?.length) {
-      setRunId(runs[0].id);
-    }
-  }, [runId, runs]);
-
-  if (isFetching) {
-    return <Loader message="Carregando o gráfico" />;
+function GantChart({ id }: { id: number }) {
+  if (!id) {
+    return <p>Nenhum sequenciamento disponível.</p>;
   }
 
   return (
     <div className="space-y-4">
-      <h2 className="font-semibold">Filtre pelo sequenciamento do dia</h2>
-      <select
-        value={runId ?? ""}
-        onChange={(e) =>
-          setRunId(e.target.value ? Number(e.target.value) : null)
-        }
-        className="p-2 border rounded-md w-full max-w-sm"
-      >
-        <option value="" disabled>
-          Selecione um sequenciamento
-        </option>
-        {runs?.map((run) => (
-          <option key={run.id} value={run.id}>
-            {Intl.DateTimeFormat("pt-BR", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }).format(new Date(run.startDate))}
-          </option>
-        ))}
-      </select>
-
-      <div className="mt-4">{runId && <Chart id={runId} />}</div>
+      <div className="mt-4">
+        <Chart id={id} />
+      </div>
     </div>
   );
 }
