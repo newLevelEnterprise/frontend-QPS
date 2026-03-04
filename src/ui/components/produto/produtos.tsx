@@ -11,28 +11,26 @@ import FormEditarProduto from "./formEditProduto";
 import FormNovoProduto from "./formNovoProduto";
 
 function Produtos() {
+  const queryClient = useQueryClient();
   const [novoProduto, setNovoProduto] = useState<boolean>(false);
   const [editarProduto, setEditarProduto] = useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
-  const queryClient = useQueryClient();
 
   const [produto, setProduto] = useState<Pick<IProduto, "id" | "name">>({
     id: 0,
     name: "",
   });
 
-  const deletarProdutoFn = async (produtoId: number) => {
+  const deletarProdutoFn = async (productId: number) => {
     try {
-      await apiClient.delete(`/products/${produtoId}`);
-
+      await apiClient.delete(`/products/${productId}`);
       queryClient.setQueryData(
         ["get", "all", "products"],
         (oldData: IProduto[]) => {
           if (!oldData) return oldData;
-          return oldData.filter((client) => client.id !== produtoId);
+          return oldData.filter((item) => item.id !== productId);
         },
       );
-
       toast.success("Produto removido com sucesso!", {
         toastId: "deleteProductToast",
       });
@@ -51,8 +49,7 @@ function Produtos() {
   });
 
   return (
-    <div className="w-full bg-white rounded-md shadow p-4">
-      {/* Modal para o produto */}
+    <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root isVisible={novoProduto}>
         <Modal.Container>
           <Modal.Header
@@ -60,16 +57,15 @@ function Produtos() {
             onClose={() => setNovoProduto(false)}
           />
           <FormNovoProduto
-            setNovoProduto={setNovoProduto}
             setProducts={() =>
               queryClient.invalidateQueries({
                 queryKey: ["get", "all", "products"],
               })
             }
+            setNovoProduto={setNovoProduto}
           />
         </Modal.Container>
       </Modal.Root>
-
       <Modal.Root isVisible={editarProduto}>
         <Modal.Container>
           <Modal.Header
@@ -82,26 +78,24 @@ function Produtos() {
                 queryKey: ["get", "all", "products"],
               })
             }
-            produto={produto}
             setEditarProduto={setEditarProduto}
+            produto={produto}
           />
         </Modal.Container>
       </Modal.Root>
-
-      {/* Listagem dos produtos */}
       <h1 className="text-xl text-[#5B85D5] font-bold">Produtos Cadastrados</h1>
-      <div className="w-full flex flex-col gap-4 md:flex-row justify-between items-end">
-        <div className="flex-1 relative w-full md:max-w-md mt-4">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <IoSearchSharp className="h-4 w-4 text-gray-400" />
-          </div>
-          <input
-            onChange={(e) => setBusca(e.target.value)}
-            type="text"
-            placeholder="Buscar..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+      <div className="relative max-w-md mt-4">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <IoSearchSharp className="h-4 w-4 text-gray-400" />
         </div>
+        <input
+          disabled={!products || products.length === 0}
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          type="text"
+          placeholder="Buscar..."
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
       </div>
 
       <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
@@ -115,41 +109,43 @@ function Produtos() {
           </div>
         ) : (
           <table className="w-full overflow-auto max-h-[470px]">
-            <thead className="overflow-x-auto">
+            <thead>
               <tr className="border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                   Produto
                 </th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                   Ações
                 </th>
               </tr>
             </thead>
-            <tbody className="overflow-x-auto">
+            <tbody>
               {products
-                .filter((p) => p.name.includes(busca))
-                .map((produto) => (
+                .filter((item) =>
+                  item.name.toLowerCase().includes(busca.toLowerCase()),
+                )
+                .map((item) => (
                   <tr
-                    key={produto.id}
+                    key={item.id}
                     className="border-b border-gray-200 last:border-b-0"
                   >
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      {produto.name}
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {item.name}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="w-full flex justify-end gap-2">
                         <button
                           onClick={() => {
-                            setProduto(produto);
                             setEditarProduto(true);
+                            setProduto(item);
                           }}
-                          className="text-blue-600 cursor-pointer hover:text-blue-800 text-sm font-medium transition-colors duration-150"
+                          className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"
                         >
                           Editar
                         </button>
                         <button
-                          onClick={() => deletarProdutoFn(produto.id)}
-                          className="text-red-500 cursor-pointer hover:text-red-700 text-sm font-medium transition-colors duration-150"
+                          onClick={() => deletarProdutoFn(item.id)}
+                          className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
                         >
                           Remover
                         </button>
@@ -166,6 +162,10 @@ function Produtos() {
         <button
           onClick={() => {
             setNovoProduto(true);
+            setProduto({
+              id: 0,
+              name: "",
+            });
           }}
           className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
