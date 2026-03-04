@@ -8,37 +8,35 @@ interface IRunOption {
   id: number;
 }
 
-interface IProcurementItem {
-  id: number;
-  run_id: number;
-  result_id: number;
-  order_index: number;
-  job_id: number;
-  order_number: string;
-  item_type: string;
-  item_id: number;
-  item_name: string;
+interface IProcurementEntry {
+  name: string;
   quantity: number;
   purchase_date: string;
-  unit_cost: string;
+  cost: string;
+}
+
+interface IProcurementsByJobItem {
+  job_id: number;
+  product_name: string;
+  client_name: string;
+  order_number: string;
+  raw_materials: IProcurementEntry[];
+  purchase_items: IProcurementEntry[];
   total_cost: string;
-  lead_time_days: number;
-  demand_base: number;
-  demand_with_scrap: number;
-  mold_scrap_percent: number;
-  item_scrap_percent: number;
-  composition_quantity: number;
-  created_at: string;
+}
+
+interface IProcurementsByJobResponse {
+  procurements_by_job: IProcurementsByJobItem[];
 }
 
 function RawMaterialTable({ id }: IRunOption) {
   const { data, isFetching } = useQuery({
     queryKey: ["rawMaterialInfo", id],
     queryFn: async () => {
-      const { data } = await apiClient.get<IProcurementItem[]>(
-        `/production-schedule/${id}/procurements`,
+      const { data } = await apiClient.get<IProcurementsByJobResponse>(
+        `/production-schedule/${id}/procurements-by-job`,
       );
-      return data;
+      return data.procurements_by_job;
     },
   });
 
@@ -73,38 +71,68 @@ function RawMaterialTable({ id }: IRunOption) {
     }).format(parsed);
   };
 
+  const rows = data.flatMap((job) => {
+    const rawMaterialRows = job.raw_materials.map((entry, index) => ({
+      key: `raw-${job.job_id}-${job.order_number}-${index}-${entry.name}`,
+      job_id: job.job_id,
+      product_name: job.product_name,
+      client_name: job.client_name,
+      order_number: job.order_number,
+      category: "Matéria-prima",
+      item_name: entry.name,
+      quantity: entry.quantity,
+      purchase_date: entry.purchase_date,
+      cost: entry.cost,
+      total_cost: job.total_cost,
+    }));
+
+    const purchaseItemRows = job.purchase_items.map((entry, index) => ({
+      key: `purchase-${job.job_id}-${job.order_number}-${index}-${entry.name}`,
+      job_id: job.job_id,
+      product_name: job.product_name,
+      client_name: job.client_name,
+      order_number: job.order_number,
+      category: "Item de compra",
+      item_name: entry.name,
+      quantity: entry.quantity,
+      purchase_date: entry.purchase_date,
+      cost: entry.cost,
+      total_cost: job.total_cost,
+    }));
+
+    return [...rawMaterialRows, ...purchaseItemRows];
+  });
+
   return (
-    <div className="w-full overflow-x-auto rounded-md border border-gray-200">
-      <table className="min-w-[1000px] w-full text-sm">
+    <div className="overflow-x-auto rounded-md border border-gray-200">
+      <table className="w-full text-sm">
         <thead className="bg-gray-50 text-left">
           <tr>
+            <th className="px-3 py-2 font-medium">Job</th>
             <th className="px-3 py-2 font-medium">Pedido</th>
-            <th className="px-3 py-2 font-medium">Ordem</th>
-            <th className="px-3 py-2 font-medium">Tipo</th>
+            <th className="px-3 py-2 font-medium">Cliente</th>
+            <th className="px-3 py-2 font-medium">Produto</th>
+            <th className="px-3 py-2 font-medium">Categoria</th>
             <th className="px-3 py-2 font-medium">Item</th>
             <th className="px-3 py-2 font-medium">Quantidade</th>
             <th className="px-3 py-2 font-medium">Data compra</th>
-            <th className="px-3 py-2 font-medium">Custo unit.</th>
-            <th className="px-3 py-2 font-medium">Custo total</th>
-            <th className="px-3 py-2 font-medium">Lead time (dias)</th>
-            <th className="px-3 py-2 font-medium">Demanda base</th>
-            <th className="px-3 py-2 font-medium">Demanda c/ perda</th>
+            <th className="px-3 py-2 font-medium">Custo item</th>
+            <th className="px-3 py-2 font-medium">Total pedido</th>
           </tr>
         </thead>
         <tbody>
-          {data.map((item) => (
-            <tr key={item.id} className="border-t border-gray-200">
+          {rows.map((item) => (
+            <tr key={item.key} className="border-t border-gray-200">
+              <td className="px-3 py-2">{item.job_id}</td>
               <td className="px-3 py-2">{item.order_number}</td>
-              <td className="px-3 py-2">{item.order_index}</td>
-              <td className="px-3 py-2">{item.item_type}</td>
+              <td className="px-3 py-2">{item.client_name}</td>
+              <td className="px-3 py-2">{item.product_name}</td>
+              <td className="px-3 py-2">{item.category}</td>
               <td className="px-3 py-2">{item.item_name}</td>
               <td className="px-3 py-2">{item.quantity}</td>
               <td className="px-3 py-2">{formatDate(item.purchase_date)}</td>
-              <td className="px-3 py-2">{formatCurrency(item.unit_cost)}</td>
+              <td className="px-3 py-2">{formatCurrency(item.cost)}</td>
               <td className="px-3 py-2">{formatCurrency(item.total_cost)}</td>
-              <td className="px-3 py-2">{item.lead_time_days}</td>
-              <td className="px-3 py-2">{item.demand_base}</td>
-              <td className="px-3 py-2">{item.demand_with_scrap}</td>
             </tr>
           ))}
         </tbody>
@@ -148,7 +176,7 @@ function RawMaterialInfoTable() {
         ))}
       </select>
 
-      <div className="mt-4">
+      <div className="mt-4 w-full overflow-auto max-h-[470px]">
         {runId ? <RawMaterialTable id={runId} /> : null}
       </div>
     </div>

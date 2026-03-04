@@ -81,8 +81,8 @@ function CadastroPage() {
         </section>
       </div>
 
-      <Modal.Root isVisible={isGanttModalOpen}>
-        <Modal.Container className="w-[60%] max-w-7xl max-h-[85vh] overflow-y-auto">
+      <Modal.Root isVisible={isGanttModalOpen} full>
+        <Modal.Container className="w-full max-w-7xl max-h-full overflow-y-auto">
           <Modal.Header
             title="Visualização do gráfico de Gantt"
             onClose={() => setIsGanttModalOpen(false)}
@@ -91,8 +91,8 @@ function CadastroPage() {
         </Modal.Container>
       </Modal.Root>
 
-      <Modal.Root isVisible={isMaisInfoModalOpen}>
-        <Modal.Container>
+      <Modal.Root isVisible={isMaisInfoModalOpen} full>
+        <Modal.Container className="w-full">
           <Modal.Header
             title="Necessidade de Matéria Prima"
             onClose={() => setIsMaisInfoModalOpen(false)}
