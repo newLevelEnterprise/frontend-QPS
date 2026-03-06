@@ -140,7 +140,7 @@ function FormEditarItem({
             htmlFor="refugo"
             className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
           >
-            Refugo
+            % Refugo
           </label>
           <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
             <input

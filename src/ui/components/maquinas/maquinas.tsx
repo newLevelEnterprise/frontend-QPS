@@ -90,7 +90,7 @@ function Maquinas() {
                   Máquina
                 </th>
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                  Disponibilidade
+                  % Disponibilidade
                 </th>
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                   Ações

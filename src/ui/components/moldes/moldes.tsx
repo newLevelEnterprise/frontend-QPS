@@ -96,17 +96,17 @@ function Moldes() {
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                   Produto
                 </th>
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
                   Total de Cavidades
                 </th>
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
                   Cavidades Abertas
                 </th>
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                  Refugo
+                  % Refugo
                 </th>
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                  Risco de Cavidade
+                  % Risco de Cavidade
                 </th>
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                   Ações
@@ -125,10 +125,10 @@ function Moldes() {
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                     {molde.products.map((product) => product.name).join(", ")}
                   </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {molde.total_cavities}
                   </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {molde.open_cavities}
                   </td>
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">

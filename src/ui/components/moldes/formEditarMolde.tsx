@@ -205,7 +205,7 @@ function FormEditarMolde({
               htmlFor="refugo"
               className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
             >
-              Refugo
+              % Refugo
             </label>
             <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
               <input
@@ -231,7 +231,7 @@ function FormEditarMolde({
             htmlFor="riscoDeCavidade"
             className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
           >
-            Risco de Cavidade
+            % Risco de Cavidade
           </label>
           <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
             <input

@@ -103,10 +103,10 @@ function Insumos() {
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                   Material
                 </th>
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
                   Lead Time Médio de Entrega (dias)
                 </th>
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
                   Custo Médio (R$/Kg)
                 </th>
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
@@ -123,10 +123,10 @@ function Insumos() {
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                     {insumo.nome}
                   </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {insumo.lead_time_medio_entrega}
                   </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {insumo.custo_medio}
                   </td>
                   <td className="px-6 py-4 text-right">

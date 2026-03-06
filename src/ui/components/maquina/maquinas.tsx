@@ -211,30 +211,30 @@ function Maquina() {
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                    Cód. Molde
+                    Nome do Molde
                   </th>
                   <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                     Produto
                   </th>
-                  <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                     Total de Cavidades
                   </th>
-                  <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                     Cavidades Abertas
                   </th>
                   {machineColumns.map((machine) => (
                     <th
                       key={machine.id}
-                      className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700"
+                      className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700"
                     >
-                      Tempo ciclo {machine.name}
+                      Tempo ciclo {machine.name} (s)
                     </th>
                   ))}
-                  <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                    Refugo
+                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                    % Refugo
                   </th>
-                  <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                    Absorver riscos de cav. fechadas
+                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                    % Absorver riscos de cav. fechadas
                   </th>
                   <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                     Ações
@@ -253,10 +253,10 @@ function Maquina() {
                     <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                       {cp.product_name}
                     </td>
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                       {cp.mold.total_cavities}
                     </td>
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                       {cp.mold.open_cavities}
                     </td>
                     {machineColumns.map((machine) => {
@@ -267,7 +267,7 @@ function Maquina() {
                       return (
                         <td
                           key={`${cp.id}-${machine.id}`}
-                          className="px-6 py-4 text-xs md:text-sm text-gray-900"
+                          className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center"
                         >
                           {machineInCompositionLine
                             ? machineInCompositionLine.cycle_time
@@ -275,10 +275,10 @@ function Maquina() {
                         </td>
                       );
                     })}
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                       {cp.mold.scrap}
                     </td>
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                       {cp.mold.closed_cavity_risk}
                     </td>
                     <td className="px-6 py-4 text-right">

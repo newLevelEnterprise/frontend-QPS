@@ -29,7 +29,7 @@ function AuthLayout() {
 
         <p className="text-xs text-center text-white">
           <span className="block">Sistema de Inteligência Artificial</span>
-          Planejamento de Sequenciamento da Produção – QPS-1
+          Planejamento de Sequenciamento da Produção – QPS-2
         </p>
       </div>
       <Outlet />
