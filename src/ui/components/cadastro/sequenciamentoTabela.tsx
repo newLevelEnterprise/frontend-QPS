@@ -27,9 +27,7 @@ function SequenciamentoTabela({
 
   return (
     <div className="flex-1 rounded-md bg-white shadow p-2">
-      <h1 className="text-xl text-[#5B85D5] font-bold">
-        Sequenciamento Planejado
-      </h1>
+      <h1 className="text-xl  font-bold">Sequenciamento Planejado</h1>
       <div className="relative w-full mt-4">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <IoSearchSharp className="h-4 w-4 text-gray-400" />

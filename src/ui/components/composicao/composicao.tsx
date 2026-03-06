@@ -193,7 +193,7 @@ function Composicao() {
                     key={`raw-material-column-${rawMaterialColumn.id}`}
                     className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700"
                   >
-                    {rawMaterialColumn.nome}
+                    % {rawMaterialColumn.nome}
                   </th>
                 ))}
                 {purchaseItemColumns.map((purchaseItemColumn) => (
@@ -201,7 +201,7 @@ function Composicao() {
                     key={`purchase-item-column-${purchaseItemColumn.id}`}
                     className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700"
                   >
-                    {purchaseItemColumn.name}
+                    {purchaseItemColumn.name} (Kg)
                   </th>
                 ))}
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">

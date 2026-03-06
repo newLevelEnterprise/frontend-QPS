@@ -159,7 +159,7 @@ function FormNovaComposicao({
                   htmlFor={rawMaterial.nome}
                   className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
                 >
-                  {rawMaterial.nome}
+                  % {rawMaterial.nome}
                 </label>
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input
@@ -187,7 +187,7 @@ function FormNovaComposicao({
                   htmlFor={purchaseItem.name}
                   className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
                 >
-                  {purchaseItem.name}
+                  {purchaseItem.name} (Kg)
                 </label>
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input
