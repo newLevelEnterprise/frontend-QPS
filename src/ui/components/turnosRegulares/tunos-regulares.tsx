@@ -53,7 +53,7 @@ function TurnosRegulares() {
     queryKey: ["get", "all", "turnos-regulares"],
     queryFn: async () => {
       const { data } =
-        await apiClient.get<ITurnosRegulares[]>("/regular-shifts/");
+        await apiClient.get<ITurnosRegulares[]>("/regular-shifts");
       return data;
     },
   });

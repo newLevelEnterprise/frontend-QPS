@@ -36,7 +36,7 @@ function FeriadosEstaduais() {
   const { data: feriadosData, isFetching } = useQuery({
     queryKey: ["get", "all", "feriados"],
     queryFn: async () => {
-      const { data } = await apiClient.get<IFeriadoType[]>("/holidays/");
+      const { data } = await apiClient.get<IFeriadoType[]>("/holidays");
       return data;
     },
   });
