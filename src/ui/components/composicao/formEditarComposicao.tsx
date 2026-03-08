@@ -7,6 +7,7 @@ import type { NovaComposicaoFormState } from "./formNovaComposicao";
 
 interface ProductCompositionResponse {
   produto_id: number;
+  produto_nome: string;
   raw_materials: {
     raw_material_id: number;
     quantity: string;
@@ -104,7 +105,7 @@ function FormEditComposicao({
 
     setFormState({
       id: compositionId,
-      productId: String(composition.produto_id),
+      productId: composition.produto_nome,
       rawMaterials: composition.raw_materials.map((rawMaterial) => ({
         id: rawMaterial.raw_material_id,
         quantity: Number(rawMaterial.quantity),
@@ -145,7 +146,7 @@ function FormEditComposicao({
             </div>
           </div>
 
-          <div className="w-full grid grid-cols-2 gap-3 overflow-y-auto">
+          <div className="w-full grid grid-cols-2 gap-3 overflow-y-auto max-h-[300px] 2xl:max-h-[400px]">
             {composition?.raw_materials.map((rawMaterial) => (
               <div
                 key={rawMaterial.raw_material_id}

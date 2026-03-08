@@ -152,7 +152,7 @@ function FormNovaComposicao({
             </div>
           </div>
 
-          <div className="w-full grid grid-cols-2 gap-3 overflow-y-auto">
+          <div className="w-full grid grid-cols-2 gap-3 overflow-y-auto max-h-[300px] 2xl:max-h-[400px]">
             {rawMaterials?.map((rawMaterial) => (
               <div key={rawMaterial.id} className="w-full flex flex-col gap-3">
                 <label
