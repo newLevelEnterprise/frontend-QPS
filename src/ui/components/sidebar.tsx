@@ -5,6 +5,7 @@ import { BiPlus, BiUserCircle } from "react-icons/bi";
 import { CiShoppingCart } from "react-icons/ci";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { IoChevronDown, IoClose } from "react-icons/io5";
+import { LiaIndustrySolid } from "react-icons/lia";
 import { LuShapes, LuSpline } from "react-icons/lu";
 import {
   MdCalendarMonth,
@@ -70,7 +71,7 @@ const menuItems: MenuItem[] = [
       },
       {
         title: "Linhas de Produção",
-        icon: LuSpline,
+        icon: LiaIndustrySolid,
         url: "/cadastro/linhas-producao",
       },
     ],
@@ -79,7 +80,7 @@ const menuItems: MenuItem[] = [
     title: "Linhas de Produção",
     icon: (props) => (
       <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
-        <LuSpline className={props.className} />
+        <LiaIndustrySolid className={props.className} />
       </div>
     ),
     url: "/linhas-producao",
