@@ -21,7 +21,7 @@ type IEstadoAtualMaquinaItem =
 const defaultNovoEstado: IEstadoAtualMaquinaItem = {
   production_line_id: "",
   maquina: "",
-  utilizacao: false,
+  utilizacao: true,
   codMolde: "",
   prodMaquinaInicioSequenciamento: "",
   nome_cliente: "",
@@ -139,7 +139,7 @@ function FormNovoEstado({
   useEffect(() => {
     if (statusSelecionado === "Concluido") {
       setValue("numeroPedido", "");
-      setValue("utilizacao", false);
+      setValue("utilizacao", true);
       setValue("tempoRestanteProdInjetora", "");
       setValue("tempoRestanteProdPosInjetora", "");
       setValue("demanda", "");
@@ -290,19 +290,6 @@ function FormNovoEstado({
             </option>
           ))}
         </select>
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="font-semibold text-sm">Utilização</label>
-        <label className="flex items-center gap-2 h-[34px]">
-          <input
-            type="checkbox"
-            className="accent-[#5B85D5] disabled:opacity-50 disabled:cursor-not-allowed"
-            {...register("utilizacao")}
-            disabled={camposBloqueadosPorConcluido}
-          />
-          Em utilização
-        </label>
       </div>
 
       <div className="flex flex-col gap-1">
