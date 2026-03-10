@@ -62,8 +62,8 @@ function Resumo({ dados }: { dados: IProductionSchedule["results"] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {Array.from(aggregateData.values()).map((item) => (
-                <tr key={item.job_id} className="text-sm">
+              {Array.from(aggregateData.values()).map((item, idx) => (
+                <tr key={idx} className="text-sm">
                   <td className="py-2 text-gray-900">{item.client_name}</td>
                   <td className="py-2 text-gray-700 text-center">
                     {Intl.NumberFormat("pt-br").format(item.quantity)}

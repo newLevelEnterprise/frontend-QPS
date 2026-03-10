@@ -28,10 +28,10 @@ interface IProcurementsByJobResponse {
 }
 
 const formatDate = (value?: string) => {
-  if (!value) return "-";
+  if (!value) return "";
 
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "-";
+  if (Number.isNaN(parsed.getTime())) return "";
 
   return Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
@@ -83,12 +83,12 @@ function RawMaterialTable({ id }: IRunOption) {
     );
   }
 
-  const materiaPrima1Titulo =
-    data.find((job) => job.raw_materials[0]?.name)?.raw_materials[0]?.name ??
-    "Matéria-prima 1";
-  const materiaPrima2Titulo =
-    data.find((job) => job.raw_materials[1]?.name)?.raw_materials[1]?.name ??
-    "Matéria-prima 2";
+  const materiaPrima1Titulo = data.find((job) => job.raw_materials[0]?.name)
+    ?.raw_materials[0]?.name;
+  const materiaPrima2Titulo = data.find((job) => job.raw_materials[1]?.name)
+    ?.raw_materials[1]?.name;
+  const hasMateriaPrima1 = Boolean(materiaPrima1Titulo);
+  const hasMateriaPrima2 = Boolean(materiaPrima2Titulo);
 
   const rows = data.map((job) => {
     const materiaPrima1 = job.raw_materials[0];
@@ -99,22 +99,16 @@ function RawMaterialTable({ id }: IRunOption) {
       order_number: job.order_number,
       client_name: job.client_name,
       product_name: job.product_name,
-      materia_prima_1_nome: materiaPrima1?.name ?? "-",
-      materia_prima_1_quantidade: materiaPrima1
-        ? job.raw_materials[0].quantity
-        : "-",
+      materia_prima_1_quantidade: materiaPrima1?.quantity,
       materia_prima_1_data: formatDate(materiaPrima1?.purchase_date),
       materia_prima_1_custo: materiaPrima1
         ? formatCurrency(materiaPrima1.cost)
-        : "-",
-      materia_prima_2_nome: materiaPrima2?.name ?? "-",
-      materia_prima_2_quantidade: materiaPrima2
-        ? job.raw_materials[1].quantity
-        : "-",
+        : "",
+      materia_prima_2_quantidade: materiaPrima2?.quantity,
       materia_prima_2_data: formatDate(materiaPrima2?.purchase_date),
       materia_prima_2_custo: materiaPrima2
         ? formatCurrency(materiaPrima2.cost)
-        : "-",
+        : "",
       total_cost: formatCurrency(job.total_cost),
     };
   });
@@ -127,24 +121,36 @@ function RawMaterialTable({ id }: IRunOption) {
             <th className="px-3 py-2 font-medium">Pedido</th>
             <th className="px-3 py-2 font-medium">Cliente</th>
             <th className="px-3 py-2 font-medium">Produto</th>
-            <th className="px-3 py-2 font-medium">
-              {materiaPrima1Titulo} (kg)
-            </th>
-            <th className="px-3 py-2 font-medium">
-              {`Data compra ${materiaPrima1Titulo} (kg)`}
-            </th>
-            <th className="px-3 py-2 font-medium">
-              {`Custo compra ${materiaPrima1Titulo}`}
-            </th>
-            <th className="px-3 py-2 font-medium">
-              {materiaPrima2Titulo} (kg)
-            </th>
-            <th className="px-3 py-2 font-medium">
-              {`Data compra ${materiaPrima2Titulo} (kg)`}
-            </th>
-            <th className="px-3 py-2 font-medium">
-              {`Custo compra ${materiaPrima2Titulo}`}
-            </th>
+            {hasMateriaPrima1 && (
+              <th className="px-3 py-2 font-medium">
+                {materiaPrima1Titulo} (kg)
+              </th>
+            )}
+            {hasMateriaPrima1 && (
+              <th className="px-3 py-2 font-medium">
+                {`Data compra ${materiaPrima1Titulo}`}
+              </th>
+            )}
+            {hasMateriaPrima1 && (
+              <th className="px-3 py-2 font-medium">
+                {`Custo compra ${materiaPrima1Titulo}`}
+              </th>
+            )}
+            {hasMateriaPrima2 && (
+              <th className="px-3 py-2 font-medium">
+                {materiaPrima2Titulo} (kg)
+              </th>
+            )}
+            {hasMateriaPrima2 && (
+              <th className="px-3 py-2 font-medium">
+                {`Data compra ${materiaPrima2Titulo}`}
+              </th>
+            )}
+            {hasMateriaPrima2 && (
+              <th className="px-3 py-2 font-medium">
+                {`Custo compra ${materiaPrima2Titulo}`}
+              </th>
+            )}
             <th className="px-3 py-2 font-medium">Custo Total</th>
           </tr>
         </thead>
@@ -154,16 +160,36 @@ function RawMaterialTable({ id }: IRunOption) {
               <td className="px-3 py-2">{item.order_number}</td>
               <td className="px-3 py-2">{item.client_name}</td>
               <td className="px-3 py-2">{item.product_name}</td>
-              <td className="px-3 py-2">
-                {formatToDecimal(item.materia_prima_1_quantidade.toString())}
-              </td>
-              <td className="px-3 py-2">{item.materia_prima_1_data}</td>
-              <td className="px-3 py-2">{item.materia_prima_1_custo}</td>
-              <td className="px-3 py-2">
-                {formatToDecimal(item.materia_prima_2_quantidade.toString())}
-              </td>
-              <td className="px-3 py-2">{item.materia_prima_2_data}</td>
-              <td className="px-3 py-2">{item.materia_prima_2_custo}</td>
+              {hasMateriaPrima1 && (
+                <td className="px-3 py-2">
+                  {item.materia_prima_1_quantidade !== undefined
+                    ? formatToDecimal(
+                        item.materia_prima_1_quantidade.toString(),
+                      )
+                    : ""}
+                </td>
+              )}
+              {hasMateriaPrima1 && (
+                <td className="px-3 py-2">{item.materia_prima_1_data}</td>
+              )}
+              {hasMateriaPrima1 && (
+                <td className="px-3 py-2">{item.materia_prima_1_custo}</td>
+              )}
+              {hasMateriaPrima2 && (
+                <td className="px-3 py-2">
+                  {item.materia_prima_2_quantidade !== undefined
+                    ? formatToDecimal(
+                        item.materia_prima_2_quantidade.toString(),
+                      )
+                    : ""}
+                </td>
+              )}
+              {hasMateriaPrima2 && (
+                <td className="px-3 py-2">{item.materia_prima_2_data}</td>
+              )}
+              {hasMateriaPrima2 && (
+                <td className="px-3 py-2">{item.materia_prima_2_custo}</td>
+              )}
               <td className="px-3 py-2">{item.total_cost}</td>
             </tr>
           ))}
