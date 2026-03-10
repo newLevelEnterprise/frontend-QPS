@@ -40,7 +40,7 @@ function FormEditarMaquina({
     try {
       await apiClient.put(`/machines/${maquina.id}`, {
         name: data.name,
-        availability: parseInt(data.disponibilidade),
+        availability: parseFloat(data.disponibilidade),
       });
       setMaquina();
       toast.success("Máquina atualizada com sucesso!");
@@ -94,6 +94,7 @@ function FormEditarMaquina({
               id="disponibilidade"
               placeholder="Disponibilidade (%)"
               type="number"
+              step={0.01}
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("disponibilidade")}
             />

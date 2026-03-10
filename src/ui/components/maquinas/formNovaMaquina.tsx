@@ -33,7 +33,7 @@ function FormNovaMaquina({
       console.log("Dados do formulário:", data);
       await apiClient.post("/machines", {
         name: data.name,
-        availability: parseInt(data.disponibilidade),
+        availability: parseFloat(data.disponibilidade),
       });
       toast.success("Máquina criada com sucesso!");
       setMaquina();
@@ -87,6 +87,7 @@ function FormNovaMaquina({
               id="disponibilidade"
               placeholder="Disponibilidade (%)"
               type="number"
+              step={0.01}
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("disponibilidade")}
             />
