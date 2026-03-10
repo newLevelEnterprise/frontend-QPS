@@ -27,6 +27,36 @@ interface IProcurementsByJobResponse {
   procurements_by_job: IProcurementsByJobItem[];
 }
 
+const formatDate = (value?: string) => {
+  if (!value) return "-";
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "-";
+
+  return Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(parsed);
+};
+
+const formatCurrency = (value: string) => {
+  const parsed = Number(value);
+  if (Number.isNaN(parsed)) return value;
+  return Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(parsed);
+};
+
+const formatToDecimal = (value: string) => {
+  const parsed = Number(value);
+  if (Number.isNaN(parsed)) return value;
+  return Intl.NumberFormat("pt-BR", {
+    style: "decimal",
+  }).format(parsed);
+};
+
 function RawMaterialTable({ id }: IRunOption) {
   const { data, isFetching } = useQuery({
     queryKey: ["rawMaterialInfo", id],
@@ -53,52 +83,40 @@ function RawMaterialTable({ id }: IRunOption) {
     );
   }
 
-  const formatDate = (value: string) =>
-    Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(new Date(value));
+  const materiaPrima1Titulo =
+    data.find((job) => job.raw_materials[0]?.name)?.raw_materials[0]?.name ??
+    "Matéria-prima 1";
+  const materiaPrima2Titulo =
+    data.find((job) => job.raw_materials[1]?.name)?.raw_materials[1]?.name ??
+    "Matéria-prima 2";
 
-  const formatCurrency = (value: string) => {
-    const parsed = Number(value);
-    if (Number.isNaN(parsed)) return value;
-    return Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(parsed);
-  };
+  const rows = data.map((job) => {
+    const materiaPrima1 = job.raw_materials[0];
+    const materiaPrima2 = job.raw_materials[1];
 
-  const rows = data.flatMap((job) => {
-    const rawMaterialRows = job.raw_materials.map((entry, index) => ({
-      key: `raw-${job.job_id}-${job.order_number}-${index}-${entry.name}`,
-      job_id: job.job_id,
-      product_name: job.product_name,
-      client_name: job.client_name,
+    return {
+      key: `job-${job.job_id}-${job.order_number}`,
       order_number: job.order_number,
-      category: "Matéria-prima",
-      item_name: entry.name,
-      quantity: entry.quantity,
-      purchase_date: entry.purchase_date,
-      cost: entry.cost,
-      total_cost: job.total_cost,
-    }));
-
-    const purchaseItemRows = job.purchase_items.map((entry, index) => ({
-      key: `purchase-${job.job_id}-${job.order_number}-${index}-${entry.name}`,
-      job_id: job.job_id,
-      product_name: job.product_name,
       client_name: job.client_name,
-      order_number: job.order_number,
-      category: "Item de compra",
-      item_name: entry.name,
-      quantity: entry.quantity,
-      purchase_date: entry.purchase_date,
-      cost: entry.cost,
-      total_cost: job.total_cost,
-    }));
-
-    return [...rawMaterialRows, ...purchaseItemRows];
+      product_name: job.product_name,
+      materia_prima_1_nome: materiaPrima1?.name ?? "-",
+      materia_prima_1_quantidade: materiaPrima1
+        ? job.raw_materials[0].quantity
+        : "-",
+      materia_prima_1_data: formatDate(materiaPrima1?.purchase_date),
+      materia_prima_1_custo: materiaPrima1
+        ? formatCurrency(materiaPrima1.cost)
+        : "-",
+      materia_prima_2_nome: materiaPrima2?.name ?? "-",
+      materia_prima_2_quantidade: materiaPrima2
+        ? job.raw_materials[1].quantity
+        : "-",
+      materia_prima_2_data: formatDate(materiaPrima2?.purchase_date),
+      materia_prima_2_custo: materiaPrima2
+        ? formatCurrency(materiaPrima2.cost)
+        : "-",
+      total_cost: formatCurrency(job.total_cost),
+    };
   });
 
   return (
@@ -106,31 +124,47 @@ function RawMaterialTable({ id }: IRunOption) {
       <table className="w-full text-sm">
         <thead className="bg-gray-50 text-left">
           <tr>
-            <th className="px-3 py-2 font-medium">Job</th>
             <th className="px-3 py-2 font-medium">Pedido</th>
             <th className="px-3 py-2 font-medium">Cliente</th>
             <th className="px-3 py-2 font-medium">Produto</th>
-            <th className="px-3 py-2 font-medium">Categoria</th>
-            <th className="px-3 py-2 font-medium">Item</th>
-            <th className="px-3 py-2 font-medium">Quantidade</th>
-            <th className="px-3 py-2 font-medium">Data compra</th>
-            <th className="px-3 py-2 font-medium">Custo item</th>
-            <th className="px-3 py-2 font-medium">Total pedido</th>
+            <th className="px-3 py-2 font-medium">
+              {materiaPrima1Titulo} (kg)
+            </th>
+            <th className="px-3 py-2 font-medium">
+              {`Data compra ${materiaPrima1Titulo} (kg)`}
+            </th>
+            <th className="px-3 py-2 font-medium">
+              {`Custo compra ${materiaPrima1Titulo}`}
+            </th>
+            <th className="px-3 py-2 font-medium">
+              {materiaPrima2Titulo} (kg)
+            </th>
+            <th className="px-3 py-2 font-medium">
+              {`Data compra ${materiaPrima2Titulo} (kg)`}
+            </th>
+            <th className="px-3 py-2 font-medium">
+              {`Custo compra ${materiaPrima2Titulo}`}
+            </th>
+            <th className="px-3 py-2 font-medium">Custo Total</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((item) => (
             <tr key={item.key} className="border-t border-gray-200">
-              <td className="px-3 py-2">{item.job_id}</td>
               <td className="px-3 py-2">{item.order_number}</td>
               <td className="px-3 py-2">{item.client_name}</td>
               <td className="px-3 py-2">{item.product_name}</td>
-              <td className="px-3 py-2">{item.category}</td>
-              <td className="px-3 py-2">{item.item_name}</td>
-              <td className="px-3 py-2">{item.quantity}</td>
-              <td className="px-3 py-2">{formatDate(item.purchase_date)}</td>
-              <td className="px-3 py-2">{formatCurrency(item.cost)}</td>
-              <td className="px-3 py-2">{formatCurrency(item.total_cost)}</td>
+              <td className="px-3 py-2">
+                {formatToDecimal(item.materia_prima_1_quantidade.toString())}
+              </td>
+              <td className="px-3 py-2">{item.materia_prima_1_data}</td>
+              <td className="px-3 py-2">{item.materia_prima_1_custo}</td>
+              <td className="px-3 py-2">
+                {formatToDecimal(item.materia_prima_2_quantidade.toString())}
+              </td>
+              <td className="px-3 py-2">{item.materia_prima_2_data}</td>
+              <td className="px-3 py-2">{item.materia_prima_2_custo}</td>
+              <td className="px-3 py-2">{item.total_cost}</td>
             </tr>
           ))}
         </tbody>
