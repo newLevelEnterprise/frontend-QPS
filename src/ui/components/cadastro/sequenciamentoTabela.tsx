@@ -27,52 +27,54 @@ function SequenciamentoTabela({
 
   return (
     <div className="flex-1 rounded-md bg-white shadow p-2">
-      <h1 className="text-xl  font-bold">Sequenciamento Planejado</h1>
-      <div className="relative w-full mt-4">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <IoSearchSharp className="h-4 w-4 text-gray-400" />
+      <div className="sticky top-0 z-20 bg-white pb-2 border-b border-gray-100">
+        <h1 className="text-xl font-bold">Sequenciamento Planejado</h1>
+        <div className="relative w-full mt-4">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <IoSearchSharp className="h-4 w-4 text-gray-400" />
+          </div>
+          <input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            type="text"
+            placeholder="Buscar..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
-        <input
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          type="text"
-          placeholder="Buscar..."
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
       </div>
-      <div className="relative max-h-[280px] mx-auto p-2 overflow-y-auto overflow-x-auto">
+      <div className="relative max-h-[300px] mx-auto overflow-y-auto overflow-x-auto">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <table className="w-max table-auto">
+          <table className="w-full table-auto">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Clientes
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Produto
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Máquina
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Molde
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Demanda do Produto
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Limite Fat
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Finalização da Prod
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Prev de Fat
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Status
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Previsão Fat.
                 </th>
               </tr>
