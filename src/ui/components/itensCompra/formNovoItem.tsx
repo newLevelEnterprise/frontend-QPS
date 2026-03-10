@@ -31,8 +31,8 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
       const { data: res } = await apiClient.post<IInsumos>("/purchase-items", {
         name: data.item,
         lead_time: Number(data.leadTimeEntrega),
-        cost: Number(data.custoMedio),
-        scrap: Number(data.refugo),
+        cost: parseFloat(data.custoMedio),
+        scrap: parseFloat(data.refugo),
       });
       toast.success("Insumo criado com sucesso!");
       setItem();
@@ -112,6 +112,7 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
                 id="custoMedio"
                 placeholder="Custo Médio (R$/Kg)"
                 type="number"
+                step={0.01}
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("custoMedio")}
               />
@@ -137,6 +138,7 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
               id="refugo"
               placeholder="Refugo"
               type="number"
+              step={0.01}
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("refugo")}
             />

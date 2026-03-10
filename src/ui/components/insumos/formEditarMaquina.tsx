@@ -46,7 +46,7 @@ function FormEditarInsumo({
       await apiClient.put<IInsumos>(`/raw-material/${insumo.id}`, {
         nome: data.nome,
         lead_time_medio_entrega: Number(data.leadTimeEntrega),
-        custo_medio: Number(data.custoMedio),
+        custo_medio: parseFloat(data.custoMedio),
       });
       setInsumo();
       toast.success("Insumo atualizado com sucesso!");
@@ -124,6 +124,7 @@ function FormEditarInsumo({
               id="custoMedio"
               placeholder="Custo Médio (R$/Kg)"
               type="number"
+              step={0.01}
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("custoMedio")}
             />

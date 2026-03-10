@@ -31,7 +31,7 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
       const { data: res } = await apiClient.post<IInsumos>("/raw-material", {
         nome: data.nome,
         lead_time_medio_entrega: Number(data.leadTimeEntrega),
-        custo_medio: Number(data.custoMedio),
+        custo_medio: parseFloat(data.custoMedio),
       });
       toast.success("Insumo criado com sucesso!");
       setInsumo();
@@ -110,6 +110,7 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
               id="custoMedio"
               placeholder="Custo Médio (R$/Kg)"
               type="number"
+              step={0.01}
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("custoMedio")}
             />

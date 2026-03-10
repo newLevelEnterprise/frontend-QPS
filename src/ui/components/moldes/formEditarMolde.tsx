@@ -60,8 +60,8 @@ function FormEditarMolde({
         products: data.products,
         total_cavities: Number(data.total_cavities),
         open_cavities: Number(data.open_cavities),
-        scrap: Number(data.scrap),
-        closed_cavity_risk: Number(data.closed_cavity_risk),
+        scrap: parseFloat(data.scrap),
+        closed_cavity_risk: parseFloat(data.closed_cavity_risk),
       });
       setMolde();
       toast.success("Molde atualizado com sucesso!");
@@ -212,6 +212,7 @@ function FormEditarMolde({
                 id="refugo"
                 placeholder="Refugo"
                 type="number"
+                step={0.01}
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("scrap")}
               />
@@ -238,6 +239,7 @@ function FormEditarMolde({
               id="cavityRisk"
               placeholder="Risco de Cavidade"
               type="number"
+              step={0.01}
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("closed_cavity_risk")}
             />
