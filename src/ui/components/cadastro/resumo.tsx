@@ -14,9 +14,9 @@ function Resumo({ dados }: { dados: IProductionSchedule["results"] }) {
 
           return acc;
         },
-        { quantity: 0, revenue_total: 0 }
+        { quantity: 0, revenue_total: 0 },
       ),
-    [dados]
+    [dados],
   );
 
   const aggregateData = useMemo(() => {
@@ -28,7 +28,7 @@ function Resumo({ dados }: { dados: IProductionSchedule["results"] }) {
 
       if (acc.get(curr.client_name)) {
         const { quantity, expected_revenue, ...data } = acc.get(
-          curr.client_name
+          curr.client_name,
         ) as Results;
 
         const newQuantity = quantity + curr.quantity;
@@ -57,8 +57,8 @@ function Resumo({ dados }: { dados: IProductionSchedule["results"] }) {
             <thead className="bg-white sticky z-10 top-0">
               <tr className="text-xs text-gray-500 border-b border-gray-200">
                 <th className="text-left pb-2 font-medium">Clientes</th>
-                <th className="text-left pb-2 font-medium">Volume de Peças</th>
-                <th className="text-left pb-2 font-medium">Faturamento</th>
+                <th className="text-center pb-2 font-medium">Volume de Pc</th>
+                <th className="text-center pb-2 font-medium">Faturamento</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
