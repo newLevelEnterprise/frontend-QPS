@@ -105,7 +105,7 @@ function Moldes() {
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                   % Refugo
                 </th>
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                   % Risco de Cavidade
                 </th>
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
@@ -134,7 +134,7 @@ function Moldes() {
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                     {molde.scrap}
                   </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {molde.closed_cavity_risk}
                   </td>
                   <td className="px-6 py-4 text-right">

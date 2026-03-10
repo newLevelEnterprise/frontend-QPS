@@ -154,7 +154,7 @@ function FormEditarMolde({
               htmlFor="totalCavidades"
               className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
             >
-              totalCavidades
+              Total Cavidades
             </label>
             <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
               <input
