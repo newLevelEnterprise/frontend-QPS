@@ -3,7 +3,11 @@ import { useEffect, useState, type FormEvent } from "react";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import Loader from "../Loader";
-import type { NovaComposicaoFormState } from "./formNovaComposicao";
+import type {
+  NovaComposicaoFormState,
+  PurchaseItem,
+  RawMaterial,
+} from "./formNovaComposicao";
 
 interface ProductCompositionResponse {
   produto_id: number;
@@ -25,18 +29,18 @@ export interface EditarComposicaoFormState extends NovaComposicaoFormState {
 }
 
 interface FormEditComposicaoProps {
-  compositionId: number;
+  productId: number;
   onSubmit?: (data: EditarComposicaoFormState) => void;
   isSubmitting?: boolean;
 }
 
 function FormEditComposicao({
-  compositionId,
+  productId,
   onSubmit,
   isSubmitting,
 }: FormEditComposicaoProps) {
   const [formState, setFormState] = useState<EditarComposicaoFormState>({
-    id: compositionId,
+    id: productId,
     productId: "",
     rawMaterials: [],
     purchaseItems: [],
@@ -90,36 +94,112 @@ function FormEditComposicao({
     isFetching: isFetchingComposition,
     isSuccess: isCompositionSuccess,
   } = useQuery({
-    queryKey: ["get", "product-composition", compositionId],
+    queryKey: ["get", "product-composition", productId],
     queryFn: async () => {
       const { data } = await apiClient.get<ProductCompositionResponse>(
-        `/product-composition/product/${compositionId}`,
+        `/product-composition/product/${productId}`,
       );
       return data;
     },
-    enabled: !!compositionId,
+    enabled: !!productId,
   });
+
+  const { data: rawMaterials, isFetching: isFetchingRawMaterials } = useQuery({
+    queryKey: ["get", "all", "materia-prima"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<RawMaterial[]>("/raw-material/");
+      return data;
+    },
+  });
+
+  const { data: purchaseItens, isFetching: isFetchingPurchaseItens } = useQuery(
+    {
+      queryKey: ["get", "all", "purchase-itens"],
+      queryFn: async () => {
+        const { data } =
+          await apiClient.get<PurchaseItem[]>("/purchase-items/");
+        return data;
+      },
+    },
+  );
 
   useEffect(() => {
     if (!isCompositionSuccess || !composition) return;
 
+    const rawMaterialsById = new Map(
+      composition.raw_materials.map((rawMaterial) => [
+        rawMaterial.raw_material_id,
+        Number(rawMaterial.quantity),
+      ]),
+    );
+
+    const rawMaterialsByName = new Map(
+      composition.raw_materials.map((rawMaterial) => [
+        rawMaterial.nome.trim().toLowerCase(),
+        Number(rawMaterial.quantity),
+      ]),
+    );
+
+    const purchaseItemsById = new Map(
+      composition.purchase_items.map((purchaseItem) => [
+        purchaseItem.purchase_item_id,
+        Number(purchaseItem.quantity),
+      ]),
+    );
+
+    const purchaseItemsByName = new Map(
+      composition.purchase_items.map((purchaseItem) => [
+        purchaseItem.name.trim().toLowerCase(),
+        Number(purchaseItem.quantity),
+      ]),
+    );
+
     setFormState({
-      id: compositionId,
+      id: productId,
       productId: composition.produto_nome,
-      rawMaterials: composition.raw_materials.map((rawMaterial) => ({
-        id: rawMaterial.raw_material_id,
-        quantity: Number(rawMaterial.quantity),
-      })),
-      purchaseItems: composition.purchase_items.map((purchaseItem) => ({
-        id: purchaseItem.purchase_item_id,
-        quantity: Number(purchaseItem.quantity),
-      })),
+      rawMaterials:
+        rawMaterials?.map((rawMaterial) => {
+          const quantityFromId = rawMaterialsById.get(rawMaterial.id);
+          const quantityFromName = rawMaterialsByName.get(
+            rawMaterial.nome.trim().toLowerCase(),
+          );
+
+          return {
+            id: rawMaterial.id,
+            quantity: quantityFromId ?? quantityFromName ?? 0,
+          };
+        }) ??
+        composition.raw_materials.map((rawMaterial) => ({
+          id: rawMaterial.raw_material_id,
+          quantity: Number(rawMaterial.quantity),
+        })),
+      purchaseItems:
+        purchaseItens?.map((purchaseItem) => {
+          const quantityFromId = purchaseItemsById.get(purchaseItem.id);
+          const quantityFromName = purchaseItemsByName.get(
+            purchaseItem.name.trim().toLowerCase(),
+          );
+
+          return {
+            id: purchaseItem.id,
+            quantity: quantityFromId ?? quantityFromName ?? 0,
+          };
+        }) ??
+        composition.purchase_items.map((purchaseItem) => ({
+          id: purchaseItem.purchase_item_id,
+          quantity: Number(purchaseItem.quantity),
+        })),
     });
-  }, [composition, compositionId, isCompositionSuccess]);
+  }, [
+    composition,
+    productId,
+    isCompositionSuccess,
+    purchaseItens,
+    rawMaterials,
+  ]);
 
-  const isGettingData = isFetchingComposition;
-
-  console.log(composition);
+  const isGettingData =
+    isFetchingComposition || isFetchingRawMaterials || isFetchingPurchaseItens;
 
   return (
     <div className="w-full h-full">
@@ -147,13 +227,10 @@ function FormEditComposicao({
           </div>
 
           <div className="w-full grid grid-cols-2 gap-3 overflow-y-auto max-h-[300px] 2xl:max-h-[400px]">
-            {composition?.raw_materials.map((rawMaterial) => (
-              <div
-                key={rawMaterial.raw_material_id}
-                className="w-full flex flex-col gap-3"
-              >
+            {rawMaterials?.map((rawMaterial) => (
+              <div key={rawMaterial.id} className="w-full flex flex-col gap-3">
                 <label
-                  htmlFor={`raw-material-${rawMaterial.raw_material_id}`}
+                  htmlFor={`raw-material-${rawMaterial.id}`}
                   className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
                 >
                   {rawMaterial.nome} (Kg)
@@ -161,16 +238,17 @@ function FormEditComposicao({
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input
                     type="number"
-                    id={`raw-material-${rawMaterial.raw_material_id}`}
+                    step={0.0001}
+                    id={`raw-material-${rawMaterial.id}`}
                     className="w-full h-full outline-none"
                     value={
                       formState.rawMaterials.find(
-                        (rm) => rm.id === rawMaterial.raw_material_id,
+                        (rm) => rm.id === rawMaterial.id,
                       )?.quantity ?? "0"
                     }
                     onChange={(event) =>
                       handleRawMaterialChange(
-                        rawMaterial.raw_material_id,
+                        rawMaterial.id,
                         event.target.value,
                       )
                     }
@@ -178,13 +256,10 @@ function FormEditComposicao({
                 </div>
               </div>
             ))}
-            {composition?.purchase_items.map((purchaseItem) => (
-              <div
-                key={purchaseItem.purchase_item_id}
-                className="w-full flex flex-col gap-3"
-              >
+            {purchaseItens?.map((purchaseItem) => (
+              <div key={purchaseItem.id} className="w-full flex flex-col gap-3">
                 <label
-                  htmlFor={`purchase-item-${purchaseItem.purchase_item_id}`}
+                  htmlFor={`purchase-item-${purchaseItem.id}`}
                   className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
                 >
                   {purchaseItem.name} (Un)
@@ -192,16 +267,17 @@ function FormEditComposicao({
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input
                     type="number"
-                    id={`purchase-item-${purchaseItem.purchase_item_id}`}
+                    step={0.0001}
+                    id={`purchase-item-${purchaseItem.id}`}
                     className="w-full h-full outline-none"
                     value={
                       formState.purchaseItems.find(
-                        (pi) => pi.id === purchaseItem.purchase_item_id,
+                        (pi) => pi.id === purchaseItem.id,
                       )?.quantity ?? "0"
                     }
                     onChange={(event) =>
                       handlePurchaseItemChange(
-                        purchaseItem.purchase_item_id,
+                        purchaseItem.id,
                         event.target.value,
                       )
                     }

@@ -36,6 +36,8 @@ function Composicao() {
   const [composicaoSelecionadaId, setComposicaoSelecionadaId] =
     useState<number>(0);
 
+  const [produtoId, setProdutoId] = useState<number>(0);
+
   const { data: composicoes, isFetching } = useQuery({
     queryKey: ["get", "all", "product-composition"],
     queryFn: async () => {
@@ -92,16 +94,26 @@ function Composicao() {
   const { mutateAsync: editarComposicao, isPending: isEditingComposicao } =
     useMutation({
       mutationFn: async (data: EditarComposicaoFormState) => {
-        await apiClient.put(`/product-composition/${data.id}`, {
-          produto_id: data.productId,
-          raw_materials: data.rawMaterials.map((rawMaterial) => ({
-            id: rawMaterial.id,
-            quantity: rawMaterial.quantity,
-          })),
-          purchase_items: data.purchaseItems.map((purchaseItem) => ({
-            id: purchaseItem.id,
-            quantity: purchaseItem.quantity,
-          })),
+        console.log("Dados para editar composição:", data);
+        console.log("Produto ID para editar composição:", produtoId);
+        console.log(
+          "Composição selecionada ID para editar composição:",
+          composicaoSelecionadaId,
+        );
+        await apiClient.put(`/product-composition/${composicaoSelecionadaId}`, {
+          produto_id: Number(produtoId),
+          raw_materials: data.rawMaterials
+            .filter((raw) => raw.quantity > 0)
+            .map((rawMaterial) => ({
+              id: rawMaterial.id,
+              quantity: rawMaterial.quantity,
+            })),
+          purchase_items: data.purchaseItems
+            .filter((pi) => pi.quantity > 0)
+            .map((purchaseItem) => ({
+              id: purchaseItem.id,
+              quantity: purchaseItem.quantity,
+            })),
         });
       },
       onSuccess: () => {
@@ -110,6 +122,8 @@ function Composicao() {
         });
         toast.success("Composição editada com sucesso!");
         setEdicaoComposicaoAberta(false);
+        setComposicaoSelecionadaId(0);
+        setProdutoId(0);
       },
       onError: () => {
         toast.error("Erro ao editar composição. Tente novamente.");
@@ -173,7 +187,7 @@ function Composicao() {
             onClose={() => setEdicaoComposicaoAberta(false)}
           />
           <FormEditComposicao
-            compositionId={composicaoSelecionadaId}
+            productId={produtoId}
             isSubmitting={isEditingComposicao}
             onSubmit={(formsState) => editarComposicao(formsState)}
           />
@@ -251,7 +265,8 @@ function Composicao() {
                     <div className="w-full flex justify-end gap-2">
                       <button
                         onClick={() => {
-                          setComposicaoSelecionadaId(composicao.produto_id);
+                          setComposicaoSelecionadaId(composicao.id);
+                          setProdutoId(composicao.produto_id);
                           setEdicaoComposicaoAberta(true);
                         }}
                         className="text-blue-600 cursor-pointer hover:text-blue-800 text-xs md:text-sm font-medium transition-colors duration-150"

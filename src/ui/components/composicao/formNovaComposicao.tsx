@@ -4,17 +4,17 @@ import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import Loader from "../Loader";
 
-interface PurchaseItem {
+export interface PurchaseItem {
   id: number;
   name: string;
 }
 
-interface RawMaterial {
+export interface RawMaterial {
   id: number;
   nome: string;
 }
 
-interface Product {
+export interface Product {
   id: number;
   name: string;
 }
@@ -164,6 +164,7 @@ function FormNovaComposicao({
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input
                     type="number"
+                    step={0.0001}
                     id={rawMaterial.nome}
                     className="w-full h-full outline-none"
                     value={
@@ -192,6 +193,7 @@ function FormNovaComposicao({
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input
                     type="number"
+                    step={0.0001}
                     id={purchaseItem.name}
                     className="w-full h-full outline-none"
                     value={
