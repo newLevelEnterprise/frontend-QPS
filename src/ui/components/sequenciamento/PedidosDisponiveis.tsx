@@ -165,9 +165,6 @@ function PedidosDisponiveis() {
                 <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Cliente
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-center text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
-                  Prioridade
-                </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Produto
                 </th>
@@ -182,6 +179,9 @@ function PedidosDisponiveis() {
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Valor
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-center text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
+                  Prioridade
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Ações
@@ -202,9 +202,6 @@ function PedidosDisponiveis() {
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {pedido.client.name}
-                    </td>
-                    <td className="px-2 py-2 text-center whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.client.priority}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {pedido.product_name.split(" - ")[1]}
@@ -228,7 +225,9 @@ function PedidosDisponiveis() {
                         currency: "BRL",
                       }).format(pedido.product_value)}
                     </td>
-
+                    <td className="px-2 py-2 text-center whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                      {pedido.client.priority}
+                    </td>
                     <td className="px-2 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
                       <div className="w-full flex justify-center gap-2">
                         <button
