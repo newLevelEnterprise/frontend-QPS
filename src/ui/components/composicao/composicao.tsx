@@ -202,7 +202,7 @@ function Composicao() {
                     key={`purchase-item-column-${purchaseItemColumn.id}`}
                     className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700"
                   >
-                    {purchaseItemColumn.name} (Kg)
+                    {purchaseItemColumn.name} (Un)
                   </th>
                 ))}
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">

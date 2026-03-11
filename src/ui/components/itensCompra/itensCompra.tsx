@@ -94,7 +94,7 @@ function ItensCompras() {
                   Lead Time Médio de Entrega (dias)
                 </th>
                 <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                  Custo Médio (R$/Kg)
+                  Custo Médio (R$/Un)
                 </th>
                 <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                   % Refugo

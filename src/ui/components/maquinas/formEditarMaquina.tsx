@@ -38,6 +38,14 @@ function FormEditarMaquina({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     try {
+      if (isNaN(parseFloat(data.disponibilidade))) {
+        toast.error("Disponibilidade deve ser um número válido.");
+        return;
+      }
+      if (parseFloat(data.disponibilidade) < 0) {
+        toast.error("Disponibilidade deve ser entre 0 e 100.");
+        return;
+      }
       await apiClient.put(`/machines/${maquina.id}`, {
         name: data.name,
         availability: parseFloat(data.disponibilidade),
@@ -95,6 +103,7 @@ function FormEditarMaquina({
               placeholder="Disponibilidade (%)"
               type="number"
               step={0.01}
+              min={0}
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("disponibilidade")}
             />

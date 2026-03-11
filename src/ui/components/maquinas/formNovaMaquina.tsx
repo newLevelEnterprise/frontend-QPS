@@ -31,6 +31,14 @@ function FormNovaMaquina({
   const onSubmit = async (data: ICriarMaquinaBody) => {
     try {
       console.log("Dados do formulário:", data);
+      if (isNaN(parseFloat(data.disponibilidade))) {
+        toast.error("Disponibilidade deve ser um número válido.");
+        return;
+      }
+      if (parseFloat(data.disponibilidade) < 0) {
+        toast.error("Disponibilidade deve ser entre 0 e 100.");
+        return;
+      }
       await apiClient.post("/machines", {
         name: data.name,
         availability: parseFloat(data.disponibilidade),
@@ -88,6 +96,7 @@ function FormNovaMaquina({
               placeholder="Disponibilidade (%)"
               type="number"
               step={0.01}
+              min={0}
               className="w-full outline-none border-b border-[#A4AABC]"
               {...register("disponibilidade")}
             />

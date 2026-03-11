@@ -39,6 +39,14 @@ function FormEditarItem({
 
   const onSubmit = async (data: IEditarItensCompraBody) => {
     try {
+      if (isNaN(parseFloat(data.custoMedio))) {
+        toast.error("Custo Médio deve ser um número válido.");
+        return;
+      }
+      if (parseFloat(data.custoMedio) < 0) {
+        toast.error("Custo Médio deve ser entre 0 e 100.");
+        return;
+      }
       await apiClient.put<IItensCompra>(`/purchase-items/${item.id}`, {
         name: data.item,
         lead_time: Number(data.leadTimeEntrega),
@@ -115,14 +123,15 @@ function FormEditarItem({
               htmlFor="custoMedio"
               className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
             >
-              Custo Médio (R$/Kg)
+              Custo Médio (R$/Un)
             </label>
             <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
               <input
                 id="custoMedio"
-                placeholder="Custo Médio (R$/Kg)"
+                placeholder="Custo Médio (R$/Un)"
                 type="number"
                 step={0.01}
+                min={0}
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("custoMedio")}
               />
