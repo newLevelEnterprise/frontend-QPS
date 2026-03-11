@@ -23,11 +23,20 @@ interface IProcurementsByJobItem {
   raw_materials: IProcurementEntry[];
   purchase_items: IProcurementEntry[];
   total_cost: string;
-  resumo_total: Record<string, string>;
 }
 
 interface IProcurementsByJobResponse {
   procurements_by_job: IProcurementsByJobItem[];
+  resumo_total: {
+    name: string;
+    quantity: number;
+    total_cost: string;
+  }[];
+}
+
+interface IRawMaterialSummaryTableProps {
+  data: IProcurementsByJobResponse["resumo_total"] | undefined;
+  isFetching: boolean;
 }
 
 const formatDate = (value?: string) => {
@@ -108,56 +117,77 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
   });
 
   return (
-    <div className="overflow-x-auto rounded-md border border-gray-200">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-left">
-          <tr>
-            <th className="px-3 py-2 font-medium">Pedido</th>
-            <th className="px-3 py-2 font-medium">Cliente</th>
-            <th className="px-3 py-2 font-medium">Produto</th>
-            <th className="px-3 py-2 font-medium">Nome Máquina</th>
+    <div className="relative mx-auto max-h-[470px] overflow-y-auto overflow-x-auto rounded-md border border-gray-200">
+      <table className="w-full table-auto">
+        <thead>
+          <tr className="bg-gray-50 border-b border-gray-200">
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              Pedido
+            </th>
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              Cliente
+            </th>
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              Produto
+            </th>
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              Nome Máquina
+            </th>
             {hasMateriaPrima1 && (
-              <th className="px-3 py-2 font-medium">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {materiaPrima1Titulo} (kg)
               </th>
             )}
             {hasMateriaPrima1 && (
-              <th className="px-3 py-2 font-medium">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {`Data compra ${materiaPrima1Titulo}`}
               </th>
             )}
             {hasMateriaPrima1 && (
-              <th className="px-3 py-2 font-medium">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {`Custo compra ${materiaPrima1Titulo}`}
               </th>
             )}
             {hasMateriaPrima2 && (
-              <th className="px-3 py-2 font-medium">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {materiaPrima2Titulo} (kg)
               </th>
             )}
             {hasMateriaPrima2 && (
-              <th className="px-3 py-2 font-medium">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {`Data compra ${materiaPrima2Titulo}`}
               </th>
             )}
             {hasMateriaPrima2 && (
-              <th className="px-3 py-2 font-medium">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {`Custo compra ${materiaPrima2Titulo}`}
               </th>
             )}
-            <th className="px-3 py-2 font-medium">Custo Total</th>
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              Custo Total
+            </th>
           </tr>
         </thead>
-        <tbody>
-          {rows.map((item) => (
-            <tr key={item.key} className="border-t border-gray-200">
-              <td className="px-3 py-2">{item.order_number}</td>
-              <td className="px-3 py-2">{item.client_name}</td>
-              <td className="px-3 py-2">{item.product_name}</td>
-              <td className="px-3 py-2">{item.machine_name}</td>
+        <tbody className="divide-y divide-gray-200">
+          {rows.map((item, index) => (
+            <tr
+              key={item.key}
+              className={`${index % 2 === 1 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition-colors`}
+            >
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {item.order_number}
+              </td>
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {item.client_name}
+              </td>
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {item.product_name}
+              </td>
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {item.machine_name}
+              </td>
               {hasMateriaPrima1 && (
-                <td className="px-3 py-2">
+                <td className="px-4 py-3 text-sm text-gray-700">
                   {item.materia_prima_1_quantidade !== undefined
                     ? formatToDecimal(
                         item.materia_prima_1_quantidade.toString(),
@@ -166,13 +196,17 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
                 </td>
               )}
               {hasMateriaPrima1 && (
-                <td className="px-3 py-2">{item.materia_prima_1_data}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">
+                  {item.materia_prima_1_data}
+                </td>
               )}
               {hasMateriaPrima1 && (
-                <td className="px-3 py-2">{item.materia_prima_1_custo}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">
+                  {item.materia_prima_1_custo}
+                </td>
               )}
               {hasMateriaPrima2 && (
-                <td className="px-3 py-2">
+                <td className="px-4 py-3 text-sm text-gray-700">
                   {item.materia_prima_2_quantidade !== undefined
                     ? formatToDecimal(
                         item.materia_prima_2_quantidade.toString(),
@@ -181,14 +215,74 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
                 </td>
               )}
               {hasMateriaPrima2 && (
-                <td className="px-3 py-2">{item.materia_prima_2_data}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">
+                  {item.materia_prima_2_data}
+                </td>
               )}
               {hasMateriaPrima2 && (
-                <td className="px-3 py-2">{item.materia_prima_2_custo}</td>
+                <td className="px-4 py-3 text-sm text-gray-700">
+                  {item.materia_prima_2_custo}
+                </td>
               )}
-              <td className="px-3 py-2">{item.total_cost}</td>
+              <td className="px-4 py-3 text-sm text-gray-700">
+                {item.total_cost}
+              </td>
             </tr>
           ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function RawMaterialSummaryTable({
+  data,
+  isFetching,
+}: IRawMaterialSummaryTableProps) {
+  if (isFetching) {
+    return <Loader message="Carregando o resumo de matéria prima" />;
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div>
+        <p className="text-gray-500">Nenhum resumo geral disponível.</p>
+      </div>
+    );
+  }
+
+  const totalCost = data.reduce((acc, item) => {
+    const parsed = Number(item.total_cost);
+    return Number.isNaN(parsed) ? acc : acc + parsed;
+  }, 0);
+
+  return (
+    <div className="overflow-x-auto rounded-md border border-gray-200">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 text-left">
+          <tr>
+            <th className="px-3 py-2 font-medium">Descrição</th>
+            <th className="px-3 py-2 font-medium">Quantidade</th>
+            <th className="px-3 py-2 font-medium">Matéria Prima (R$)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((item) => (
+            <tr key={item.name} className="border-t border-gray-200">
+              <td className="px-3 py-2">{item.name}</td>
+              <td className="px-3 py-2">
+                {formatToDecimal(item.quantity.toString())}
+              </td>
+              <td className="px-3 py-2">{formatCurrency(item.total_cost)}</td>
+            </tr>
+          ))}
+          <tr className="border-t border-gray-300 bg-gray-50 font-semibold">
+            <td className="px-3 py-2">Total</td>
+            <td className="px-3 py-2"></td>
+            <td className="px-3 py-2">
+              {formatCurrency(totalCost.toString())}
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -202,7 +296,7 @@ function RawMaterialInfoTable({ id }: { id?: number }) {
       const { data } = await apiClient.get<IProcurementsByJobResponse>(
         `/production-schedule/${id}/procurements-by-job`,
       );
-      return data.procurements_by_job;
+      return data;
     },
   });
 
@@ -212,12 +306,21 @@ function RawMaterialInfoTable({ id }: { id?: number }) {
 
   return (
     <div>
-      <div className="mt-4 w-full overflow-auto max-h-[470px]">
-        <RawMaterialTable data={data} isFetching={isFetching} />
+      <div className="mt-4 w-full">
+        <RawMaterialTable
+          data={data?.procurements_by_job}
+          isFetching={isFetching}
+        />
       </div>
-      {/* <div className="mt-4 w-full overflow-auto max-h-[470px]">
-        <h1>Teste</h1>
-      </div> */}
+      <div className="mt-6 w-full overflow-auto max-h-[470px]">
+        <div className="p-2 w-full text-center bg-gray-300 border border-gray-200">
+          <p className="text-lg font-semibold">Resumo geral</p>
+        </div>
+        <RawMaterialSummaryTable
+          data={data?.resumo_total}
+          isFetching={isFetching}
+        />
+      </div>
     </div>
   );
 }

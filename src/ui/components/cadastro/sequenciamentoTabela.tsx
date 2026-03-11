@@ -91,7 +91,7 @@ function SequenciamentoTabela({
                   } hover:bg-gray-100 transition-colors`}
                 >
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                    {order.order_index}
+                    {index + 1}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
                     {order.client_name}
