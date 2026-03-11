@@ -47,37 +47,37 @@ function SequenciamentoTabela({
           <table className="w-full table-auto">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Ordem Seq.
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Cliente
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Numero Pedido
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Máquina
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Molde
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Demanda do Prod.
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Limite Fat.
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Finalização
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Prev. Fat.
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Status
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Previsão Fat.
                 </th>
               </tr>
@@ -90,31 +90,31 @@ function SequenciamentoTabela({
                     index % 2 === 1 ? "bg-gray-50" : "bg-white"
                   } hover:bg-gray-100 transition-colors`}
                 >
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                     {index + 1}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                     {order.client_name}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                     {order.order_index}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {order.machine_name ?? "-"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {order.mold_name ?? "-"}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {Intl.NumberFormat("pt-br").format(order.quantity)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {formatDate(order.billing_date)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {formatDate(order.completion_time)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {formatDate(order.billing_date)}
                   </td>
                   <td className="px-4 py-3 text-sm">

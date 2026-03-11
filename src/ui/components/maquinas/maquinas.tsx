@@ -47,7 +47,7 @@ function Maquinas() {
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root isVisible={novaMaquina && (maquinas?.length || 0) < 10}>
-        <Modal.Container>
+        <Modal.Container className="w-1/2">
           <Modal.Header
             title="Adicionar Nova Máquina"
             onClose={() => setNovaMaquina(false)}
@@ -63,7 +63,7 @@ function Maquinas() {
         </Modal.Container>
       </Modal.Root>
       <Modal.Root isVisible={editarMaquina}>
-        <Modal.Container>
+        <Modal.Container className="w-1/2">
           <Modal.Header
             title="Editar Máquina"
             onClose={() => setEditarMaquina(false)}
@@ -86,10 +86,10 @@ function Maquinas() {
           <table className="w-full overflow-auto max-h-[470px]">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                   Máquina
                 </th>
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                   % Disponibilidade
                 </th>
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
@@ -103,10 +103,10 @@ function Maquinas() {
                   key={maq.id}
                   className="border-b border-gray-200 last:border-b-0"
                 >
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {maq.name}
                   </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {maq.availability}
                   </td>
                   <td className="px-6 py-4 text-right">

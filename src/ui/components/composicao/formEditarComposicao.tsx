@@ -156,7 +156,7 @@ function FormEditComposicao({
                   htmlFor={`raw-material-${rawMaterial.raw_material_id}`}
                   className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
                 >
-                  % {rawMaterial.nome}
+                  {rawMaterial.nome} (Kg)
                 </label>
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input
@@ -187,7 +187,7 @@ function FormEditComposicao({
                   htmlFor={`purchase-item-${purchaseItem.purchase_item_id}`}
                   className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
                 >
-                  {purchaseItem.name} (Kg)
+                  {purchaseItem.name} (Un)
                 </label>
                 <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
                   <input

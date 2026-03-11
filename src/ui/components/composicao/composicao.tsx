@@ -186,21 +186,21 @@ function Composicao() {
           <table className="w-full overflow-auto max-h-[470px]">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                   Nome do Produto
                 </th>
                 {rawMaterialColumns.map((rawMaterialColumn) => (
                   <th
                     key={`raw-material-column-${rawMaterialColumn.id}`}
-                    className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700"
+                    className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700"
                   >
-                    % {rawMaterialColumn.nome}
+                    {rawMaterialColumn.nome} (Kg)
                   </th>
                 ))}
                 {purchaseItemColumns.map((purchaseItemColumn) => (
                   <th
                     key={`purchase-item-column-${purchaseItemColumn.id}`}
-                    className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700"
+                    className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700"
                   >
                     {purchaseItemColumn.name} (Un)
                   </th>
@@ -216,7 +216,7 @@ function Composicao() {
                   key={getCompositionId(composicao) ?? composicao.produto_id}
                   className="border-b border-gray-200 last:border-b-0"
                 >
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {composicao.produto_nome}
                   </td>
                   {rawMaterialColumns.map((rawMaterialColumn) => {
@@ -227,7 +227,7 @@ function Composicao() {
                     return (
                       <td
                         key={`raw-material-value-${composicao.produto_id}-${rawMaterialColumn.id}`}
-                        className="px-6 py-4 text-xs md:text-sm text-gray-900"
+                        className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center"
                       >
                         {rawMaterial?.quantity ?? "-"}
                       </td>
@@ -241,7 +241,7 @@ function Composicao() {
                     return (
                       <td
                         key={`purchase-item-value-${composicao.produto_id}-${purchaseItemColumn.id}`}
-                        className="px-6 py-4 text-xs md:text-sm text-gray-900"
+                        className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center"
                       >
                         {purchaseItem?.quantity ?? "-"}
                       </td>

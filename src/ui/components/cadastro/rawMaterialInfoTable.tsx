@@ -275,25 +275,29 @@ function RawMaterialSummaryTable({
       <table className="w-full text-sm">
         <thead className="bg-gray-50 text-left">
           <tr>
-            <th className="px-3 py-2 font-medium">Descrição</th>
-            <th className="px-3 py-2 font-medium">Quantidade</th>
-            <th className="px-3 py-2 font-medium">Matéria Prima (R$)</th>
+            <th className="px-3 py-2 font-medium text-center">Descrição</th>
+            <th className="px-3 py-2 font-medium text-center">Quantidade</th>
+            <th className="px-3 py-2 font-medium text-center">
+              Matéria Prima (R$)
+            </th>
           </tr>
         </thead>
         <tbody>
           {data.map((item) => (
             <tr key={item.name} className="border-t border-gray-200">
-              <td className="px-3 py-2">{item.name}</td>
-              <td className="px-3 py-2">
+              <td className="px-3 py-2 text-center">{item.name}</td>
+              <td className="px-3 py-2 text-center">
                 {formatToDecimal(item.quantity.toString())}
               </td>
-              <td className="px-3 py-2">{formatCurrency(item.total_cost)}</td>
+              <td className="px-3 py-2 text-center">
+                {formatCurrency(item.total_cost)}
+              </td>
             </tr>
           ))}
           <tr className="border-t border-gray-300 bg-gray-50 font-semibold">
-            <td className="px-3 py-2">Total</td>
-            <td className="px-3 py-2"></td>
-            <td className="px-3 py-2">
+            <td className="px-3 py-2 text-center">Total</td>
+            <td className="px-3 py-2 text-center"></td>
+            <td className="px-3 py-2 text-center">
               {formatCurrency(totalCost.toString())}
             </td>
           </tr>
