@@ -1,4 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 
@@ -36,6 +45,11 @@ interface IProcurementsByJobResponse {
 
 interface IRawMaterialSummaryTableProps {
   data: IProcurementsByJobResponse["resumo_total"] | undefined;
+  isFetching: boolean;
+}
+
+interface IRawMaterialDailyCostChartProps {
+  data: IProcurementsByJobItem[] | undefined;
   isFetching: boolean;
 }
 
@@ -289,6 +303,120 @@ function RawMaterialSummaryTable({
   );
 }
 
+function RawMaterialDailyCostChart({
+  data,
+  isFetching,
+}: IRawMaterialDailyCostChartProps) {
+  if (isFetching) {
+    return <Loader message="Carregando gráfico de matéria prima" />;
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      <div>
+        <p className="text-gray-500">Nenhum dado para exibir no gráfico.</p>
+      </div>
+    );
+  }
+
+  const totalsByDay = data.reduce<Record<string, number>>((acc, job) => {
+    job.raw_materials.forEach((rawMaterial) => {
+      if (!rawMaterial.purchase_date) return;
+
+      const parsedDate = new Date(rawMaterial.purchase_date);
+      if (Number.isNaN(parsedDate.getTime())) return;
+
+      const dayKey = `${parsedDate.getUTCFullYear()}-${String(parsedDate.getUTCMonth() + 1).padStart(2, "0")}-${String(parsedDate.getUTCDate()).padStart(2, "0")}`;
+      const parsedCost = Number(rawMaterial.cost);
+      const cost = Number.isNaN(parsedCost) ? 0 : parsedCost;
+
+      acc[dayKey] = (acc[dayKey] ?? 0) + cost;
+    });
+
+    return acc;
+  }, {});
+
+  const chartData = Object.entries(totalsByDay)
+    .sort(([dayA], [dayB]) => dayA.localeCompare(dayB))
+    .map(([day, totalCost]) => ({
+      day,
+      totalCost,
+    }));
+
+  if (chartData.length === 0) {
+    return (
+      <div>
+        <p className="text-gray-500">
+          Nenhum dado de compra por dia disponível.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full bg-white rounded-md border border-gray-200 p-4">
+      <h2 className="text-[#5A7BEF] font-bold text-lg">
+        Gasto Total de Matéria Prima por Dia
+      </h2>
+      <div className="mt-4 h-[360px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={chartData}
+            margin={{ top: 12, right: 12, left: 44, bottom: 24 }}
+          >
+            <CartesianGrid strokeDasharray="1 1" />
+            <XAxis
+              dataKey="day"
+              tickFormatter={(dateValue) => {
+                const parsed = new Date(`${dateValue}T00:00:00Z`);
+                return new Intl.DateTimeFormat("pt-BR", {
+                  timeZone: "UTC",
+                  day: "2-digit",
+                  month: "2-digit",
+                }).format(parsed);
+              }}
+            />
+            <YAxis
+              width={90}
+              tickMargin={8}
+              tickFormatter={(value) =>
+                Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                  maximumFractionDigits: 0,
+                }).format(value)
+              }
+            />
+            <Tooltip
+              formatter={(value) =>
+                Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(Number(value))
+              }
+              labelFormatter={(dateValue) => {
+                const parsed = new Date(`${dateValue}T00:00:00Z`);
+                return new Intl.DateTimeFormat("pt-BR", {
+                  timeZone: "UTC",
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }).format(parsed);
+              }}
+            />
+            <Bar
+              dataKey="totalCost"
+              fill="#255DC8"
+              barSize={24}
+              radius={[4, 4, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
 function RawMaterialInfoTable({ id }: { id?: number }) {
   const { data, isFetching } = useQuery({
     queryKey: ["rawMaterialInfo", id],
@@ -305,7 +433,7 @@ function RawMaterialInfoTable({ id }: { id?: number }) {
   }
 
   return (
-    <div>
+    <div className="max-h-[700px] overflow-y-auto">
       <div className="mt-4 w-full">
         <RawMaterialTable
           data={data?.procurements_by_job}
@@ -318,6 +446,12 @@ function RawMaterialInfoTable({ id }: { id?: number }) {
         </div>
         <RawMaterialSummaryTable
           data={data?.resumo_total}
+          isFetching={isFetching}
+        />
+      </div>
+      <div className="mt-6 w-full overflow-auto max-h-[470px]">
+        <RawMaterialDailyCostChart
+          data={data?.procurements_by_job}
           isFetching={isFetching}
         />
       </div>
