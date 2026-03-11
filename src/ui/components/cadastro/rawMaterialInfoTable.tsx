@@ -3,7 +3,8 @@ import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 
 interface IRunOption {
-  id: number;
+  data: IProcurementsByJobItem[] | undefined;
+  isFetching: boolean;
 }
 
 interface IProcurementEntry {
@@ -22,6 +23,7 @@ interface IProcurementsByJobItem {
   raw_materials: IProcurementEntry[];
   purchase_items: IProcurementEntry[];
   total_cost: string;
+  resumo_total: Record<string, string>;
 }
 
 interface IProcurementsByJobResponse {
@@ -58,17 +60,7 @@ const formatToDecimal = (value: string) => {
   }).format(parsed);
 };
 
-function RawMaterialTable({ id }: IRunOption) {
-  const { data, isFetching } = useQuery({
-    queryKey: ["rawMaterialInfo", id],
-    queryFn: async () => {
-      const { data } = await apiClient.get<IProcurementsByJobResponse>(
-        `/production-schedule/${id}/procurements-by-job`,
-      );
-      return data.procurements_by_job;
-    },
-  });
-
+function RawMaterialTable({ data, isFetching }: IRunOption) {
   if (isFetching) {
     return <Loader message="Carregando a tabela de matéria prima" />;
   }
@@ -204,6 +196,16 @@ function RawMaterialTable({ id }: IRunOption) {
 }
 
 function RawMaterialInfoTable({ id }: { id?: number }) {
+  const { data, isFetching } = useQuery({
+    queryKey: ["rawMaterialInfo", id],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IProcurementsByJobResponse>(
+        `/production-schedule/${id}/procurements-by-job`,
+      );
+      return data.procurements_by_job;
+    },
+  });
+
   if (!id) {
     return <p>Nenhum sequenciamento disponível.</p>;
   }
@@ -211,7 +213,7 @@ function RawMaterialInfoTable({ id }: { id?: number }) {
   return (
     <div>
       <div className="mt-4 w-full overflow-auto max-h-[470px]">
-        <RawMaterialTable id={id} />
+        <RawMaterialTable data={data} isFetching={isFetching} />
       </div>
       {/* <div className="mt-4 w-full overflow-auto max-h-[470px]">
         <h1>Teste</h1>
