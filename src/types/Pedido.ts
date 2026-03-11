@@ -1,4 +1,17 @@
 export interface IPedido {
+  client: {
+    id: number;
+    name: string;
+    priority: number;
+  };
+  product: {
+    id: number;
+    name: string;
+  };
+  mold: {
+    id: number;
+    name: string;
+  };
   product_name: string;
   promised_date: string;
   sequencing_start_date: string;

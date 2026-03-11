@@ -165,6 +165,9 @@ function PedidosDisponiveis() {
                 <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Cliente
                 </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-center text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
+                  Prioridade
+                </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Produto
                 </th>
@@ -198,7 +201,10 @@ function PedidosDisponiveis() {
                       {pedido.order_number}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.product_name.split(" - ")[0]}
+                      {pedido.client.name}
+                    </td>
+                    <td className="px-2 py-2 text-center whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
+                      {pedido.client.priority}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {pedido.product_name.split(" - ")[1]}
