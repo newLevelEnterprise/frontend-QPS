@@ -159,28 +159,28 @@ function PedidosDisponiveis() {
           <table className="w-full overflow-x-auto">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-1 py-2 text-center text-xs text-gray-700 uppercase tracking-wider">
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-center text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Número do pedido
                 </th>
-                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Cliente
                 </th>
-                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Produto
                 </th>
-                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Demanda
                 </th>
-                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Data Prometida
                 </th>
-                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Hora Prometida
                 </th>
-                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Valor
                 </th>
-                <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
+                <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
                   Ações
                 </th>
               </tr>
