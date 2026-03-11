@@ -11,6 +11,7 @@ export interface IPedido {
   processed: number;
   fk_id_client: number;
   fk_id_product: number;
+  order_number: string;
   id: number;
 }
 

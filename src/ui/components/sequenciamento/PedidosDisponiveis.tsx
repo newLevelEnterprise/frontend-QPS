@@ -114,7 +114,7 @@ function PedidosDisponiveis() {
       });
     }
   };
-
+  console.log("jobs disponiveis", jobs);
   return (
     <div className="w-full md:w-[65%]  bg-white rounded-md shadow p-4 overflow-x-auto">
       <h1 className="text-lg md:text-xl text-[#5B85D5] font-bold">
@@ -159,6 +159,9 @@ function PedidosDisponiveis() {
           <table className="w-full overflow-x-auto">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="px-1 py-2 text-center text-xs text-gray-700 uppercase tracking-wider">
+                  Número do pedido
+                </th>
                 <th className="px-1 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                   Cliente
                 </th>
@@ -191,6 +194,9 @@ function PedidosDisponiveis() {
                     onClick={() => handleAddPedido(pedido)}
                     className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
                   >
+                    <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-center text-black truncate text-ellipsis">
+                      {pedido.order_number}
+                    </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {pedido.product_name.split(" - ")[0]}
                     </td>
