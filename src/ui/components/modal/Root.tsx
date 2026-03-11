@@ -10,10 +10,10 @@ function Root({ children, isVisible, full }: RootProps) {
   }
 
   let styles =
-    "flex justify-center items-center bg-black/70 fixed w-full h-full z-20 top-0 left-0 md:left-56  px-10 overflow-auto";
+    "flex justify-center items-center bg-black/70 fixed w-full h-full z-20 top-0 left-0 md:left-56  px-4 overflow-auto";
   if (full) {
     styles =
-      "flex justify-center items-center bg-black/70 fixed w-full h-full z-20 top-0 left-0 px-10  overflow-auto";
+      "flex justify-center items-center bg-black/70 fixed w-full h-full z-20 top-0 left-0 px-4  overflow-auto";
   }
 
   return <div className={styles}>{children}</div>;

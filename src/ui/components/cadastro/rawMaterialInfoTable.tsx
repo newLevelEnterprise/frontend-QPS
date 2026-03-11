@@ -437,27 +437,29 @@ function RawMaterialInfoTable({ id }: { id?: number }) {
   }
 
   return (
-    <div className="max-h-[700px] overflow-y-auto">
+    <div className="max-h-[900px] overflow-y-auto">
       <div className="mt-4 w-full">
         <RawMaterialTable
           data={data?.procurements_by_job}
           isFetching={isFetching}
         />
       </div>
-      <div className="mt-6 w-full overflow-auto max-h-[470px]">
-        <div className="p-2 w-full text-center bg-gray-300 border border-gray-200">
-          <p className="text-lg font-semibold">Resumo geral</p>
+      <div className="grid grid-cols-10 gap-4">
+        <div className="mt-6 w-full overflow-auto h-full max-h-[470px] col-span-3">
+          <div className="p-2 w-full text-center bg-gray-300 border border-gray-200">
+            <p className="text-lg font-semibold">Resumo geral</p>
+          </div>
+          <RawMaterialSummaryTable
+            data={data?.resumo_total}
+            isFetching={isFetching}
+          />
         </div>
-        <RawMaterialSummaryTable
-          data={data?.resumo_total}
-          isFetching={isFetching}
-        />
-      </div>
-      <div className="mt-6 w-full overflow-auto max-h-[470px]">
-        <RawMaterialDailyCostChart
-          data={data?.procurements_by_job}
-          isFetching={isFetching}
-        />
+        <div className="mt-6 w-full overflow-auto h-full max-h-[470px] col-span-7">
+          <RawMaterialDailyCostChart
+            data={data?.procurements_by_job}
+            isFetching={isFetching}
+          />
+        </div>
       </div>
     </div>
   );
