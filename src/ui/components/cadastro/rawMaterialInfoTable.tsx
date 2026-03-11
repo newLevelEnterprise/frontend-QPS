@@ -18,6 +18,7 @@ interface IProcurementsByJobItem {
   product_name: string;
   client_name: string;
   order_number: string;
+  machine_name: string;
   raw_materials: IProcurementEntry[];
   purchase_items: IProcurementEntry[];
   total_cost: string;
@@ -99,6 +100,7 @@ function RawMaterialTable({ id }: IRunOption) {
       order_number: job.order_number,
       client_name: job.client_name,
       product_name: job.product_name,
+      machine_name: job.machine_name,
       materia_prima_1_quantidade: materiaPrima1?.quantity,
       materia_prima_1_data: formatDate(materiaPrima1?.purchase_date),
       materia_prima_1_custo: materiaPrima1
@@ -121,6 +123,7 @@ function RawMaterialTable({ id }: IRunOption) {
             <th className="px-3 py-2 font-medium">Pedido</th>
             <th className="px-3 py-2 font-medium">Cliente</th>
             <th className="px-3 py-2 font-medium">Produto</th>
+            <th className="px-3 py-2 font-medium">Nome Máquina</th>
             {hasMateriaPrima1 && (
               <th className="px-3 py-2 font-medium">
                 {materiaPrima1Titulo} (kg)
@@ -160,6 +163,7 @@ function RawMaterialTable({ id }: IRunOption) {
               <td className="px-3 py-2">{item.order_number}</td>
               <td className="px-3 py-2">{item.client_name}</td>
               <td className="px-3 py-2">{item.product_name}</td>
+              <td className="px-3 py-2">{item.machine_name}</td>
               {hasMateriaPrima1 && (
                 <td className="px-3 py-2">
                   {item.materia_prima_1_quantidade !== undefined
@@ -209,6 +213,9 @@ function RawMaterialInfoTable({ id }: { id?: number }) {
       <div className="mt-4 w-full overflow-auto max-h-[470px]">
         <RawMaterialTable id={id} />
       </div>
+      {/* <div className="mt-4 w-full overflow-auto max-h-[470px]">
+        <h1>Teste</h1>
+      </div> */}
     </div>
   );
 }

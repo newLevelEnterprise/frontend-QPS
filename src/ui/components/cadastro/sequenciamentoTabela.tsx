@@ -48,10 +48,13 @@ function SequenciamentoTabela({
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Clientes
+                  Ordem Seq.
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Produto
+                  Cliente
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                  Numero Pedido
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Máquina
@@ -60,16 +63,16 @@ function SequenciamentoTabela({
                   Molde
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Demanda do Produto
+                  Demanda do Prod.
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Limite Fat
+                  Data Limite Fat.
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Finalização da Prod
+                  Data Finalização
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Prev de Fat
+                  Data Prev. Fat.
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Status
@@ -88,10 +91,13 @@ function SequenciamentoTabela({
                   } hover:bg-gray-100 transition-colors`}
                 >
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    {order.order_index}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
                     {order.client_name}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700">
-                    {order.product_name}
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    {order.order_index}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">
                     {order.machine_name ?? "-"}
