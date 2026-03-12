@@ -112,7 +112,7 @@ function SequenciamentoTabela({
                     {formatDate(order.billing_date)}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {formatDate(order.completion_time)}
+                    {order.completion_time}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {formatDate(order.billing_date)}
