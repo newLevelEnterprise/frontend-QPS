@@ -24,6 +24,7 @@ export interface Results {
   job_id: number;
   id: number;
   order_index: number;
+  order_number: string;
   client_name: string;
   product_name: string;
   machine_name: string | null;

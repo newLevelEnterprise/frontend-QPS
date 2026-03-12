@@ -57,6 +57,9 @@ function SequenciamentoTabela({
                   Numero Pedido
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                  Nome do Produto
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Máquina
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
@@ -97,7 +100,10 @@ function SequenciamentoTabela({
                     {order.client_name}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                    {order.order_index}
+                    {order.order_number}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                    {order.product_name}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {order.machine_name ?? "-"}
