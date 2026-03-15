@@ -24,12 +24,12 @@ type IMaquinaEdicao = IMaquinas & {
   machine_id?: number;
   tempoPosInjecao?: number | string;
   post_injection_cycle_time?: number | string;
-  tempoCiclo?: number | string;
+  cycle_time?: number | string;
   tempo_ciclo?: number | string;
   machines?: Array<{
     id?: number;
     machine_id?: number;
-    tempoCiclo?: number | string;
+    cycle_time?: number | string;
     tempo_ciclo?: number | string;
   }>;
 };
@@ -101,12 +101,12 @@ function FormEditarMaquina({
     maquina.machines && maquina.machines.length > 0
       ? maquina.machines.map((m) => ({
           machineId: String(m.machine_id ?? m.id ?? ""),
-          tempoCiclo: String(m.tempo_ciclo ?? m.tempoCiclo ?? ""),
+          tempoCiclo: String(m.tempo_ciclo ?? m.cycle_time ?? ""),
         }))
       : [
           {
             machineId: String(maquina.machine_id ?? maquina.id ?? ""),
-            tempoCiclo: String(maquina.tempo_ciclo ?? maquina.tempoCiclo ?? ""),
+            tempoCiclo: String(maquina.tempo_ciclo ?? maquina.cycle_time ?? ""),
           },
         ];
 
