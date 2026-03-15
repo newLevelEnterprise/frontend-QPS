@@ -101,7 +101,6 @@ function Maquina() {
         .map((machine) => [machine.id, machine]),
     ).values(),
   );
-
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root
