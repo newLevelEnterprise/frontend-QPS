@@ -107,8 +107,14 @@ function FormSetup({
       ...item,
     }));
 
-    setSetupProdutos(setupProdutosFromProps);
-    setSetupOldProdutos(setupOldProdutosFromProps);
+    setSetupProdutos(
+      setupProdutosFromProps.filter((item) => item.from_name !== item.to_name),
+    );
+    setSetupOldProdutos(
+      setupOldProdutosFromProps.filter(
+        (item) => item.from_name !== item.to_name,
+      ),
+    );
   }, [setups]);
 
   const setupProdutosFiltrados = setupProdutos.filter((produto) =>
@@ -118,7 +124,7 @@ function FormSetup({
   );
 
   return (
-    <div className="w-full flex flex-col gap-4 my-4 overflow-y-auto max-h-[95%]">
+    <div className="w-[500px] flex flex-col gap-4 my-4 overflow-y-auto h-fit max-h-[500px]">
       <div className="relative w-full md:max-w-md">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <IoSearchSharp className="h-4 w-4 text-gray-400" />
@@ -138,15 +144,12 @@ function FormSetup({
         </div>
       ) : (
         <div className="w-full border border-gray-200 rounded-lg overflow-hidden">
-          <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_130px] gap-3 px-3 py-2 bg-gray-50 border-b border-gray-200">
+          <div className="flex justify-between items-center gap-3 px-3 py-2 bg-gray-50 border-b border-gray-200">
             <p className="text-xs font-semibold uppercase text-gray-500 tracking-wide">
-              Da linha de composição
-            </p>
-            <p className="text-xs font-semibold uppercase text-gray-500 tracking-wide">
-              Para linha de composição
+              Molde e Produto
             </p>
             <p className="text-xs font-semibold uppercase text-gray-500 tracking-wide text-right">
-              Tempo
+              Tempo (Min)
             </p>
           </div>
 
@@ -159,11 +162,8 @@ function FormSetup({
               setupProdutosFiltrados.map((produto) => (
                 <div
                   key={produto.setup_id}
-                  className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_130px] gap-3 items-center px-3 py-2"
+                  className="grid grid-cols-[minmax(0,1fr)_130px] gap-3 items-center px-3 py-2"
                 >
-                  <p className="text-sm text-gray-800 truncate">
-                    {produto.from_name}
-                  </p>
                   <p className="text-sm text-gray-800 truncate">
                     {produto.to_name}
                   </p>

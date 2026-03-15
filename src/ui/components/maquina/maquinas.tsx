@@ -142,7 +142,7 @@ function Maquina() {
           />
         </Modal.Container>
       </Modal.Root>
-      <Modal.Root isVisible={!!setup}>
+      <Modal.Root isVisible={!!setup} full>
         <Modal.Container>
           <Modal.Header
             title={setup?.nome || ""}
