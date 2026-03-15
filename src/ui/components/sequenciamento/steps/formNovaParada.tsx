@@ -58,8 +58,16 @@ function FormNovaParada({ onCriarParada }: FormNovaParadaProps) {
       );
       return;
     }
-
-    onCriarParada({ ...data, product_line_id: productLineId });
+    const maquina_name =
+      (maquinas &&
+        maquinas.find((machine) => machine.id === Number(data.maquina))
+          ?.name) ||
+      "";
+    onCriarParada({
+      ...data,
+      maquina_name: maquina_name ? maquina_name : "-",
+      product_line_id: productLineId,
+    });
   };
 
   return (

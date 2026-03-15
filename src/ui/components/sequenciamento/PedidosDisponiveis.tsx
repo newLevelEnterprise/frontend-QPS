@@ -201,7 +201,7 @@ function PedidosDisponiveis() {
                       {pedido.order_number}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.client.name}
+                      {pedido.client ? pedido.client.name : "-"}
                     </td>
                     <td className="px-2 py-2 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
                       {pedido.product_name.split(" - ")[1]}
@@ -226,7 +226,7 @@ function PedidosDisponiveis() {
                       }).format(pedido.product_value)}
                     </td>
                     <td className="px-2 py-2 text-center whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                      {pedido.client.priority}
+                      {pedido.client ? pedido.client.priority : 0}
                     </td>
                     <td className="px-2 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis relative">
                       <div className="w-full flex justify-center gap-2">

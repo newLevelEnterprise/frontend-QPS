@@ -82,6 +82,7 @@ function Paradas() {
     dataFim: "",
     horaFim: "",
     maquina: "",
+    maquina_name: "",
   });
 
   const [paradas, setParadas] = useState<IParadas[]>([]);
@@ -291,7 +292,7 @@ function Paradas() {
       setProcessing(false);
     }
   };
-
+  console.log(paradas);
   return (
     <div className="bg-white w-full overflow-y-auto max-h-full rounded-lg p-4">
       <Modal.Root isVisible={processing}>
@@ -378,7 +379,7 @@ function Paradas() {
                   <td className="px-3 py-2">{p.horaInicio}</td>
                   <td className="px-3 py-2">{p.dataFim}</td>
                   <td className="px-3 py-2">{p.horaFim}</td>
-                  <td className="px-3 py-2">{p.maquina}</td>
+                  <td className="px-3 py-2">{p.maquina_name}</td>
                   <td className="px-3 py-2 flex gap-2 text-sm items-center text-right">
                     <button
                       onClick={() => {

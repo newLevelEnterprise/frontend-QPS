@@ -7,4 +7,5 @@ export interface IParadas {
   dataFim: string;
   horaFim: string;
   maquina: string;
+  maquina_name: string;
 }

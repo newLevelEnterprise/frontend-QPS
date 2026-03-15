@@ -71,6 +71,11 @@ function FormEditarParada({
       );
       return;
     }
+    const maquina_name =
+      (maquinas &&
+        maquinas.find((machine) => machine.id === Number(data.maquina))
+          ?.name) ||
+      "";
 
     onEditarParada({
       id: parada.id,
@@ -81,6 +86,7 @@ function FormEditarParada({
       dataFim: data.dataFim,
       horaFim: data.horaFim,
       maquina: data.maquina,
+      maquina_name: maquina_name ? maquina_name : "-",
     });
 
     setEditarParada(false);
