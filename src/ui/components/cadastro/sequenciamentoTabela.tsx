@@ -25,6 +25,8 @@ function SequenciamentoTabela({
       (p.mold_name ?? "").toLowerCase().includes(busca.toLowerCase()),
   );
 
+  console.log(dadosFiltrados);
+
   return (
     <div className="flex-1 rounded-md bg-white shadow p-2">
       <div className="sticky top-0 z-20 bg-white pb-2 border-b border-gray-100">
@@ -51,37 +53,37 @@ function SequenciamentoTabela({
                   Ordem Seq.
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                  Maquina
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                  Pedido
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Cliente
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Numero Pedido
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Nome do Produto
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Máquina
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Molde
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Demanda do Prod.
+                  Produto
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Limite Fat.
+                  Demanda
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Finalização
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Prev. Fat.
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Status
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Previsão Fat.
+                  Data Fat.
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                  Fat.
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                  Data finalização injetora
                 </th>
               </tr>
             </thead>
@@ -94,34 +96,28 @@ function SequenciamentoTabela({
                   } hover:bg-gray-100 transition-colors`}
                 >
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                    {index + 1}
+                    {order.order_index}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                    {order.client_name}
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                    {order.machine_name ?? "-"}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                     {order.order_number}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                    {order.product_name}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {order.machine_name ?? "-"}
+                    {order.client_name}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {order.mold_name ?? "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                    {order.product_name}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {Intl.NumberFormat("pt-br").format(order.quantity)}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {formatDate(order.billing_date)}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {order.completion_time}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {formatDate(order.billing_date)}
+                    {order.completion_datetime}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span
@@ -134,11 +130,19 @@ function SequenciamentoTabela({
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                    {formatDate(order.billing_date)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {Intl.NumberFormat("pt-br", {
                       style: "currency",
                       currency: "BRL",
                     }).format(order.expected_revenue)}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    {order.completion_injection_datetime
+                      ? formatDate(order.completion_injection_datetime)
+                      : "-"}
                   </td>
                 </tr>
               ))}

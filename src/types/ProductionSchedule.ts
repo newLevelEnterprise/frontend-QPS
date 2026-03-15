@@ -33,7 +33,8 @@ export interface Results {
   scheduled_date: string;
   scheduled_time: string | null;
   actual_date: string;
-  completion_time: string | null;
+  completion_datetime: string | null;
+  completion_injection_datetime: string | null;
   billing_date: string;
   status: string;
   expected_revenue: number;
