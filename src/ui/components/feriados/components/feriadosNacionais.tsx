@@ -11,6 +11,7 @@ import EditarFeriadoForm from "../formEditarFeriado";
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "long",
+  timeZone: "UTC",
 });
 
 function formatHolidayDate(date: string) {
