@@ -101,6 +101,7 @@ function Maquina() {
         .map((machine) => [machine.id, machine]),
     ).values(),
   );
+
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root
@@ -221,6 +222,9 @@ function Maquina() {
                   <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                     Cavidades Abertas
                   </th>
+                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                    Tempo pós-injeção (s)
+                  </th>
                   {machineColumns.map((machine) => (
                     <th
                       key={machine.id}
@@ -257,6 +261,9 @@ function Maquina() {
                     </td>
                     <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                       {cp.mold.open_cavities}
+                    </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                      {cp.post_injection_cycle_time || "-"}
                     </td>
                     {machineColumns.map((machine) => {
                       const machineInCompositionLine = cp.machines.find(
