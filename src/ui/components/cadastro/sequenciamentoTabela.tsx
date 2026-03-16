@@ -2,11 +2,19 @@ import { useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import type { IProductionSchedule } from "../../../types/ProductionSchedule";
 
-const formatDate = (date?: string | null) => {
+const formatDate = (date?: string | null, hour = false) => {
   if (!date) return "-";
 
   const parsedDate = new Date(date);
   if (Number.isNaN(parsedDate.getTime())) return "-";
+
+  if (hour) {
+    return Intl.DateTimeFormat("pt-br", {
+      timeZone: "UTC",
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(parsedDate);
+  }
 
   return Intl.DateTimeFormat("pt-br", { timeZone: "UTC" }).format(parsedDate);
 };
@@ -117,7 +125,7 @@ function SequenciamentoTabela({
                     {Intl.NumberFormat("pt-br").format(order.quantity)}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {order.completion_datetime}
+                    {formatDate(order.completion_datetime, true)}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span

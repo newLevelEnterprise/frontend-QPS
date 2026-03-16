@@ -116,12 +116,17 @@ function FormNovoEstado({
     if (!moldeSelecionadoId) {
       return [];
     }
-
+    const moldeSelecionado = moldes?.find(
+      (molde) => String(molde.name) === moldeSelecionadoId,
+    );
+    if (!moldeSelecionado) {
+      return [];
+    }
     return (
       produtos?.filter((produto) =>
         produto.molds?.some((mold) => {
           const moldId = typeof mold === "number" ? mold : mold.id;
-          return String(moldId) === moldeSelecionadoId;
+          return String(moldId) === String(moldeSelecionado.id);
         }),
       ) || []
     );
@@ -184,7 +189,7 @@ function FormNovoEstado({
               : "Selecione uma máquina"}
           </option>
           {maquinas?.map((maquina) => (
-            <option key={maquina.id} value={maquina.name}>
+            <option key={maquina.id} value={maquina.id}>
               {maquina.name}
             </option>
           ))}
@@ -207,7 +212,7 @@ function FormNovoEstado({
                 : "Selecione um molde"}
           </option>
           {moldes?.map((molde) => (
-            <option key={molde.id} value={String(molde.id)}>
+            <option key={molde.id} value={String(molde.name)}>
               {molde.name}
             </option>
           ))}

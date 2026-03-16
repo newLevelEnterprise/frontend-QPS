@@ -245,8 +245,8 @@ function Paradas() {
           mold_name: estadoAtual.codMolde,
           product_name: estadoAtual.prodMaquinaInicioSequenciamento,
           completed: estadoAtual.status === "Concluido",
-          order_number: estadoAtual.numeroPedido || "",
-          client_name: estadoAtual.nome_cliente || "",
+          order_number: estadoAtual.numeroPedido || null,
+          client_name: estadoAtual.nome_cliente || null,
           remaining_injection_hours: toNumberOrZero(
             estadoAtual.tempoRestanteProdInjetora,
           ),
@@ -255,10 +255,10 @@ function Paradas() {
           ),
           demand: toNumberOrZero(estadoAtual.demanda),
           billing_value: toNumberOrZero(estadoAtual.valorAFAturar),
-          billing_deadline_date: estadoAtual.dataLimiteFaturamento || "",
-          billing_deadline_time: formatTimeToHHMMSS(
-            estadoAtual.horarioLimiteFaturamento || "",
-          ),
+          billing_deadline_date: estadoAtual.dataLimiteFaturamento || null,
+          billing_deadline_time: estadoAtual.horarioLimiteFaturamento
+            ? formatTimeToHHMMSS(estadoAtual.horarioLimiteFaturamento)
+            : null,
         })),
         programmed_stops_json:
           incluirParadas && payload.paradasSequenciamento
