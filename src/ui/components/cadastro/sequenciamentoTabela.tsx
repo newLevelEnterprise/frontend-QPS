@@ -71,7 +71,7 @@ function SequenciamentoTabela({
                   Demanda
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Finalização
+                  Data Fin.
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Status
@@ -83,7 +83,7 @@ function SequenciamentoTabela({
                   Fat.
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data finalização injetora
+                  Data Fin. injetora
                 </th>
               </tr>
             </thead>
@@ -139,7 +139,7 @@ function SequenciamentoTabela({
                       currency: "BRL",
                     }).format(order.expected_revenue)}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                     {order.completion_injection_datetime
                       ? formatDate(order.completion_injection_datetime)
                       : "-"}

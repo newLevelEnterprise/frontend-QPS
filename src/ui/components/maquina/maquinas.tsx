@@ -150,6 +150,7 @@ function Maquina() {
           />
           <FormSetup
             onClose={setSetup}
+            linhaId={linhaId}
             setups={
               setupMatrix?.filter(
                 (item) => item.from_composition_line.id === setup?.id,

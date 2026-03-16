@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { type Dispatch, useEffect, useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
 import { VscLoading } from "react-icons/vsc";
@@ -26,6 +27,7 @@ interface ISetupMatrixItem {
 interface FormSetupProps {
   setups: ISetupMatrixItem[];
   isLoadingProducts?: boolean;
+  linhaId?: string;
   onClose: Dispatch<
     React.SetStateAction<{
       nome: string;
@@ -45,7 +47,9 @@ function FormSetup({
   setups,
   isLoadingProducts = false,
   onClose,
+  linhaId,
 }: FormSetupProps) {
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [setupProdutos, setSetupProdutos] = useState<ISetupRow[]>([]);
   const [setupOldProdutos, setSetupOldProdutos] = useState<ISetupRow[]>([]);
@@ -73,6 +77,9 @@ function FormSetup({
         await apiClient.put("/setups/batch", payload);
         toast.success("Setup atualizado");
       }
+      queryClient.invalidateQueries({
+        queryKey: ["get", "all", "setupMatrix", linhaId],
+      });
       onClose(null);
     } catch (error) {
       console.log(error);
