@@ -10,6 +10,10 @@ export interface IMaquinasType {
   id: number;
   name: string;
   availability: string | number;
+  production_line: {
+    id: number;
+    name: string;
+  };
 }
 
 export interface ICompositionLineMachine {

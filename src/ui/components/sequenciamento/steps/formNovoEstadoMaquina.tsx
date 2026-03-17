@@ -79,20 +79,20 @@ function FormNovoEstado({
     },
   });
 
-  const { data: compositionLines, isFetching: isFetchingCompositionLines } =
-    useQuery({
-      queryKey: ["get", "all", "compositionLines"],
-      queryFn: async () => {
-        const { data } = await apiClient.get<
-          {
-            product_id: number;
-            production_line_id: number;
-            product: { name: string; id: number };
-          }[]
-        >("/composition-lines/");
-        return data;
-      },
-    });
+  // const { data: compositionLines, isFetching: isFetchingCompositionLines } =
+  //   useQuery({
+  //     queryKey: ["get", "all", "compositionLines"],
+  //     queryFn: async () => {
+  //       const { data } = await apiClient.get<
+  //         {
+  //           product_id: number;
+  //           production_line_id: number;
+  //           product: { name: string; id: number };
+  //         }[]
+  //       >("/composition-lines/");
+  //       return data;
+  //     },
+  //   });
 
   const {
     register,
@@ -155,16 +155,18 @@ function FormNovoEstado({
   }, [setValue, statusSelecionado]);
 
   const adicionarEstadoAtualMaquina = (data: IEstadoAtualMaquinaItem) => {
-    const productLineId = compositionLines?.find(
-      (line) => line.product.name === data.prodMaquinaInicioSequenciamento,
+    const machineSelected = maquinas?.find(
+      (machine) => machine.id.toString() === data.maquina,
     );
-    if (!productLineId || !productLineId.production_line_id) {
+    if (!machineSelected || !machineSelected.production_line) {
       toast.error(
         "Não foi possível encontrar a linha de produção para o produto selecionado. Verifique se o produto está corretamente associado a uma linha de produção.",
       );
       return;
     }
-    data.production_line_id = productLineId.production_line_id.toString() || "";
+    data.production_line_id =
+      machineSelected.production_line.id.toString() || "";
+
     onAddEstadoAtualMaquina(data);
     reset(defaultNovoEstado);
     setIsModalNovoEstadoVisible(false);
@@ -181,7 +183,8 @@ function FormNovoEstado({
           className={`border rounded px-2 py-1 ${disabledFieldClassName}`}
           defaultValue=""
           {...register("maquina", { required: true })}
-          disabled={isFetchingMaquinas || isFetchingCompositionLines}
+          disabled={isFetchingMaquinas}
+          // isFetchingCompositionLines
         >
           <option value="" disabled>
             {isFetchingMaquinas

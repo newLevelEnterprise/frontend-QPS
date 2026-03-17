@@ -54,17 +54,6 @@ const toNumberOrZero = (value: string | number | undefined) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-const inferMachineId = (machineName: string) => {
-  const matches = (machineName || "").match(/\d+/g);
-
-  if (!matches || matches.length === 0) {
-    return 0;
-  }
-
-  const parsed = Number(matches[matches.length - 1]);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
 function Paradas() {
   const queryClient = useQueryClient();
   const { user_id } = useAuth();
@@ -240,7 +229,7 @@ function Paradas() {
         next_saturday_is_working: sequenciamento.sabadoTrabalha,
         machine_states_json: payload.estadoAtualMaquina.map((estadoAtual) => ({
           production_line_id: Number(estadoAtual.production_line_id),
-          machine_id: inferMachineId(estadoAtual.maquina),
+          machine_id: Number(estadoAtual.maquina),
           used: estadoAtual.utilizacao,
           mold_name: estadoAtual.codMolde,
           product_name: estadoAtual.prodMaquinaInicioSequenciamento,
@@ -265,7 +254,7 @@ function Paradas() {
             ? payload.paradasSequenciamento.map((paradaAtual) => ({
                 production_line_id: Number(paradaAtual.production_line_id),
                 reason: paradaAtual.motivo,
-                machine_id: inferMachineId(paradaAtual.maquina),
+                machine_id: Number(paradaAtual.maquina),
                 start_date: paradaAtual.dataInicio,
                 start_time: formatTimeToHHMMSS(paradaAtual.horarioInicio),
                 end_date: paradaAtual.dataFim,
