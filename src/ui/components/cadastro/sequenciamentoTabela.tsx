@@ -139,7 +139,7 @@ function SequenciamentoTabela({
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {formatDate(order.billing_date)}
+                    {formatDate(order.billing_date, true)}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {Intl.NumberFormat("pt-br", {
