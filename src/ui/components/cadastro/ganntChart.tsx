@@ -25,6 +25,7 @@ interface IGanttMachine {
 interface IGanttLine {
   line_id: number;
   total_time: number;
+  line_name: string;
   machines: IGanttMachine[];
 }
 
@@ -164,7 +165,7 @@ function Chart({ id }: IRun) {
             <div key={line.line_id} className="rounded-md border p-3 space-y-3">
               <div className="flex items-center justify-between gap-2 min-w-0">
                 <h3 className="font-semibold text-sm truncate">
-                  Linha {line.line_id}
+                  {line.line_name}
                 </h3>
                 <span className="text-xs text-gray-600 shrink-0">
                   Tempo total: {formatMinutes(line.total_time)} Horas

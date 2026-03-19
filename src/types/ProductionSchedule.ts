@@ -30,9 +30,9 @@ export interface Results {
   machine_name: string | null;
   mold_name: string | null;
   quantity: number;
-  scheduled_date: string;
+  scheduled_datetime: string;
   scheduled_time: string | null;
-  actual_date: string;
+  actual_datetime: string;
   completion_datetime: string | null;
   completion_injection_datetime: string | null;
   billing_date: string;

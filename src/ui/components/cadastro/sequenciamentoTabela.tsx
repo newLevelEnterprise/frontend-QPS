@@ -32,8 +32,6 @@ function SequenciamentoTabela({
       (p.mold_name ?? "").toLowerCase().includes(busca.toLowerCase()),
   );
 
-  console.log(dadosFiltrados);
-
   return (
     <div className="flex-1 rounded-md bg-white shadow p-2">
       <div className="sticky top-0 z-20 bg-white pb-2 border-b border-gray-100">
@@ -78,10 +76,13 @@ function SequenciamentoTabela({
                   Demanda
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Fin.
+                  Data Limite Faturamento
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Fin. injetora
+                  Data Prevista Início Injetora
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                  Data Prevista Final Produção
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Prevista Faturamento
@@ -124,11 +125,16 @@ function SequenciamentoTabela({
                     {Intl.NumberFormat("pt-br").format(order.quantity)}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {formatDate(order.completion_datetime, true)}
+                    {formatDate(order.scheduled_datetime, true)}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                    {order.completion_injection_datetime
-                      ? formatDate(order.completion_injection_datetime)
+                  <td className="px-4 py-3 text-sm  text-gray-900 text-center">
+                    {order.actual_datetime
+                      ? formatDate(order.actual_datetime)
+                      : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm  text-gray-900 text-center">
+                    {order.completion_datetime
+                      ? formatDate(order.completion_datetime)
                       : "-"}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
