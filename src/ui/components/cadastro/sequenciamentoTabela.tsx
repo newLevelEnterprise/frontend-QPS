@@ -129,12 +129,12 @@ function SequenciamentoTabela({
                   </td>
                   <td className="px-4 py-3 text-sm  text-gray-900 text-center">
                     {order.actual_datetime
-                      ? formatDate(order.actual_datetime)
+                      ? formatDate(order.actual_datetime, true)
                       : "-"}
                   </td>
                   <td className="px-4 py-3 text-sm  text-gray-900 text-center">
                     {order.completion_datetime
-                      ? formatDate(order.completion_datetime)
+                      ? formatDate(order.completion_datetime, true)
                       : "-"}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">

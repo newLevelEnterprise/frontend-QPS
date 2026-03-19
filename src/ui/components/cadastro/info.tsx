@@ -72,13 +72,13 @@ function Info({ dados }: { dados: IProductionSchedule | undefined }) {
       <InfoCard titulo="Data Inicio Prog." valor={formatDate} cor="azul" />
       <InfoCard titulo="Hr. Inicio Prog." valor={formatHour} cor="azul" />
       <InfoCard titulo="Qtd. Setup Nec." valor={`${setup_count}`} cor="azul" />
-      <InfoCard titulo="ID Sequenciamento" valor={`${id}`} cor="verde" />
       <InfoCard
         titulo="Pedidos no Prazo"
         valor={`${on_time_jobs}`}
-        cor="roxo"
+        cor="azul"
       />
-      <InfoCard titulo="Hr. de Fat Até:" valor="16:59:00" cor="roxo" />
+      <InfoCard titulo="Hr. de Fat Até:" valor="16:59:00" cor="azul" />
+      <InfoCard titulo="ID Sequenciamento" valor={`${id}`} cor="azul" />
     </div>
   );
 }
