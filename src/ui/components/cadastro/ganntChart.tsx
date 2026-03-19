@@ -29,11 +29,22 @@ interface IGanttLine {
   machines: IGanttMachine[];
 }
 
+interface IGanttLegendItem {
+  index: number;
+  pedido: string;
+  cliente: string;
+  produto: string;
+  demanda: string;
+  inicio: string;
+  finalizacao: string;
+}
+
 interface IGanttResponse {
   run_id: number;
   sequencing_start: string;
   lines: IGanttLine[];
   generated_at: string;
+  legend: IGanttLegendItem[];
 }
 
 const jobColors = [
