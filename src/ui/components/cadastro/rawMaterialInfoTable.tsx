@@ -60,6 +60,7 @@ const formatDate = (value?: string) => {
   if (Number.isNaN(parsed.getTime())) return "";
 
   return Intl.DateTimeFormat("pt-BR", {
+    timeZone: "UTC",
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -327,10 +328,8 @@ function RawMaterialDailyCostChart({
     job.raw_materials.forEach((rawMaterial) => {
       if (!rawMaterial.purchase_date) return;
 
-      const parsedDate = new Date(rawMaterial.purchase_date);
-      if (Number.isNaN(parsedDate.getTime())) return;
-
-      const dayKey = `${parsedDate.getUTCFullYear()}-${String(parsedDate.getUTCMonth() + 1).padStart(2, "0")}-${String(parsedDate.getUTCDate()).padStart(2, "0")}`;
+      const parsedDate = formatDate(rawMaterial.purchase_date);
+      const dayKey = parsedDate;
       const parsedCost = Number(rawMaterial.cost);
       const cost = Number.isNaN(parsedCost) ? 0 : parsedCost;
 
@@ -341,7 +340,7 @@ function RawMaterialDailyCostChart({
   }, {});
 
   const chartData = Object.entries(totalsByDay)
-    .sort(([dayA], [dayB]) => dayA.localeCompare(dayB))
+    .sort(([dayA], [dayB]) => (dayA > dayB ? 1 : -1))
     .map(([day, totalCost]) => ({
       day,
       totalCost,
@@ -369,17 +368,7 @@ function RawMaterialDailyCostChart({
             margin={{ top: 12, right: 12, left: 44, bottom: 24 }}
           >
             <CartesianGrid strokeDasharray="1 1" />
-            <XAxis
-              dataKey="day"
-              tickFormatter={(dateValue) => {
-                const parsed = new Date(`${dateValue}T00:00:00Z`);
-                return new Intl.DateTimeFormat("pt-BR", {
-                  timeZone: "UTC",
-                  day: "2-digit",
-                  month: "2-digit",
-                }).format(parsed);
-              }}
-            />
+            <XAxis dataKey="day" tickFormatter={(dateValue) => dateValue} />
             <YAxis
               width={90}
               tickMargin={8}
@@ -398,15 +387,7 @@ function RawMaterialDailyCostChart({
                   currency: "BRL",
                 }).format(Number(value))
               }
-              labelFormatter={(dateValue) => {
-                const parsed = new Date(`${dateValue}T00:00:00Z`);
-                return new Intl.DateTimeFormat("pt-BR", {
-                  timeZone: "UTC",
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                }).format(parsed);
-              }}
+              labelFormatter={(dateValue) => dateValue}
             />
             <Bar
               dataKey="totalCost"
