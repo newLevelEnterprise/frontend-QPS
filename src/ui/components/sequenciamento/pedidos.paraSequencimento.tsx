@@ -19,8 +19,8 @@ function PedidosParaSequenciamento({
 
   const connectToSSE = () => {
     try {
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const sseUrl = `${baseURL}/sequenciamento/stream?user_id=${user_id}`;
+      const baseURL = import.meta.env.VITE_BACKEND_URL as string;
+      const sseUrl = `${baseURL.endsWith("/") ? baseURL.slice(0, -1) : baseURL}/sequenciamento/stream?user_id=${user_id}`;
 
       const newEventSource = new EventSource(sseUrl);
 
@@ -31,8 +31,8 @@ function PedidosParaSequenciamento({
       newEventSource.onmessage = (event) => {
         try {
           console.log("Evento recebido", event.data);
-          const data = JSON.parse(event.data) as { finishied: boolean };
-          const isFinished = data.finishied === true;
+          const data = JSON.parse(event.data) as { finished: boolean };
+          const isFinished = data.finished === true;
           if (isFinished) {
             newEventSource.close();
             setEventSource(null);
@@ -151,6 +151,9 @@ function PedidosParaSequenciamento({
                   <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
                     Valor
                   </th>
+                  <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-center text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
+                    Prioridade
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200 overflow-y-auto overflow-x-scroll">
@@ -181,6 +184,9 @@ function PedidosParaSequenciamento({
                           style: "currency",
                           currency: "BRL",
                         }).format(pedido.product_value)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-xs md:text-sm text-black truncate text-ellipsis">
+                        {pedido.client ? pedido.client.priority : "N/A"}
                       </td>
                     </tr>
                   ))}
