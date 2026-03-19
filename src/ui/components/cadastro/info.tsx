@@ -53,8 +53,7 @@ function Info({ dados }: { dados: IProductionSchedule | undefined }) {
     );
   }
 
-  const { sequencing_start, setup_count, optimized_setups, on_time_jobs } =
-    dados;
+  const { sequencing_start, setup_count, id, on_time_jobs } = dados;
 
   const formatDate = Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
@@ -66,17 +65,14 @@ function Info({ dados }: { dados: IProductionSchedule | undefined }) {
     minute: "2-digit",
   }).format(new Date(sequencing_start));
   const month = new Date(Date.now()).getMonth();
+
   return (
     <div className="w-full h-fit flex flex-col py-1 md:pt-1 gap-1 overflow-y-auto">
       <InfoCard titulo="Mês Corrente" cor="azul" valor={mesesObj[month]} />
       <InfoCard titulo="Data Inicio Prog." valor={formatDate} cor="azul" />
       <InfoCard titulo="Hr. Inicio Prog." valor={formatHour} cor="azul" />
       <InfoCard titulo="Qtd. Setup Nec." valor={`${setup_count}`} cor="azul" />
-      <InfoCard
-        titulo="Qtde Setups Planejado"
-        valor={`${optimized_setups}`}
-        cor="verde"
-      />
+      <InfoCard titulo="ID Sequenciamento" valor={`${id}`} cor="verde" />
       <InfoCard
         titulo="Pedidos no Prazo"
         valor={`${on_time_jobs}`}

@@ -10,7 +10,6 @@ const formatDate = (date?: string | null, hour = false) => {
 
   if (hour) {
     return Intl.DateTimeFormat("pt-br", {
-      timeZone: "UTC",
       dateStyle: "short",
       timeStyle: "short",
     }).format(parsedDate);
@@ -82,16 +81,16 @@ function SequenciamentoTabela({
                   Data Fin.
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                  Data Fin. injetora
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                  Data Prevista Faturamento
+                </th>
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Status
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Fat.
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Fat.
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Fin. injetora
+                  Valor Faturado
                 </th>
               </tr>
             </thead>
@@ -127,6 +126,14 @@ function SequenciamentoTabela({
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {formatDate(order.completion_datetime, true)}
                   </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                    {order.completion_injection_datetime
+                      ? formatDate(order.completion_injection_datetime)
+                      : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                    {formatDate(order.billing_date)}
+                  </td>
                   <td className="px-4 py-3 text-sm">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -139,18 +146,10 @@ function SequenciamentoTabela({
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {formatDate(order.billing_date)}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {Intl.NumberFormat("pt-br", {
                       style: "currency",
                       currency: "BRL",
                     }).format(order.expected_revenue)}
-                  </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                    {order.completion_injection_datetime
-                      ? formatDate(order.completion_injection_datetime)
-                      : "-"}
                   </td>
                 </tr>
               ))}

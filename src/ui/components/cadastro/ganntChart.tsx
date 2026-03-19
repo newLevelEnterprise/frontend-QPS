@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { apiClient } from "../../../utils/apiClient";
@@ -128,9 +129,6 @@ function Chart({ id }: IRun) {
     <div className="space-y-6 max-w-full">
       <div className="text-sm text-gray-700">
         <p>
-          <span className="font-semibold">Run:</span> {data.run_id}
-        </p>
-        <p>
           <span className="font-semibold">Início do sequenciamento:</span>{" "}
           {formatDateTime(data.sequencing_start)}
         </p>
@@ -141,7 +139,7 @@ function Chart({ id }: IRun) {
           className="space-y-6"
           style={{ minWidth: `${timelineMinWidth}px` }}
         >
-          <div className="rounded-md border p-3 bg-gray-50 space-y-2">
+          {/* <div className="rounded-md border p-3 bg-gray-50 space-y-2">
             <p className="text-xs font-semibold text-gray-700">
               Escala de horários
             </p>
@@ -160,7 +158,7 @@ function Chart({ id }: IRun) {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {data.lines.map((line) => (
             <div key={line.line_id} className="rounded-md border p-3 space-y-3">
@@ -169,7 +167,7 @@ function Chart({ id }: IRun) {
                   Linha {line.line_id}
                 </h3>
                 <span className="text-xs text-gray-600 shrink-0">
-                  Tempo total: {formatMinutes(line.total_time)} min
+                  Tempo total: {formatMinutes(line.total_time)} Horas
                 </span>
               </div>
 
@@ -190,14 +188,14 @@ function Chart({ id }: IRun) {
                         return (
                           <div
                             key={`${machine.id}-${block.job_id}-${index}-${block.start}`}
-                            className={`absolute top-0 h-full border-r border-white ${getBlockColorClass(block.job_id)}`}
+                            className={`absolute top-0 h-full border-2 border-black ${getBlockColorClass(block.job_id)}`}
                             style={{
                               left: `${left}%`,
                               width: `${width}%`,
                             }}
                             title={`Pedido ${block.label} • ${formatMinutes(block.duration)} min`}
                           >
-                            <span className="text-[10px] text-white font-semibold px-1 leading-8 block truncate">
+                            <span className="text-md text-center text-white font-semibold px-1 leading-8 block truncate">
                               {block.label}
                             </span>
                           </div>
