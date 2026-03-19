@@ -14,6 +14,7 @@ export const criarStepsSequenciamentoschema = z.object({
     .object({
       production_line_id: z.string().min(1, "Linha de produção é obrigatório"),
       maquina: z.string().min(1, "Máquina é obrigatório"),
+      maquina_name: z.string().optional(),
       utilizacao: z.boolean(),
       codMolde: z.string().min(1, "Código do molde é obrigatório"),
       prodMaquinaInicioSequenciamento: z

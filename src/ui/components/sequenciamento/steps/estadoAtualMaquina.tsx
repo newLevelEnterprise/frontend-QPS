@@ -160,15 +160,19 @@ function EstadoAtualMaquina() {
             <tbody>
               {estadoAtualMaquina.map((row, idx) => (
                 <tr key={idx} className="odd:bg-white even:bg-gray-50">
-                  <td className="px-2 py-2 border">{row.maquina}</td>
+                  <td className="px-2 py-2 border text-center">
+                    {row.maquina_name || row.maquina || "Máquina sem nome"}
+                  </td>
                   <td className="px-2 py-2 border text-center">
                     {row.utilizacao ? "Sim" : "Não"}
                   </td>
-                  <td className="px-2 py-2 border">{row.codMolde}</td>
-                  <td className="px-2 py-2 border">
+                  <td className="px-2 py-2 border text-center">
+                    {row.codMolde}
+                  </td>
+                  <td className="px-2 py-2 border text-center">
                     {row.prodMaquinaInicioSequenciamento}
                   </td>
-                  <td className="px-2 py-2 border">{row.status}</td>
+                  <td className="px-2 py-2 border text-center">{row.status}</td>
                   <td className="px-2 py-2 border text-center">
                     {row.numeroPedido}
                   </td>

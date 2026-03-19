@@ -21,6 +21,7 @@ type IEstadoAtualMaquinaItem =
 const defaultNovoEstado: IEstadoAtualMaquinaItem = {
   production_line_id: "",
   maquina: "",
+  maquina_name: "",
   utilizacao: true,
   codMolde: "",
   prodMaquinaInicioSequenciamento: "",
@@ -167,7 +168,7 @@ function FormNovoEstado({
     data.production_line_id =
       machineSelected.production_line.id.toString() || "";
 
-    onAddEstadoAtualMaquina(data);
+    onAddEstadoAtualMaquina({ ...data, maquina_name: machineSelected.name });
     reset(defaultNovoEstado);
     setIsModalNovoEstadoVisible(false);
   };
