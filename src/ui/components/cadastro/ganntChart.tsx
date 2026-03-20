@@ -91,6 +91,73 @@ const getBlockColorClass = (jobId: number) => {
   return jobColors[Math.abs(jobId) % jobColors.length];
 };
 
+function LegendTable({ legend }: { legend: IGanttLegendItem[] }) {
+  return (
+    <div className="mt-4">
+      <h3 className="font-semibold text-sm mb-3 text-gray-800">Legenda</h3>
+      <div className="rounded-md border border-gray-300 max-h-96 overflow-y-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-gray-800 text-white">
+              <th className="px-4 py-3 text-center text-xs font-semibold">#</th>
+              <th className="px-4 py-3 text-center text-xs font-semibold">
+                Pedido
+              </th>
+              <th className="px-4 py-3 text-center text-xs font-semibold">
+                Cliente
+              </th>
+              <th className="px-4 py-3 text-center text-xs font-semibold">
+                Produto
+              </th>
+              <th className="px-4 py-3 text-center text-xs font-semibold">
+                Demanda
+              </th>
+              <th className="px-4 py-3 text-center text-xs font-semibold">
+                Início
+              </th>
+              <th className="px-4 py-3 text-center text-xs font-semibold">
+                Finalização
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {legend.map((item, rowIndex) => (
+              <tr
+                key={item.index}
+                className={`border-t border-gray-200 ${
+                  rowIndex % 2 === 0 ? "bg-gray-50" : "bg-white"
+                } hover:bg-gray-100 transition-colors`}
+              >
+                <td className="px-4 py-3 text-sm text-gray-900 font-medium text-center">
+                  {item.index}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900 text-center">
+                  {item.pedido || "-"}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900 text-center">
+                  {item.cliente || "-"}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900 text-center">
+                  {item.produto || "-"}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900 text-center">
+                  {item.demanda || "-"}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap text-center">
+                  {item.inicio || "-"}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap text-center">
+                  {item.finalizacao || "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function Chart({ id }: IRun) {
   const { data, isFetching } = useQuery({
     queryKey: ["ganntChartData", id],
@@ -225,6 +292,10 @@ function Chart({ id }: IRun) {
       <p className="text-xs text-gray-500">
         Gerado em {formatDateTime(data.generated_at)}
       </p>
+
+      {data.legend && data.legend.length > 0 && (
+        <LegendTable legend={data.legend} />
+      )}
     </div>
   );
 }
@@ -236,7 +307,7 @@ function GantChart({ id }: { id: number }) {
 
   return (
     <div className="space-y-4">
-      <div className="mt-4">
+      <div className="mt-4 overflow-y-auto">
         <Chart id={id} />
       </div>
     </div>
