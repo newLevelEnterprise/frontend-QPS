@@ -94,28 +94,30 @@ const getBlockColorClass = (jobId: number) => {
 function LegendTable({ legend }: { legend: IGanttLegendItem[] }) {
   return (
     <div className="mt-4">
-      <h3 className="font-semibold text-sm mb-3 text-gray-800">Legenda</h3>
+      <h3 className="font-semibold text-lg mb-3 text-gray-800">Legenda</h3>
       <div className="rounded-md border border-gray-300 max-h-96 overflow-y-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-800 text-white">
-              <th className="px-4 py-3 text-center text-xs font-semibold">#</th>
-              <th className="px-4 py-3 text-center text-xs font-semibold">
+            <tr className="bg-gray-50 border-b border-gray-200">
+              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                #
+              </th>
+              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 Pedido
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold">
+              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 Cliente
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold">
+              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 Produto
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold">
+              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 Demanda
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold">
+              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 Início
               </th>
-              <th className="px-4 py-3 text-center text-xs font-semibold">
+              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 Finalização
               </th>
             </tr>
