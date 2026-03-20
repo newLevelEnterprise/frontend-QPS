@@ -118,7 +118,7 @@ function SequenciamentoTabela({
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {order.mold_name ?? "-"}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center whitespace-nowrap">
                     {order.product_name}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
@@ -140,7 +140,7 @@ function SequenciamentoTabela({
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {formatDate(order.billing_date)}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm whitespace-nowrap">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         order.status === "On Time"
