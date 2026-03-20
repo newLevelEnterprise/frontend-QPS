@@ -49,7 +49,13 @@ interface IRawMaterialSummaryTableProps {
 }
 
 interface IRawMaterialDailyCostChartProps {
-  data: IProcurementsByJobItem[] | undefined;
+  data:
+    | {
+        id: number;
+        purchase_date: string;
+        procurement_total: number;
+      }[]
+    | undefined;
   isFetching: boolean;
 }
 
@@ -324,26 +330,11 @@ function RawMaterialDailyCostChart({
     );
   }
 
-  const totalsByDay = data.reduce<Record<string, number>>((acc, job) => {
-    job.raw_materials.forEach((rawMaterial) => {
-      if (!rawMaterial.purchase_date) return;
-
-      const parsedDate = formatDate(rawMaterial.purchase_date);
-      const dayKey = parsedDate;
-      const parsedCost = Number(rawMaterial.cost);
-      const cost = Number.isNaN(parsedCost) ? 0 : parsedCost;
-
-      acc[dayKey] = (acc[dayKey] ?? 0) + cost;
-    });
-
-    return acc;
-  }, {});
-
-  const chartData = Object.entries(totalsByDay)
-    .sort(([dayA], [dayB]) => (dayA > dayB ? 1 : -1))
-    .map(([day, totalCost]) => ({
-      day,
-      totalCost,
+  const chartData = data
+    .sort((a, b) => (a.purchase_date > b.purchase_date ? 1 : -1))
+    .map((item) => ({
+      day: formatDate(item.purchase_date),
+      totalCost: item.procurement_total,
     }));
 
   if (chartData.length === 0) {
@@ -413,6 +404,16 @@ function RawMaterialInfoTable({ id }: { id?: number }) {
     },
   });
 
+  const { data: forecastData, isFetching: isForecastFetching } = useQuery({
+    queryKey: ["procurementsForecast", id],
+    queryFn: async () => {
+      const { data } = await apiClient.get<
+        IRawMaterialDailyCostChartProps["data"]
+      >(`/production-schedule/${id}/procurements-forecast`);
+      return data;
+    },
+  });
+
   if (!id) {
     return <p>Nenhum sequenciamento disponível.</p>;
   }
@@ -437,8 +438,8 @@ function RawMaterialInfoTable({ id }: { id?: number }) {
         </div>
         <div className="mt-6 w-full overflow-auto h-full max-h-[470px] col-span-7">
           <RawMaterialDailyCostChart
-            data={data?.procurements_by_job}
-            isFetching={isFetching}
+            data={forecastData}
+            isFetching={isForecastFetching}
           />
         </div>
       </div>
