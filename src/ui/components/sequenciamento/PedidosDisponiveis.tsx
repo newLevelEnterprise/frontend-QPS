@@ -40,6 +40,19 @@ function PedidosDisponiveis() {
   });
 
   const handleAddPedido = (pedido: IPedido) => {
+    const pedidosParaSequencimentoJson = JSON.parse(
+      localStorage.getItem("jobs_para_sequenciamento") || "[]",
+    ) as IPedido[];
+    if (pedidosParaSequencimentoJson.length >= 30) {
+      toast.error(
+        "Não é possível adicionar mais de 30 pedidos para sequenciamento",
+        {
+          toastId: "addPedidoToast",
+        },
+      );
+      return;
+    }
+
     queryClient.setQueryData(["get", "jobs"], (oldData: IPedido[]) => {
       if (!oldData) return oldData;
       const orders = [...oldData];

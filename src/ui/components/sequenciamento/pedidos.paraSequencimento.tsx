@@ -109,7 +109,7 @@ function PedidosParaSequenciamento({
     <div className="max-w-full md:flex-1 flex flex-col justify-between bg-white rounded-md shadow p-4 overflow-y-auto overflow-x-auto">
       <div className="flex flex-col gap-4">
         <h1 className="text-lg md:text-xl text-[#5B85D5] font-bold">
-          Pedidos Para o Sequenciamento
+          Pedidos Para o Sequenciamento ({pedidos ? pedidos.length : 0}/30)
         </h1>
 
         <div className="relative max-w-md mt-4">
