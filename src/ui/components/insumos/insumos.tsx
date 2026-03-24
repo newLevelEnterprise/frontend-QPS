@@ -92,7 +92,7 @@ function Insumos() {
         </Modal.Container>
       </Modal.Root>
       <h1 className="text-xl text-[#5B85D5] font-bold">
-        Cadastrar matéria prima
+        Cadastrar Matéria-Prima
       </h1>
       {isFetching && <Loader message="Carregando insumos" />}
       {!isFetching && (

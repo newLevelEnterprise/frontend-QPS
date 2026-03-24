@@ -13,7 +13,7 @@ function HorasMaquina({ dados }: HorasMaquinaProps) {
 
       <div className="space-y-3 mb-4">
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Hs. Limite de Entrega</span>
+          <span className="text-sm text-gray-600">Hs. de Disponibilidade</span>
           <span className="text-sm font-medium text-gray-900">
             {new Intl.NumberFormat("pt-BR").format(
               dados?.hs_de_disponibilidade || 0,

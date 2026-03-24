@@ -1,7 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { CiCirclePlus } from "react-icons/ci";
-import { toast } from "react-toastify";
 import type { ITurnosRegulares } from "../../../types/TurnosRegulares";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
@@ -33,21 +31,21 @@ function TurnosRegulares() {
     frequencia: "Semanal",
   });
 
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (id: number) => {
-      await apiClient.delete(`/regular-shifts/${id}`);
-    },
-    onError: (error) => {
-      toast.error("Erro ao deletar turno. Tente novamente.");
-      console.error("Erro ao deletar turno:", error);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["get", "all", "turnos-regulares"],
-      });
-      toast.success("Turno deletado com sucesso!");
-    },
-  });
+  // const { mutateAsync, isPending } = useMutation({
+  //   mutationFn: async (id: number) => {
+  //     await apiClient.delete(`/regular-shifts/${id}`);
+  //   },
+  //   onError: (error) => {
+  //     toast.error("Erro ao deletar turno. Tente novamente.");
+  //     console.error("Erro ao deletar turno:", error);
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({
+  //       queryKey: ["get", "all", "turnos-regulares"],
+  //     });
+  //     toast.success("Turno deletado com sucesso!");
+  //   },
+  // });
 
   const { data: turnos, isFetching } = useQuery({
     queryKey: ["get", "all", "turnos-regulares"],
@@ -161,12 +159,6 @@ function TurnosRegulares() {
                       >
                         Editar
                       </button>
-                      <button
-                        onClick={() => mutateAsync(itemTurno.id)}
-                        className="text-red-500 cursor-pointer hover:text-red-700 text-xs md:text-sm font-medium transition-colors duration-150"
-                      >
-                        Excluir
-                      </button>
                     </div>
                   </td>
                 </tr>
@@ -175,26 +167,6 @@ function TurnosRegulares() {
           </table>
         </div>
       )}
-      <div className="flex flex-col gap-4 items-center justify-center mt-4">
-        <button
-          disabled={isFetching || isPending}
-          onClick={() => {
-            setNovoTurno(true);
-            setTurno({
-              id: 0,
-              dia_semana: "Segunda-feira",
-              manha: false,
-              tarde: false,
-              noite: false,
-              frequencia: "Semanal",
-            });
-          }}
-          className="disabled:bg-blue-300 disabled:cursor-not-allowed cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
-          Adicionar Novo Turno
-        </button>
-      </div>
     </div>
   );
 }

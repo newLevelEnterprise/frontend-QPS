@@ -95,7 +95,7 @@ const menuItems: MenuItem[] = [
     url: "",
     items: [
       {
-        title: "Materia Prima",
+        title: "Materia-Prima",
         icon: MdOutlineViewComfyAlt,
         url: "/insumos/materia-prima",
       },

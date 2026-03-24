@@ -351,24 +351,32 @@ function Paradas() {
           <table className="min-w-full text-sm mb-4">
             <thead>
               <tr className="bg-gray-50">
-                <th className="px-3 py-2">Motivo</th>
-                <th className="px-3 py-2">Data de Início da Parada</th>
-                <th className="px-3 py-2">Horário de Início da Parada</th>
-                <th className="px-3 py-2">Data de Finalização da Parada</th>
-                <th className="px-3 py-2">Horário de Finalização da Parada</th>
-                <th className="px-3 py-2">Máquina</th>
+                <th className="px-3 py-2 text-center">Motivo</th>
+                <th className="px-3 py-2 text-center">
+                  Data de Início da Parada
+                </th>
+                <th className="px-3 py-2 text-center">
+                  Horário de Início da Parada
+                </th>
+                <th className="px-3 py-2 text-center">
+                  Data de Finalização da Parada
+                </th>
+                <th className="px-3 py-2 text-center">
+                  Horário de Finalização da Parada
+                </th>
+                <th className="px-3 py-2 text-center">Máquina</th>
                 <th className="px-3 py-2"></th>
               </tr>
             </thead>
             <tbody>
               {paradas.map((p) => (
                 <tr key={p.id} className="odd:bg-white even:bg-gray-50">
-                  <td className="px-3 py-2">{p.motivo}</td>
-                  <td className="px-3 py-2">{p.dataInicio}</td>
-                  <td className="px-3 py-2">{p.horaInicio}</td>
-                  <td className="px-3 py-2">{p.dataFim}</td>
-                  <td className="px-3 py-2">{p.horaFim}</td>
-                  <td className="px-3 py-2">{p.maquina_name}</td>
+                  <td className="px-3 py-2 text-center">{p.motivo}</td>
+                  <td className="px-3 py-2 text-center">{p.dataInicio}</td>
+                  <td className="px-3 py-2 text-center">{p.horaInicio}</td>
+                  <td className="px-3 py-2 text-center">{p.dataFim}</td>
+                  <td className="px-3 py-2 text-center">{p.horaFim}</td>
+                  <td className="px-3 py-2 text-center">{p.maquina_name}</td>
                   <td className="px-3 py-2 flex gap-2 text-sm items-center text-right">
                     <button
                       onClick={() => {

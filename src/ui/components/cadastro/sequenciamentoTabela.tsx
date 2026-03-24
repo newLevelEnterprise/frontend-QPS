@@ -79,7 +79,7 @@ function SequenciamentoTabela({
                   Data Limite Faturamento
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Prevista Início Injetora
+                  Data de Finalização na Injetora
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Prevista Final Produção

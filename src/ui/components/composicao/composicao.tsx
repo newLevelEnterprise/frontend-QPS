@@ -193,7 +193,7 @@ function Composicao() {
           />
         </Modal.Container>
       </Modal.Root>
-      <h1 className="text-xl text-[#5B85D5] font-bold">Composições</h1>
+      <h1 className="text-xl text-[#5B85D5] font-bold">Composição</h1>
       {isFetching && <Loader message="Carregando composições" />}
       {!isFetching && (
         <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">

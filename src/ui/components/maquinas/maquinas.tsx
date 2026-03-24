@@ -160,7 +160,7 @@ function Maquinas() {
             Adicionar Nova Máquina
           </button>
           <p className="text-gray-500 text-lg">
-            Pode ser cadastrada até 10 máquinas
+            Pode ser cadastrada até 10 máquinas por linha.
           </p>
         </div>
       )}

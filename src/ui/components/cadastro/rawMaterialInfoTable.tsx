@@ -142,49 +142,49 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
       <table className="w-full table-auto">
         <thead>
           <tr className="bg-gray-50 border-b border-gray-200">
-            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Pedido
             </th>
-            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Cliente
             </th>
-            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Produto
             </th>
-            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Nome Máquina
             </th>
             {hasMateriaPrima1 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {materiaPrima1Titulo} (kg)
               </th>
             )}
             {hasMateriaPrima1 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {`Data compra ${materiaPrima1Titulo}`}
               </th>
             )}
             {hasMateriaPrima1 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {`Custo compra ${materiaPrima1Titulo}`}
               </th>
             )}
             {hasMateriaPrima2 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {materiaPrima2Titulo} (kg)
               </th>
             )}
             {hasMateriaPrima2 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {`Data compra ${materiaPrima2Titulo}`}
               </th>
             )}
             {hasMateriaPrima2 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                 {`Custo compra ${materiaPrima2Titulo}`}
               </th>
             )}
-            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Custo Total
             </th>
           </tr>
@@ -195,20 +195,20 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
               key={item.key}
               className={`${index % 2 === 1 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition-colors`}
             >
-              <td className="px-4 py-3 text-sm text-gray-700">
+              <td className="px-4 py-3 text-sm text-center text-gray-700">
                 {item.order_number}
               </td>
-              <td className="px-4 py-3 text-sm text-gray-700">
+              <td className="px-4 py-3 text-sm text-center text-gray-700">
                 {item.client_name}
               </td>
-              <td className="px-4 py-3 text-sm text-gray-700">
+              <td className="px-4 py-3 text-sm text-center text-gray-700">
                 {item.product_name}
               </td>
-              <td className="px-4 py-3 text-sm text-gray-700">
+              <td className="px-4 py-3 text-sm text-center text-gray-700">
                 {item.machine_name}
               </td>
               {hasMateriaPrima1 && (
-                <td className="px-4 py-3 text-sm text-gray-700">
+                <td className="px-4 py-3 text-sm text-center text-gray-700">
                   {item.materia_prima_1_quantidade !== undefined
                     ? formatToDecimal(
                         item.materia_prima_1_quantidade.toString(),
@@ -217,17 +217,17 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
                 </td>
               )}
               {hasMateriaPrima1 && (
-                <td className="px-4 py-3 text-sm text-gray-700">
+                <td className="px-4 py-3 text-sm text-center text-gray-700">
                   {item.materia_prima_1_data}
                 </td>
               )}
               {hasMateriaPrima1 && (
-                <td className="px-4 py-3 text-sm text-gray-700">
+                <td className="px-4 py-3 text-sm text-center text-gray-700">
                   {item.materia_prima_1_custo}
                 </td>
               )}
               {hasMateriaPrima2 && (
-                <td className="px-4 py-3 text-sm text-gray-700">
+                <td className="px-4 py-3 text-sm text-center text-gray-700">
                   {item.materia_prima_2_quantidade !== undefined
                     ? formatToDecimal(
                         item.materia_prima_2_quantidade.toString(),
@@ -236,16 +236,16 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
                 </td>
               )}
               {hasMateriaPrima2 && (
-                <td className="px-4 py-3 text-sm text-gray-700">
+                <td className="px-4 py-3 text-sm text-center text-gray-700">
                   {item.materia_prima_2_data}
                 </td>
               )}
               {hasMateriaPrima2 && (
-                <td className="px-4 py-3 text-sm text-gray-700">
+                <td className="px-4 py-3 text-sm text-center text-gray-700">
                   {item.materia_prima_2_custo}
                 </td>
               )}
-              <td className="px-4 py-3 text-sm text-gray-700">
+              <td className="px-4 py-3 text-sm text-center text-gray-700">
                 {item.total_cost}
               </td>
             </tr>
@@ -350,7 +350,7 @@ function RawMaterialDailyCostChart({
   return (
     <div className="w-full bg-white rounded-md border border-gray-200 p-4">
       <h2 className="text-[#5A7BEF] font-bold text-lg">
-        Gasto Total de Matéria Prima por Dia
+        Custo Total de Matéria Prima por Dia
       </h2>
       <div className="mt-4 h-[360px] w-full">
         <ResponsiveContainer width="100%" height="100%">

@@ -47,11 +47,11 @@ function CadastroPage() {
         </h1>
         <div className="flex flex-wrap gap-2">
           <Button
-            title="Visualização do gráfico de Gantt"
+            title="Gráfico de Prog. das Máquinas"
             onClick={() => setIsGanttModalOpen(true)}
           />
           <Button
-            title="Necessidade de Matéria Prima"
+            title="Necessidade de Matéria-Prima"
             onClick={() => setIsMaisInfoModalOpen(true)}
           />
         </div>
@@ -84,7 +84,7 @@ function CadastroPage() {
       <Modal.Root isVisible={isGanttModalOpen} full>
         <Modal.Container className="w-full max-w-7xl max-h-full overflow-y-auto">
           <Modal.Header
-            title="Gráfico de Programação das Máquinas"
+            title="Gráfico de Prog. das Máquinas"
             onClose={() => setIsGanttModalOpen(false)}
           />
           <GantChart id={production?.id || 0} />
@@ -94,7 +94,7 @@ function CadastroPage() {
       <Modal.Root isVisible={isMaisInfoModalOpen} full>
         <Modal.Container className="w-full">
           <Modal.Header
-            title="Necessidade de Matéria Prima"
+            title="Necessidade de Matéria-Prima"
             onClose={() => setIsMaisInfoModalOpen(false)}
           />
           <RawMaterialInfoTable id={production?.id || 0} />

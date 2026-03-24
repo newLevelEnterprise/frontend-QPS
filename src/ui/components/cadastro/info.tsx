@@ -65,7 +65,6 @@ function Info({ dados }: { dados: IProductionSchedule | undefined }) {
     minute: "2-digit",
   }).format(new Date(sequencing_start));
   const month = new Date(Date.now()).getMonth();
-
   return (
     <div className="w-full h-fit flex flex-col py-1 md:pt-1 gap-1 overflow-y-auto">
       <InfoCard titulo="Mês Corrente" cor="azul" valor={mesesObj[month]} />
