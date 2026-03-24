@@ -53,7 +53,13 @@ function Info({ dados }: { dados: IProductionSchedule | undefined }) {
     );
   }
 
-  const { sequencing_start, setup_count, id, on_time_jobs } = dados;
+  const {
+    sequencing_start,
+    setup_count,
+    id,
+    on_time_jobs,
+    billing_deadline_time,
+  } = dados;
 
   const formatDate = Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
@@ -76,7 +82,13 @@ function Info({ dados }: { dados: IProductionSchedule | undefined }) {
         valor={`${on_time_jobs}`}
         cor="azul"
       />
-      <InfoCard titulo="Hr. de Fat Até:" valor="16:59:00" cor="azul" />
+      {billing_deadline_time && (
+        <InfoCard
+          titulo="Hr. de Fat Até:"
+          valor={billing_deadline_time}
+          cor="azul"
+        />
+      )}
       <InfoCard titulo="ID Sequenciamento" valor={`${id}`} cor="azul" />
     </div>
   );

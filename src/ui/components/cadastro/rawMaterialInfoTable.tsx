@@ -350,7 +350,7 @@ function RawMaterialDailyCostChart({
   return (
     <div className="w-full bg-white rounded-md border border-gray-200 p-4">
       <h2 className="text-[#5A7BEF] font-bold text-lg">
-        Custo Total de Matéria Prima por Dia
+        Custo Total de Matéria-Prima por Dia
       </h2>
       <div className="mt-4 h-[360px] w-full">
         <ResponsiveContainer width="100%" height="100%">

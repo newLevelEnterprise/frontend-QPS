@@ -6,6 +6,7 @@ export interface IProductionSchedule {
   total_machine_hours: number;
   max_deadline_hours: number;
   machine_status: string;
+  billing_deadline_time?: string;
   id: number;
   created_at: string;
   results: Results[];
