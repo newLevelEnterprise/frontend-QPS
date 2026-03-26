@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../../hooks/useAuth";
 import { useSteps } from "../../../../hooks/useStep";
@@ -56,11 +57,14 @@ const toNumberOrZero = (value: string | number | undefined) => {
 
 function Paradas() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { user_id } = useAuth();
   const { resetSteps } = useSteps();
   const [processing, setProcessing] = useState<boolean>(false);
   const [modalCriarParada, setModalCriarParada] = useState<boolean>(false);
   const [modalEditarParada, setModalEditarParada] = useState<boolean>(false);
+  const [sequencimentoFinalizado, setSequenciamentoFinalizado] =
+    useState<boolean>(false);
   const { prevStep } = useSteps();
   const [parada, setParada] = useState<IParadas>({
     id: 0,
@@ -264,14 +268,14 @@ function Paradas() {
         user_id: `${user_id}`,
       });
 
-      toast.success("Dados prontos para iniciar o sequenciamento.");
       localStorage.removeItem(SEQUENCIAMENTO_INFO_STORAGE_KEY);
       localStorage.removeItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
       localStorage.removeItem("jobs_ids");
-      resetSteps();
+      localStorage.removeItem("jobs_para_sequenciamento");
       queryClient.setQueryData(["jobs", "para", "sequenciamento"], () => {
         return [];
       });
+      setSequenciamentoFinalizado(true);
     } catch (error) {
       console.log(error);
       toast.error(
@@ -281,12 +285,50 @@ function Paradas() {
       setProcessing(false);
     }
   };
-  console.log(paradas);
+
   return (
     <div className="bg-white w-full overflow-y-auto max-h-full rounded-lg p-4">
-      <Modal.Root isVisible={processing}>
+      <Modal.Root isVisible={processing || sequencimentoFinalizado} full>
         <Modal.Container>
-          <Loading />
+          {!processing && sequencimentoFinalizado && (
+            <div className="flex flex-col items-center justify-center p-6">
+              <div className="flex flex-col items-center gap-2 mb-4">
+                <svg
+                  width="48"
+                  height="48"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="text-green-500 mb-2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2l4-4m5 2a9 9 0 11-18 0a9 9 0 0118 0z"
+                  />
+                </svg>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  Sequenciamento finalizado!
+                </h1>
+                <p className="text-gray-600 text-center max-w-xs">
+                  O sequenciamento foi concluído com sucesso. Você pode
+                  visualizar os resultados agora.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setSequenciamentoFinalizado(false);
+                  resetSteps();
+                  navigate("/resultados");
+                }}
+                className="cursor-pointer mt-2 px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+              >
+                Ver resultados
+              </button>
+            </div>
+          )}
+          {processing && !sequencimentoFinalizado && <Loading />}
         </Modal.Container>
       </Modal.Root>
       <Modal.Root isVisible={modalCriarParada}>

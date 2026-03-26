@@ -1,13 +1,15 @@
-import { BiLoaderAlt } from "react-icons/bi";
+import { LuLoaderCircle } from "react-icons/lu";
 
 function Loading() {
   return (
-    <div className="flex flex-col justify-center items-center w-[55%] gap-4 mx-auto z-30">
-      <p className="text-center text-2xl text-[#47506F]">Carregando ...</p>
-      <p className="text-center text-sm text-[#47506F]">
-        Em instantes você terá o resultado do sequenciamento
+    <div className="flex flex-col justify-center items-center w-full max-w-md gap-5 mx-auto z-30 bg-white/90 rounded-xl shadow-lg p-8 border border-blue-100 animate-fade-in">
+      <LuLoaderCircle size={80} className="animate-spin text-blue-500 mb-2" />
+      <p className="text-center text-2xl font-semibold text-blue-700">
+        Carregando...
       </p>
-      <BiLoaderAlt   size={70} className="animate-spin"/>
+      <p className="text-center text-base text-blue-500">
+        Em instantes você terá o resultado do sequenciamento.
+      </p>
     </div>
   );
 }
