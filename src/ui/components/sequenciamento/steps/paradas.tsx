@@ -309,7 +309,7 @@ function Paradas() {
                   />
                 </svg>
                 <h1 className="text-2xl font-bold text-gray-800">
-                  Sequenciamento finalizado!
+                  SEQUENCIAMENTO CONCLUÍDO !
                 </h1>
                 <p className="text-gray-600 text-center max-w-xs">
                   O sequenciamento foi concluído com sucesso. Você pode
