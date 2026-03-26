@@ -128,8 +128,8 @@ function SequenciamentoTabela({
                     {formatDate(order.scheduled_datetime, true)}
                   </td>
                   <td className="px-4 py-3 text-sm  text-gray-900 text-center">
-                    {order.actual_datetime
-                      ? formatDate(order.actual_datetime, true)
+                    {order.completion_injection_datetime
+                      ? formatDate(order.completion_injection_datetime, true)
                       : "-"}
                   </td>
                   <td className="px-4 py-3 text-sm  text-gray-900 text-center">

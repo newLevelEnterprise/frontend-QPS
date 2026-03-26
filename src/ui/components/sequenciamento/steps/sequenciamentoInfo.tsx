@@ -171,7 +171,7 @@ function SequenciamentoInfo() {
                   Todos os dias (sem feriados)
                 </option>
                 <option value="24/7 (sempre disponível)">
-                  24/7 (sempre disponível)
+                  Todos os dias e em qualquer horário (incluindo feriados)
                 </option>
               </select>
             </div>
