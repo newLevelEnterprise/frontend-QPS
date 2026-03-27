@@ -14,6 +14,8 @@ interface IGanttBlock {
   start: number;
   duration: number;
   end: number;
+  product_id?: number;
+  is_downtime?: boolean;
 }
 
 interface IGanttMachine {
@@ -123,12 +125,23 @@ const formatTimelineTime = (startDate: string, minutesToAdd: number) => {
   }).format(date);
 };
 
-const getBlockColorClass = (duration: number) => {
-  if (duration <= 0) {
+// Mapeamento fixo: product_id -> cor
+const productColorMap: Record<number, string> = {};
+let nextColorIndex = 0;
+
+const getBlockColorClass = (block: IGanttBlock) => {
+  if (block.is_downtime) {
+    return "bg-red-600";
+  }
+  if (block.product_id == null) {
     return "bg-gray-400";
   }
-  const colorIndex = Math.floor(duration / 5) % jobColors.length;
-  return jobColors[colorIndex];
+  if (!(block.product_id in productColorMap)) {
+    productColorMap[block.product_id] =
+      jobColors[nextColorIndex % jobColors.length];
+    nextColorIndex++;
+  }
+  return productColorMap[block.product_id];
 };
 
 function LegendTable({ legend }: { legend: IGanttLegendItem[] }) {
@@ -210,7 +223,7 @@ function Chart({ id }: IRun) {
       return data;
     },
   });
-
+  console.log("Gantt data:", data);
   const maxTimeline = useMemo(() => {
     if (!data?.lines?.length) {
       return 0;
@@ -299,20 +312,33 @@ function Chart({ id }: IRun) {
                       {machine.name}
                     </p>
                     <div className="relative h-8 rounded bg-gray-100 overflow-hidden">
-                      {machine.blocks.map((block, index) => {
+                      {machine.blocks.map((block, index, arr) => {
                         const left = (block.start / maxTimeline) * 100;
                         const width = Math.max(
                           (block.duration / maxTimeline) * 100,
                           0.8,
                         );
-
+                        let marginLeft = 0;
+                        if (index > 0) {
+                          const prev = arr[index - 1];
+                          if (
+                            !block.is_downtime &&
+                            !prev.is_downtime &&
+                            block.product_id !== prev.product_id
+                          ) {
+                            marginLeft = 4;
+                          }
+                        }
                         return (
                           <div
                             key={`${machine.id}-${block.job_id}-${index}-${block.start}`}
-                            className={`absolute top-0 h-full border-2 border-black ${getBlockColorClass(block.duration)}`}
+                            className={`absolute top-0 h-full border-2 border-black ${getBlockColorClass(block)}`}
                             style={{
                               left: `${left}%`,
                               width: `${width}%`,
+                              marginLeft: marginLeft
+                                ? `${marginLeft}px`
+                                : undefined,
                             }}
                             title={`Pedido ${block.label} • ${formatMinutes(block.duration)} min`}
                           >
