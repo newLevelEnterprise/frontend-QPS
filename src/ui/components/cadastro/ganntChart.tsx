@@ -54,6 +54,46 @@ const jobColors = [
   "bg-emerald-500",
   "bg-violet-500",
   "bg-amber-500",
+  "bg-red-500",
+  "bg-pink-500",
+  "bg-green-600",
+  "bg-orange-500",
+  "bg-teal-600",
+  "bg-fuchsia-600",
+  "bg-lime-600",
+  "bg-rose-600",
+  "bg-purple-700",
+  "bg-yellow-600",
+  "bg-sky-600",
+  "bg-blue-700",
+  "bg-emerald-700",
+  "bg-orange-700",
+  "bg-red-700",
+  "bg-pink-700",
+  "bg-green-700",
+  "bg-cyan-700",
+  "bg-indigo-700",
+  "bg-violet-700",
+  "bg-amber-700",
+  "bg-fuchsia-700",
+  "bg-lime-700",
+  "bg-rose-700",
+  "bg-purple-800",
+  "bg-yellow-700",
+  "bg-sky-700",
+  "bg-blue-800",
+  "bg-emerald-800",
+  "bg-orange-800",
+  "bg-red-800",
+  "bg-pink-800",
+  "bg-green-800",
+  "bg-cyan-800",
+  "bg-indigo-800",
+  "bg-violet-800",
+  "bg-amber-800",
+  "bg-fuchsia-800",
+  "bg-lime-800",
+  "bg-rose-800",
 ];
 
 const formatDateTime = (value: string) => {
@@ -83,12 +123,14 @@ const formatTimelineTime = (startDate: string, minutesToAdd: number) => {
   }).format(date);
 };
 
-const getBlockColorClass = (jobId: number) => {
-  if (jobId === 0) {
+// Nova lógica: cor baseada na duração (em minutos), range de 5 em 5 minutos
+const getBlockColorClass = (duration: number) => {
+  if (duration <= 0) {
     return "bg-gray-400";
   }
-
-  return jobColors[Math.abs(jobId) % jobColors.length];
+  // Define o índice da cor pelo range de 5 em 5 minutos
+  const colorIndex = Math.floor(duration / 5) % jobColors.length;
+  return jobColors[colorIndex];
 };
 
 function LegendTable({ legend }: { legend: IGanttLegendItem[] }) {
@@ -269,7 +311,7 @@ function Chart({ id }: IRun) {
                         return (
                           <div
                             key={`${machine.id}-${block.job_id}-${index}-${block.start}`}
-                            className={`absolute top-0 h-full border-2 border-black ${getBlockColorClass(block.job_id)}`}
+                            className={`absolute top-0 h-full border-2 border-black ${getBlockColorClass(block.duration)}`}
                             style={{
                               left: `${left}%`,
                               width: `${width}%`,
