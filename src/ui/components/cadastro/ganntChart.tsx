@@ -123,12 +123,10 @@ const formatTimelineTime = (startDate: string, minutesToAdd: number) => {
   }).format(date);
 };
 
-// Nova lógica: cor baseada na duração (em minutos), range de 5 em 5 minutos
 const getBlockColorClass = (duration: number) => {
   if (duration <= 0) {
     return "bg-gray-400";
   }
-  // Define o índice da cor pelo range de 5 em 5 minutos
   const colorIndex = Math.floor(duration / 5) % jobColors.length;
   return jobColors[colorIndex];
 };
