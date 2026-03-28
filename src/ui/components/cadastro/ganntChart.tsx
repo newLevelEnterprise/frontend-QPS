@@ -223,7 +223,7 @@ function Chart({ id }: IRun) {
       return data;
     },
   });
-  console.log("Gantt data:", data);
+
   const maxTimeline = useMemo(() => {
     if (!data?.lines?.length) {
       return 0;
@@ -340,7 +340,7 @@ function Chart({ id }: IRun) {
                                 ? `${marginLeft}px`
                                 : undefined,
                             }}
-                            title={`Pedido ${block.label} • ${formatMinutes(block.duration)} min`}
+                            title={`Pedido ${block.label} • ${formatMinutes(block.duration)} min - Id do produto: ${block.product_id || "N/A"}`}
                           >
                             <span className="text-md text-center text-white font-semibold px-1 leading-8 block truncate">
                               {block.label}
