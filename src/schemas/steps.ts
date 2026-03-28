@@ -7,7 +7,8 @@ export const criarStepsSequenciamentoschema = z.object({
     regimeFaturamento: z.string().min(1, "Regime de faturamento é obrigatório"),
     horarioLimiteFaturamento: z
       .string()
-      .min(1, "Horário limite de faturamento é obrigatório"),
+      .min(1, "Horário limite de faturamento é obrigatório")
+      .optional(),
     sabadoTrabalha: z.boolean(),
   }),
   estadoAtualMaquina: z

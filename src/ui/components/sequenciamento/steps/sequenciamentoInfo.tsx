@@ -16,7 +16,7 @@ const defaultSequenciamentoInfo: ICriaStepsSequenciamentoBody["sequenciamento"] 
     dataInicio: "",
     horarioInicio: "",
     regimeFaturamento: "",
-    horarioLimiteFaturamento: "",
+    horarioLimiteFaturamento: undefined,
     sabadoTrabalha: false,
   };
 
@@ -161,37 +161,31 @@ function SequenciamentoInfo() {
                 <option value="" disabled>
                   Selecione uma opção
                 </option>
-                <option value="Segunda a Sexta (sem feriados)">
-                  Segunda a Sexta (sem feriados)
-                </option>
-                <option value="Todos os dias (incluindo feriados)">
-                  Todos os dias (incluindo feriados)
-                </option>
-                <option value="Todos os dias (sem feriados)">
-                  Todos os dias (sem feriados)
-                </option>
-                <option value="24/7 (sempre disponível)">
-                  Todos os dias e em qualquer horário (incluindo feriados)
-                </option>
+                <option value="1">Segunda a Sexta (sem feriados)</option>
+                <option value="2">Todos os dias (incluindo feriados)</option>
+                <option value="3">Todos os dias (sem feriados)</option>
+                <option value="4">24/7 (sempre disponível)</option>
               </select>
             </div>
-            <div className="flex items-center gap-2 mt-1">
-              <input
-                type="time"
-                className={clsx(
-                  "border rounded px-2 py-1 w-24",
-                  isFetching && "bg-gray-50 animate-pulse",
-                )}
-                disabled={isFetching}
-                value={sequenciamentoInfo.horarioLimiteFaturamento}
-                onChange={(event) =>
-                  setSequenciamentoInfo((prev) => ({
-                    ...prev,
-                    horarioLimiteFaturamento: event.target.value,
-                  }))
-                }
-              />
-            </div>
+            {sequenciamentoInfo.regimeFaturamento !== "4" && (
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="time"
+                  className={clsx(
+                    "border rounded px-2 py-1 w-24",
+                    isFetching && "bg-gray-50 animate-pulse",
+                  )}
+                  disabled={isFetching}
+                  value={sequenciamentoInfo.horarioLimiteFaturamento}
+                  onChange={(event) =>
+                    setSequenciamentoInfo((prev) => ({
+                      ...prev,
+                      horarioLimiteFaturamento: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+            )}
           </div>
         </div>
         <div className="mt-2">

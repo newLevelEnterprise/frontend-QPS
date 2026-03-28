@@ -219,12 +219,19 @@ function Paradas() {
           return;
         }
       }
+      const regimeFaturamento = Number(sequenciamento.regimeFaturamento);
+      if (regimeFaturamento > 4 || regimeFaturamento < 1) {
+        toast.error(
+          "Regime de faturamento inválido. Selecione uma opção válida.",
+        );
+        return;
+      }
 
       await apiClient.post("/billing-configuration/", {
-        rule_type: sequenciamento.regimeFaturamento,
-        billing_deadline_time: formatBillingDeadlineTime(
-          sequenciamento.horarioLimiteFaturamento,
-        ),
+        rule_type: regimeFaturamento,
+        billing_deadline_time: sequenciamento.horarioLimiteFaturamento
+          ? formatBillingDeadlineTime(sequenciamento.horarioLimiteFaturamento)
+          : null,
       });
 
       await apiClient.post("/solver/solver", {
