@@ -125,10 +125,6 @@ const formatTimelineTime = (startDate: string, minutesToAdd: number) => {
   }).format(date);
 };
 
-// Mapeamento fixo: product_id -> cor
-const productColorMap: Record<number, string> = {};
-let nextColorIndex = 0;
-
 const getBlockColorClass = (block: IGanttBlock) => {
   if (block.is_downtime) {
     return "bg-red-600";
@@ -136,12 +132,9 @@ const getBlockColorClass = (block: IGanttBlock) => {
   if (block.product_id == null) {
     return "bg-gray-400";
   }
-  if (!(block.product_id in productColorMap)) {
-    productColorMap[block.product_id] =
-      jobColors[nextColorIndex % jobColors.length];
-    nextColorIndex++;
-  }
-  return productColorMap[block.product_id];
+
+  const colorIndex = Math.abs(block.product_id) % jobColors.length;
+  return jobColors[colorIndex];
 };
 
 function LegendTable({ legend }: { legend: IGanttLegendItem[] }) {
