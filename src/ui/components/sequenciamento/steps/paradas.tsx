@@ -226,7 +226,6 @@ function Paradas() {
         );
         return;
       }
-
       await apiClient.post("/billing-configuration/", {
         rule_type: regimeFaturamento,
         billing_deadline_time: sequenciamento.horarioLimiteFaturamento

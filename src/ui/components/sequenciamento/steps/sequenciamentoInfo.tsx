@@ -44,13 +44,16 @@ function SequenciamentoInfo() {
   });
 
   const { data: billingActivated, isFetching } = useQuery({
-    queryKey: ["sequenciamentoInfo"],
+    queryKey: ["sequenciamentoInfo", 1],
     queryFn: async () => {
-      const { data } = await apiClient.get<{
-        rule_type: string;
-        billing_deadline_time: string;
-      }>("/billing-configuration/active");
-      return data;
+      const { data } = await apiClient.get<
+        {
+          rule_type: string;
+          billing_deadline_time: string;
+          rule_type_index: number;
+        }[]
+      >("/billing-configuration");
+      return data[0];
     },
   });
 
@@ -58,8 +61,11 @@ function SequenciamentoInfo() {
     if (billingActivated) {
       setSequenciamentoInfo((prev) => ({
         ...prev,
-        regimeFaturamento: billingActivated.rule_type,
-        horarioLimiteFaturamento: billingActivated.billing_deadline_time,
+        regimeFaturamento: billingActivated.rule_type_index.toString(),
+        horarioLimiteFaturamento:
+          billingActivated.rule_type_index === 4
+            ? undefined
+            : billingActivated.billing_deadline_time,
       }));
     }
   }, [isFetching, billingActivated]);
@@ -92,10 +98,15 @@ function SequenciamentoInfo() {
       return;
     }
 
-    localStorage.setItem(
-      SEQUENCIAMENTO_INFO_STORAGE_KEY,
-      JSON.stringify(isValid.data),
-    );
+    const data = {
+      ...isValid.data,
+      horarioLimiteFaturamento:
+        sequenciamentoInfo.regimeFaturamento === "4"
+          ? undefined
+          : sequenciamentoInfo.horarioLimiteFaturamento,
+    };
+
+    localStorage.setItem(SEQUENCIAMENTO_INFO_STORAGE_KEY, JSON.stringify(data));
 
     nextStep();
   };
