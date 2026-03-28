@@ -15,7 +15,7 @@ interface IGanttBlock {
   duration: number;
   end: number;
   product_id?: number;
-  is_downtime?: boolean;
+  is_dowtime?: boolean;
 }
 
 interface IGanttMachine {
@@ -70,7 +70,7 @@ const jobColors = [
   "bg-blue-700",
   "bg-emerald-700",
   "bg-orange-700",
-  "bg-red-700",
+  "bg-red-900",
   "bg-pink-700",
   "bg-green-700",
   "bg-cyan-700",
@@ -126,7 +126,7 @@ const formatTimelineTime = (startDate: string, minutesToAdd: number) => {
 };
 
 const getBlockColorClass = (block: IGanttBlock) => {
-  if (block.is_downtime) {
+  if (block.is_dowtime) {
     return "bg-red-600";
   }
   if (block.product_id == null) {
@@ -315,8 +315,8 @@ function Chart({ id }: IRun) {
                         if (index > 0) {
                           const prev = arr[index - 1];
                           if (
-                            !block.is_downtime &&
-                            !prev.is_downtime &&
+                            !block.is_dowtime &&
+                            !prev.is_dowtime &&
                             block.product_id !== prev.product_id
                           ) {
                             marginLeft = 4;
