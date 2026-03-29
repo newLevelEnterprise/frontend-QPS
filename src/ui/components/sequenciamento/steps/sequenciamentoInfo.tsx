@@ -52,7 +52,7 @@ function SequenciamentoInfo() {
           billing_deadline_time: string;
           rule_type_index: number;
         }[]
-      >("/billing-configuration");
+      >("/billing-configuration/");
       return data[0];
     },
   });
