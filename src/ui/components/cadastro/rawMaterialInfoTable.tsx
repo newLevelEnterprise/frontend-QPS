@@ -145,7 +145,7 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
             <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Pedido
             </th>
-            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+            <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Cliente
             </th>
             <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
@@ -198,7 +198,7 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
               <td className="px-4 py-3 text-sm text-center text-gray-700">
                 {item.order_number}
               </td>
-              <td className="px-4 py-3 text-sm text-center text-gray-700">
+              <td className="px-4 py-3 text-sm text-left text-gray-700">
                 {item.client_name}
               </td>
               <td className="px-4 py-3 text-sm text-center text-gray-700">

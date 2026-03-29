@@ -63,7 +63,7 @@ function SequenciamentoTabela({
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Pedido
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Cliente
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
@@ -112,7 +112,7 @@ function SequenciamentoTabela({
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                     {order.order_number}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-left">
                     {order.client_name}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
