@@ -175,7 +175,9 @@ function SequenciamentoInfo() {
                 <option value="1">Segunda a Sexta (sem feriados)</option>
                 <option value="2">Todos os dias (incluindo feriados)</option>
                 <option value="3">Todos os dias (sem feriados)</option>
-                <option value="4">24/7 (sempre disponível)</option>
+                <option value="4">
+                  Todos os dias e em qualquer horário (incluindo feriados)
+                </option>
               </select>
             </div>
             {sequenciamentoInfo.regimeFaturamento !== "4" && (
