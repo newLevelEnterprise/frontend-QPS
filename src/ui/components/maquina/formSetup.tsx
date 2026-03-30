@@ -80,6 +80,9 @@ function FormSetup({
       queryClient.invalidateQueries({
         queryKey: ["get", "all", "setupMatrix", linhaId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["get", "all", "linhaprod", linhaId],
+      });
       onClose(null);
     } catch (error) {
       console.log(error);
