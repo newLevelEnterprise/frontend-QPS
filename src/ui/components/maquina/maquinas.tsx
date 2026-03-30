@@ -111,16 +111,19 @@ function Maquina() {
       >
         <Modal.Container>
           <Modal.Header
-            title="Adicionar Nova Máquina"
+            title="Adicionar Nova Linha"
             onClose={() => setNovaMaquina(false)}
           />
           <FormNovaMaquina
             linhaId={linhaId}
-            setMaquina={() =>
+            setMaquina={() => {
               queryClient.invalidateQueries({
                 queryKey: ["get", "all", "linhaprod", linhaId],
-              })
-            }
+              });
+              queryClient.invalidateQueries({
+                queryKey: ["get", "all", "setupMatrix", linhaId],
+              });
+            }}
             setNovaMaquina={setNovaMaquina}
           />
         </Modal.Container>
@@ -128,15 +131,18 @@ function Maquina() {
       <Modal.Root isVisible={editarMaquina}>
         <Modal.Container>
           <Modal.Header
-            title="Editar Máquina"
+            title="Editar Linha"
             onClose={() => setEditarMaquina(false)}
           />
           <FormEditarMaquina
-            setMaquina={() =>
+            setMaquina={() => {
               queryClient.invalidateQueries({
                 queryKey: ["get", "all", "linhaprod", linhaId],
-              })
-            }
+              });
+              queryClient.invalidateQueries({
+                queryKey: ["get", "all", "setupMatrix", linhaId],
+              });
+            }}
             setEditarMaquina={setEditarMaquina}
             maquina={maquina}
           />
