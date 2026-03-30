@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import StepContextProvider from "../../contexts/StepContext";
 import { useSteps } from "../../hooks/useStep";
 import PedidosParaSequenciamento from "../components/sequenciamento/pedidos.paraSequencimento";
@@ -7,10 +8,18 @@ import XlsxUpload from "../components/XlsxUpload";
 
 function Content() {
   const { startSteps, setStartSteps } = useSteps();
+  const queryClient = useQueryClient();
   return (
     <div className="md:h-full flex flex-col w-full gap-2 overflow-y-auto lg:overflow-hidden">
       {!startSteps && (
-        <XlsxUpload endpoint="jobs-xlsx" cachekey={["get", "jobs"]} />
+        <XlsxUpload
+          endpoint="jobs-xlsx"
+          onRevalidate={() => {
+            queryClient.invalidateQueries({
+              queryKey: ["get", "jobs"],
+            });
+          }}
+        />
       )}
       <div className="w-full flex flex-col md:flex-row gap-2 max-h-full overflow-y-auto lg:overflow-hidden max-w-full">
         {!startSteps && (

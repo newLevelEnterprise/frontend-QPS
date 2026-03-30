@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { BiUpload } from "react-icons/bi";
@@ -10,7 +9,7 @@ import Button from "./Button";
 
 interface XlsxUploadProps {
   endpoint: string;
-  cachekey?: string[];
+  onRevalidate?: () => void;
   mainDivClassName?: string;
   uploaderContainerClassName?: string;
   onClose?: () => void;
@@ -18,13 +17,12 @@ interface XlsxUploadProps {
 
 function XlsxUpload({
   endpoint,
-  cachekey,
+  onRevalidate,
   mainDivClassName,
   uploaderContainerClassName,
-  onClose
+  onClose,
 }: XlsxUploadProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const queryClient = useQueryClient();
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
     maxFiles: 1,
     maxSize: 10 * 1024 * 1024,
@@ -41,10 +39,10 @@ function XlsxUpload({
     await apiClient.postForm(`/upload/${endpoint}`, {
       file: acceptedFiles[0],
     });
-    if (cachekey) {
-      queryClient.invalidateQueries({ queryKey: cachekey });
+    if (onRevalidate) {
+      onRevalidate();
     }
-    if(onClose) {
+    if (onClose) {
       onClose();
     }
   };
@@ -65,7 +63,8 @@ function XlsxUpload({
   return (
     <div
       className={cn(
-        "col-span-2 p-6 rounded-md shadow h-[250px] lg:h-[200px] bg-white",mainDivClassName
+        "col-span-2 p-6 rounded-md shadow h-[250px] lg:h-[200px] bg-white",
+        mainDivClassName,
       )}
     >
       <span className="flex gap-2 items-center text-[#255DC8]">
@@ -76,7 +75,10 @@ function XlsxUpload({
       <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 mt-4">
         <div
           {...getRootProps({ className: "dropzone" })}
-          className={cn("w-full lg:w-1/2 flex items-center justify-center border-2 border-dashed border-gray-400 h-[81px]", uploaderContainerClassName)}
+          className={cn(
+            "w-full lg:w-1/2 flex items-center justify-center border-2 border-dashed border-gray-400 h-[81px]",
+            uploaderContainerClassName,
+          )}
         >
           <input {...getInputProps()} />
           <div className="flex flex-wrap gap-2 justify-center items-center">

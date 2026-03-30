@@ -168,7 +168,14 @@ function Maquina() {
           />
           <XlsxUpload
             endpoint={`setup-matrix-xlsx/${String(linhaId ?? "")}`}
-            cachekey={["get", "all", "linhaprod", String(linhaId ?? "")]}
+            onRevalidate={() => {
+              queryClient.invalidateQueries({
+                queryKey: ["get", "all", "linhaprod", linhaId],
+              });
+              queryClient.invalidateQueries({
+                queryKey: ["get", "all", "setupMatrix", linhaId],
+              });
+            }}
             onClose={() => setSetupUploadModal(false)}
             mainDivClassName="shadow-none h-auto bg-transparent p-0"
             uploaderContainerClassName="h-[96px]"
