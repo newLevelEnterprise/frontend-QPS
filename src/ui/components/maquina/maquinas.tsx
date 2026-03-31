@@ -369,7 +369,7 @@ function Maquina() {
               className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
-              Adicionar Nova Linha
+              Adicionar Info. da Linha
             </button>
           </div>
         </>
