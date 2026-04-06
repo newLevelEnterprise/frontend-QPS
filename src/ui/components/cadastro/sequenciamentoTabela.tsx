@@ -112,7 +112,7 @@ function SequenciamentoTabela({
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                     {order.order_number}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-left">
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 text-left whitespace-nowrap">
                     {order.client_name}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
