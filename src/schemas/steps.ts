@@ -10,6 +10,7 @@ export const criarStepsSequenciamentoschema = z.object({
       .min(1, "Horário limite de faturamento é obrigatório")
       .optional(),
     sabadoTrabalha: z.boolean(),
+    domingoTrabalha: z.boolean(),
   }),
   estadoAtualMaquina: z
     .object({

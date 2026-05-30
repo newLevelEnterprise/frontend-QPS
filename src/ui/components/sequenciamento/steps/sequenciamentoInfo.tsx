@@ -18,6 +18,7 @@ const defaultSequenciamentoInfo: ICriaStepsSequenciamentoBody["sequenciamento"] 
     regimeFaturamento: "",
     horarioLimiteFaturamento: undefined,
     sabadoTrabalha: false,
+    domingoTrabalha: false,
   };
 
 function SequenciamentoInfo() {
@@ -229,6 +230,41 @@ function SequenciamentoInfo() {
                   setSequenciamentoInfo((prev) => ({
                     ...prev,
                     sabadoTrabalha: false,
+                  }))
+                }
+              />
+              <span>Não</span>
+            </label>
+          </div>
+        </div>
+        <div className="mt-2">
+          <label className="block font-semibold mb-1">
+            O domingo seguinte a esta data é dia de trabalho regular?
+          </label>
+          <div className="flex gap-4 items-center">
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                className="accent-[#3573C9]"
+                checked={sequenciamentoInfo.sabadoTrabalha}
+                onChange={() =>
+                  setSequenciamentoInfo((prev) => ({
+                    ...prev,
+                    domingoTrabalha: true,
+                  }))
+                }
+              />
+              <span>Sim</span>
+            </label>
+            <label className="flex items-center gap-1">
+              <input
+                type="radio"
+                className="accent-[#3573C9]"
+                checked={!sequenciamentoInfo.sabadoTrabalha}
+                onChange={() =>
+                  setSequenciamentoInfo((prev) => ({
+                    ...prev,
+                    domingoTrabalha: false,
                   }))
                 }
               />
