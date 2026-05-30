@@ -26,7 +26,7 @@ function Button({
       type={type ? type : "button"}
       className={twMerge(
         "cursor-pointer px-6 w-fit py-2 border-2 rounded-full border-[#255DC8] bg-[#255DC8] text-white font-semibold disabled:bg-[#C7C9CF] disabled:text-[#A4AABC] disabled:border-none disabled:cursor-default",
-        className
+        className,
       )}
     >
       {isLoading ? <TbLoader2 size={20} className="animate-spin" /> : title}

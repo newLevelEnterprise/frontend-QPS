@@ -22,30 +22,34 @@ export default function LoginForm() {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data_form: any) => {
     try {
       const payloadData: Record<string, string> = {
-        username: data.email,
-        password: data.password,
+        username: data_form.email,
+        password: data_form.password,
       };
 
       const params = new URLSearchParams();
       Object.keys(payloadData).forEach((key) => {
         params.append(key, payloadData[key]);
       });
-      const { data: res } = await apiClient.post<{
+      const { data } = await apiClient.post<{
         access_token: string;
         refresh_token: string;
         user: { id: number; email: string; enterprise_id: number };
       }>("/auth/login", params.toString(), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
+      if (!data) {
+        toast.error("Erro ao fazer login, verifique suas credenciais.");
+        return;
+      }
       setToken({
-        access_token: res.access_token,
-        refresh_token: res.refresh_token,
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
       });
-      setEnterpriseId(res.user.enterprise_id);
-      setUserIdFn(res.user.id);
+      setEnterpriseId(data.user.enterprise_id);
+      setUserIdFn(data.user.id);
       return navigate("/cadastro/cliente");
     } catch (error) {
       console.error(error);
@@ -63,7 +67,6 @@ export default function LoginForm() {
           <form
             className="flex flex-col gap-8"
             onSubmit={handleSubmit(onSubmit)}
-            noValidate
           >
             <div className="w-full flex flex-col gap-3">
               <label htmlFor="email" className="text-[#212A4F] font-semibold">
