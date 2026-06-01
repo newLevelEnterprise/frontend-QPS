@@ -237,6 +237,7 @@ function Paradas() {
         job_ids: jobs_ids || [],
         sequencing_date: `${sequenciamento.dataInicio}T${sequenciamento.horarioInicio}:00`,
         next_saturday_is_working: sequenciamento.sabadoTrabalha,
+        next_sunday_is_working: sequenciamento.domingoTrabalha,
         machine_states_json: payload.estadoAtualMaquina.map((estadoAtual) => ({
           production_line_id: Number(estadoAtual.production_line_id),
           machine_id: Number(estadoAtual.maquina),
