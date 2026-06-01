@@ -246,7 +246,7 @@ function SequenciamentoInfo() {
               <input
                 type="radio"
                 className="accent-[#3573C9]"
-                checked={sequenciamentoInfo.sabadoTrabalha}
+                checked={sequenciamentoInfo.domingoTrabalha}
                 onChange={() =>
                   setSequenciamentoInfo((prev) => ({
                     ...prev,
@@ -260,7 +260,7 @@ function SequenciamentoInfo() {
               <input
                 type="radio"
                 className="accent-[#3573C9]"
-                checked={!sequenciamentoInfo.sabadoTrabalha}
+                checked={!sequenciamentoInfo.domingoTrabalha}
                 onChange={() =>
                   setSequenciamentoInfo((prev) => ({
                     ...prev,
