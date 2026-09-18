@@ -1,4 +1,5 @@
 import axios from "axios";
+import { appPath } from "../config/featureFlags";
 import { setToken } from "../hooks/setToken";
 import { useToken } from "../hooks/useToken";
 
@@ -48,11 +49,11 @@ apiClient.interceptors.response.use(
         } catch (refreshError) {
           setToken({access_token: '', refresh_token: ''});
           console.error("Failed to refresh token:", refreshError);
-          window.location.href = '/login';
+          window.location.href = appPath("/login");
         }
       } else {
         setToken({access_token: '', refresh_token: ''});
-        window.location.href = '/login';
+        window.location.href = appPath("/login");
       }
     }
 

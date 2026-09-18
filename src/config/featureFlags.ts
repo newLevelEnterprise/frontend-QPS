@@ -9,6 +9,11 @@ declare global {
   }
 }
 
+const DEFAULT_RESTRICTED_HOSTS = [
+  "127.0.0.1",
+  "quant-copy-production.up.railway.app",
+];
+
 function parseHostList(value?: string) {
   return (value ?? "")
     .split(",")
@@ -26,6 +31,10 @@ function runtimeConfig(): QuantUiConfig {
   return window.__QUANT_UI_CONFIG__ ?? {};
 }
 
+export function appPath(path: string) {
+  return path.startsWith("/") ? path : `/${path}`;
+}
+
 export function getHideMoldFields() {
   const runtime = runtimeConfig();
 
@@ -38,6 +47,7 @@ export function getHideMoldFields() {
   }
 
   const restrictedHosts = [
+    ...DEFAULT_RESTRICTED_HOSTS,
     ...(runtime.restrictedHosts ?? []),
     ...parseHostList(import.meta.env.VITE_RESTRICTED_HOSTS),
   ].map((host) => host.toLowerCase());

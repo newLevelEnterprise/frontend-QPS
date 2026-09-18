@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
+import { appPath } from "../../config/featureFlags";
 import Button from "./Button";
 
 interface AppErrorBoundaryProps {
@@ -10,7 +11,7 @@ function AppErrorFallback({ error }: FallbackProps) {
   console.error("Erro capturado pelo ErrorBoundary:", error);
 
   const handleBackToHome = () => {
-    window.location.assign("/cadastro/cliente");
+    window.location.assign(appPath("/cadastro/cliente"));
   };
 
   return (
