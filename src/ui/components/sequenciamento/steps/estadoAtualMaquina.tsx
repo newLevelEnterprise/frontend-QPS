@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BiPlus } from "react-icons/bi";
 import { toast } from "react-toastify";
+import { hideMoldFields } from "../../../../config/featureFlags";
 import { useSteps } from "../../../../hooks/useStep";
 import {
   criarStepsSequenciamentoschema,
@@ -134,9 +135,11 @@ function EstadoAtualMaquina() {
               <tr>
                 <th className="px-2 py-2">Máquinas Cadastradas</th>
                 <th className="px-2 py-2">Utilização</th>
-                <th className="px-2 py-2">
-                  Código do Molde em Máquina no Início do Sequenciamento
-                </th>
+                {!hideMoldFields && (
+                  <th className="px-2 py-2">
+                    Código do Molde em Máquina no Início do Sequenciamento
+                  </th>
+                )}
                 <th className="px-2 py-2">
                   Produto em Máquina no Início do Sequenciamento
                 </th>
@@ -166,9 +169,11 @@ function EstadoAtualMaquina() {
                   <td className="px-2 py-2 border text-center">
                     {row.utilizacao ? "Sim" : "Não"}
                   </td>
-                  <td className="px-2 py-2 border text-center">
-                    {row.codMolde}
-                  </td>
+                  {!hideMoldFields && (
+                    <td className="px-2 py-2 border text-center">
+                      {row.codMolde}
+                    </td>
+                  )}
                   <td className="px-2 py-2 border text-center">
                     {row.prodMaquinaInicioSequenciamento}
                   </td>

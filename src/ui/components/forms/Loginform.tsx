@@ -4,35 +4,28 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { setToken } from "../../../hooks/setToken";
-import { useAuth } from "../../../hooks/useAuth";
 import { signinSchema, type SignInBody } from "../../../schemas/auth";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "./FormErrorMessage";
 
 export default function LoginForm() {
-  const { setEnterpriseId, setUserIdFn } = useAuth();
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
   } = useForm<SignInBody>({
     resolver: zodResolver(signinSchema),
+    mode: "onChange",
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = async (data_form: any) => {
+  const onSubmit = async (data_form: SignInBody) => {
     try {
-      const payloadData: Record<string, string> = {
-        username: data_form.email,
-        password: data_form.password,
-      };
-
       const params = new URLSearchParams();
-      Object.keys(payloadData).forEach((key) => {
-        params.append(key, payloadData[key]);
-      });
+      params.append("username", data_form.email);
+      params.append("password", data_form.password);
+
       const { data } = await apiClient.post<{
         access_token: string;
         refresh_token: string;
@@ -40,20 +33,36 @@ export default function LoginForm() {
       }>("/auth/login", params.toString(), {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
-      if (!data) {
+
+      if (!data?.access_token) {
         toast.error("Erro ao fazer login, verifique suas credenciais.");
         return;
       }
+
       setToken({
         access_token: data.access_token,
         refresh_token: data.refresh_token,
       });
-      setEnterpriseId(data.user.enterprise_id);
-      setUserIdFn(data.user.id);
-      return navigate("/cadastro/cliente");
-    } catch (error) {
+      localStorage.setItem("enterprise_id", String(data.user.enterprise_id));
+      localStorage.setItem("user_id", String(data.user.id));
+
+      toast.success("Login realizado com sucesso!");
+      navigate("/cadastro/cliente");
+    } catch (error: unknown) {
       console.error(error);
-      toast.error("Erro ao fazer login, verifique suas credenciais.");
+      const detail =
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object" &&
+        "data" in error.response &&
+        error.response.data &&
+        typeof error.response.data === "object" &&
+        "detail" in error.response.data
+          ? String((error.response.data as { detail: unknown }).detail)
+          : "Erro ao fazer login, verifique suas credenciais.";
+      toast.error(detail);
     }
   };
 
@@ -74,8 +83,8 @@ export default function LoginForm() {
               </label>
               <input
                 id="email"
-                placeholder="email@example.com"
-                type="email"
+                placeholder="teste@teste.com"
+                type="text"
                 className="w-full outline-none border-b border-[#A4AABC]"
                 {...register("email")}
                 autoComplete="email"
@@ -133,7 +142,7 @@ export default function LoginForm() {
                 isLoading={isSubmitting}
                 className="w-full flex items-center justify-center lg:flex-1"
                 type="submit"
-                disable={isSubmitting || !isValid}
+                disable={isSubmitting}
               />
             </div>
           </form>

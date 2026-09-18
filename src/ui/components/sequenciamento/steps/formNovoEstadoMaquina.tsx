@@ -2,10 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { hideMoldFields } from "../../../../config/featureFlags";
 import type { ICriaStepsSequenciamentoBody } from "../../../../schemas/steps";
 import type { IMaquinasType } from "../../../../types/Maquina";
 import type { IMoldes } from "../../../../types/Moldes";
 import { apiClient } from "../../../../utils/apiClient";
+import { findMoldByProductName } from "../../../../utils/moldResolution";
 
 interface IProdutoComMoldes {
   name: string;
@@ -114,6 +116,15 @@ function FormNovoEstado({
   const camposBloqueadosPorConcluido = statusSelecionado === "Concluido";
 
   const produtosDoMoldeSelecionado = useMemo(() => {
+    if (hideMoldFields) {
+      return (
+        produtos?.filter((produto) =>
+          moldes?.some((molde) =>
+            molde.products.some((item) => item.id === produto.id),
+          ),
+        ) ?? []
+      );
+    }
     if (!moldeSelecionadoId) {
       return [];
     }
@@ -131,16 +142,31 @@ function FormNovoEstado({
         }),
       ) || []
     );
-  }, [produtos, moldeSelecionadoId]);
+  }, [produtos, moldeSelecionadoId, moldes]);
 
   useEffect(() => {
+    if (hideMoldFields) return;
     setValue("codMolde", "");
     setValue("prodMaquinaInicioSequenciamento", "");
   }, [maquinaSelecionada, setValue]);
 
   useEffect(() => {
+    if (hideMoldFields) return;
     setValue("prodMaquinaInicioSequenciamento", "");
   }, [moldeSelecionadoId, setValue]);
+
+  useEffect(() => {
+    if (!hideMoldFields) return;
+    setValue("prodMaquinaInicioSequenciamento", "");
+  }, [maquinaSelecionada, setValue]);
+
+  useEffect(() => {
+    if (!hideMoldFields) return;
+    const molde = findMoldByProductName(moldes, produtoSelecionado);
+    setValue("codMolde", molde ? String(molde.name) : "", {
+      shouldValidate: true,
+    });
+  }, [moldes, produtoSelecionado, setValue]);
 
   useEffect(() => {
     if (statusSelecionado === "Concluido") {
@@ -200,28 +226,32 @@ function FormNovoEstado({
         </select>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="font-semibold text-sm">Código do Molde</label>
-        <select
-          className={`border rounded px-2 py-1 ${disabledFieldClassName}`}
-          {...register("codMolde", { required: true })}
-          disabled={!maquinaSelecionada || isFetchingMoldes}
-          defaultValue=""
-        >
-          <option value="" disabled>
-            {!maquinaSelecionada
-              ? "Selecione uma máquina primeiro"
-              : isFetchingMoldes
-                ? "Carregando moldes..."
-                : "Selecione um molde"}
-          </option>
-          {moldes?.map((molde) => (
-            <option key={molde.id} value={String(molde.name)}>
-              {molde.name}
+      {!hideMoldFields ? (
+        <div className="flex flex-col gap-1">
+          <label className="font-semibold text-sm">Código do Molde</label>
+          <select
+            className={`border rounded px-2 py-1 ${disabledFieldClassName}`}
+            {...register("codMolde", { required: true })}
+            disabled={!maquinaSelecionada || isFetchingMoldes}
+            defaultValue=""
+          >
+            <option value="" disabled>
+              {!maquinaSelecionada
+                ? "Selecione uma máquina primeiro"
+                : isFetchingMoldes
+                  ? "Carregando moldes..."
+                  : "Selecione um molde"}
             </option>
-          ))}
-        </select>
-      </div>
+            {moldes?.map((molde) => (
+              <option key={molde.id} value={String(molde.name)}>
+                {molde.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : (
+        <input type="hidden" {...register("codMolde", { required: true })} />
+      )}
 
       <div className="flex flex-col gap-1">
         <label className="font-semibold text-sm">Produto na Máquina</label>
@@ -230,15 +260,25 @@ function FormNovoEstado({
           {...register("prodMaquinaInicioSequenciamento", {
             required: true,
           })}
-          disabled={!moldeSelecionadoId || isFetchingProdutos}
+          disabled={
+            hideMoldFields
+              ? !maquinaSelecionada || isFetchingProdutos
+              : !moldeSelecionadoId || isFetchingProdutos
+          }
           defaultValue=""
         >
           <option value="" disabled>
-            {!moldeSelecionadoId
-              ? "Selecione um molde primeiro"
-              : isFetchingProdutos
-                ? "Carregando produtos..."
-                : "Selecione um produto"}
+            {hideMoldFields
+              ? !maquinaSelecionada
+                ? "Selecione uma máquina primeiro"
+                : isFetchingProdutos
+                  ? "Carregando produtos..."
+                  : "Selecione um produto"
+              : !moldeSelecionadoId
+                ? "Selecione um molde primeiro"
+                : isFetchingProdutos
+                  ? "Carregando produtos..."
+                  : "Selecione um produto"}
           </option>
           {produtosDoMoldeSelecionado.map((produto) => (
             <option key={produto.id} value={produto.name}>

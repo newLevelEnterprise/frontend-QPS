@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
+import { hideMoldFields } from "../../../config/featureFlags";
 import type { IProductionSchedule } from "../../../types/ProductionSchedule";
 
 const formatDate = (date?: string | null, hour = false) => {
@@ -29,7 +30,8 @@ function SequenciamentoTabela({
       p.client_name.toLowerCase().includes(busca.toLowerCase()) ||
       p.product_name.toLowerCase().includes(busca.toLowerCase()) ||
       (p.machine_name ?? "").toLowerCase().includes(busca.toLowerCase()) ||
-      (p.mold_name ?? "").toLowerCase().includes(busca.toLowerCase()),
+      (!hideMoldFields &&
+        (p.mold_name ?? "").toLowerCase().includes(busca.toLowerCase())),
   );
 
   return (
@@ -66,9 +68,11 @@ function SequenciamentoTabela({
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Cliente
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Molde
-                </th>
+                {!hideMoldFields && (
+                  <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                    Molde
+                  </th>
+                )}
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Produto
                 </th>
@@ -115,9 +119,11 @@ function SequenciamentoTabela({
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-left whitespace-nowrap">
                     {order.client_name}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {order.mold_name ?? "-"}
-                  </td>
+                  {!hideMoldFields && (
+                    <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                      {order.mold_name ?? "-"}
+                    </td>
+                  )}
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center whitespace-nowrap">
                     {order.product_name}
                   </td>

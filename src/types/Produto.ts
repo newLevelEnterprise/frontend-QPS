@@ -1,9 +1,17 @@
+export interface IProductStructureComponent {
+  id: number;
+  name: string;
+  quantity: number;
+}
+
 export interface IProduto {
   name: string;
-  scrap: number;
-  cycle: number;
-  bottleneck: number;
   id: number;
+  scrap?: number;
+  cycle?: number;
+  bottleneck?: number;
+  is_simple?: boolean;
+  structure_components?: IProductStructureComponent[];
 }
 
 export interface IProdutoSetup {

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { toast } from "react-toastify";
+import { hideMoldFields } from "../../../config/featureFlags";
 import type { IMoldes } from "../../../types/Moldes";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
@@ -96,18 +97,24 @@ function Moldes() {
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                   Produto
                 </th>
-                <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
-                  Total de Cavidades
-                </th>
-                <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
-                  Cavidades Abertas
-                </th>
+                {!hideMoldFields && (
+                  <>
+                    <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
+                      Total de Cavidades
+                    </th>
+                    <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
+                      Cavidades Abertas
+                    </th>
+                  </>
+                )}
                 <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                   % Refugo
                 </th>
-                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                  % Risco de Cavidade
-                </th>
+                {!hideMoldFields && (
+                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                    % Risco de Cavidade
+                  </th>
+                )}
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                   Ações
                 </th>
@@ -122,21 +129,27 @@ function Moldes() {
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                     {molde.name}
                   </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    {molde.products.map((product) => product.name).join(", ")}
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                    {molde.total_cavities}
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                    {molde.open_cavities}
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                    {molde.scrap}
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                    {molde.closed_cavity_risk}
-                  </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                      {molde.products.map((product) => product.name).join(", ")}
+                    </td>
+                    {!hideMoldFields && (
+                      <>
+                        <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                          {molde.total_cavities}
+                        </td>
+                        <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                          {molde.open_cavities}
+                        </td>
+                      </>
+                    )}
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                      {molde.scrap}
+                    </td>
+                    {!hideMoldFields && (
+                      <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                        {molde.closed_cavity_risk}
+                      </td>
+                    )}
                   <td className="px-6 py-4 text-right">
                     <div className="w-full flex justify-end gap-2">
                       <button

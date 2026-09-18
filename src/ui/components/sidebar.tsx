@@ -48,33 +48,33 @@ const menuItems: MenuItem[] = [
       </div>
     ),
     url: "",
-    items: [
-      {
-        title: "Clientes",
-        icon: MdSupervisedUserCircle,
-        url: "/cadastro/cliente",
-      },
-      {
-        title: "Produto",
-        icon: RiFileList3Line,
-        url: "/cadastro/produto",
-      },
-      {
-        title: "Máquinas",
-        icon: MdOutlinePrecisionManufacturing,
-        url: "/cadastro/maquinas",
-      },
-      {
-        title: "Moldes",
-        icon: LuShapes,
-        url: "/cadastro/moldes",
-      },
-      {
-        title: "Linhas de Produção",
-        icon: LiaIndustrySolid,
-        url: "/cadastro/linhas-producao",
-      },
-    ],
+        items: [
+          {
+            title: "Clientes",
+            icon: MdSupervisedUserCircle,
+            url: "/cadastro/cliente",
+          },
+          {
+            title: "Produto",
+            icon: RiFileList3Line,
+            url: "/cadastro/produto",
+          },
+          {
+            title: "Máquinas",
+            icon: MdOutlinePrecisionManufacturing,
+            url: "/cadastro/maquinas",
+          },
+          {
+            title: "Moldes",
+            icon: LuShapes,
+            url: "/cadastro/moldes",
+          },
+          {
+            title: "Linhas de Produção",
+            icon: LiaIndustrySolid,
+            url: "/cadastro/linhas-producao",
+          },
+        ],
   },
   {
     title: "Linhas de Produção",

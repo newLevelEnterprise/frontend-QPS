@@ -32,7 +32,8 @@ apiClient.interceptors.response.use(
 
       if (refreshToken) {
         try {
-          const response = await axios.post('/auth/refresh', {
+          const backendUrl = import.meta.env.VITE_BACKEND_URL as string;
+          const response = await axios.post(`${backendUrl}/auth/refresh`, {
             refreshToken: refreshToken
           });
 
@@ -54,5 +55,7 @@ apiClient.interceptors.response.use(
         window.location.href = '/login';
       }
     }
+
+    return Promise.reject(error);
   }
 );

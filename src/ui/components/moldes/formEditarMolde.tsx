@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-toastify";
+import { hideMoldFields } from "../../../config/featureFlags";
 import {
   criarmoldesSchema,
   type ICriarMoldesBody,
@@ -149,57 +150,61 @@ function FormEditarMolde({
               />
             )}
           </div>
-          <div className="w-full flex flex-col gap-3">
-            <label
-              htmlFor="totalCavidades"
-              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-            >
-              Total Cavidades
-            </label>
-            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-              <input
-                id="totalCavidades"
-                placeholder="Total de Cavidades"
-                type="number"
-                className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("total_cavities")}
-              />
+          {!hideMoldFields && (
+            <div className="w-full flex flex-col gap-3">
+              <label
+                htmlFor="totalCavidades"
+                className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+              >
+                Total Cavidades
+              </label>
+              <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+                <input
+                  id="totalCavidades"
+                  placeholder="Total de Cavidades"
+                  type="number"
+                  className="w-full outline-none border-b border-[#A4AABC]"
+                  {...register("total_cavities")}
+                />
+              </div>
+              {errors.total_cavities && (
+                <ErrorMessage
+                  errors={errors}
+                  name="total_cavities"
+                  render={({ message }) => <FormErrorMessage message={message} />}
+                />
+              )}
             </div>
-            {errors.total_cavities && (
-              <ErrorMessage
-                errors={errors}
-                name="total_cavities"
-                render={({ message }) => <FormErrorMessage message={message} />}
-              />
-            )}
-          </div>
+          )}
         </div>
 
         <div className="flex gap-6">
-          <div className="w-full flex flex-col gap-3">
-            <label
-              htmlFor="cavidadesAbertas"
-              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-            >
-              Cavidades Abertas
-            </label>
-            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-              <input
-                id="cavidadesAbertas"
-                placeholder="Cavidades Abertas"
-                type="number"
-                className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("open_cavities")}
-              />
+          {!hideMoldFields && (
+            <div className="w-full flex flex-col gap-3">
+              <label
+                htmlFor="cavidadesAbertas"
+                className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+              >
+                Cavidades Abertas
+              </label>
+              <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+                <input
+                  id="cavidadesAbertas"
+                  placeholder="Cavidades Abertas"
+                  type="number"
+                  className="w-full outline-none border-b border-[#A4AABC]"
+                  {...register("open_cavities")}
+                />
+              </div>
+              {errors.open_cavities && (
+                <ErrorMessage
+                  errors={errors}
+                  name="open_cavities"
+                  render={({ message }) => <FormErrorMessage message={message} />}
+                />
+              )}
             </div>
-            {errors.open_cavities && (
-              <ErrorMessage
-                errors={errors}
-                name="open_cavities"
-                render={({ message }) => <FormErrorMessage message={message} />}
-              />
-            )}
-          </div>
+          )}
           <div className="w-full flex flex-col gap-3">
             <label
               htmlFor="refugo"
@@ -227,31 +232,39 @@ function FormEditarMolde({
           </div>
         </div>
 
-        <div className="w-full flex flex-col gap-3">
-          <label
-            htmlFor="riscoDeCavidade"
-            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-          >
-            % Risco de Cavidade
-          </label>
-          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-            <input
-              id="cavityRisk"
-              placeholder="Risco de Cavidade"
-              type="number"
-              step={0.01}
-              className="w-full outline-none border-b border-[#A4AABC]"
-              {...register("closed_cavity_risk")}
-            />
+        {hideMoldFields ? (
+          <>
+            <input type="hidden" {...register("total_cavities")} />
+            <input type="hidden" {...register("open_cavities")} />
+            <input type="hidden" {...register("closed_cavity_risk")} />
+          </>
+        ) : (
+          <div className="w-full flex flex-col gap-3">
+            <label
+              htmlFor="riscoDeCavidade"
+              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+            >
+              % Risco de Cavidade
+            </label>
+            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+              <input
+                id="cavityRisk"
+                placeholder="Risco de Cavidade"
+                type="number"
+                step={0.01}
+                className="w-full outline-none border-b border-[#A4AABC]"
+                {...register("closed_cavity_risk")}
+              />
+            </div>
+            {errors.closed_cavity_risk && (
+              <ErrorMessage
+                errors={errors}
+                name="closed_cavity_risk"
+                render={({ message }) => <FormErrorMessage message={message} />}
+              />
+            )}
           </div>
-          {errors.closed_cavity_risk && (
-            <ErrorMessage
-              errors={errors}
-              name="closed_cavity_risk"
-              render={({ message }) => <FormErrorMessage message={message} />}
-            />
-          )}
-        </div>
+        )}
       </div>
 
       <div className="w-full flex justify-end">

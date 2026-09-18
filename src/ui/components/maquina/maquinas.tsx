@@ -3,6 +3,7 @@ import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { hideMoldFields } from "../../../config/featureFlags";
 import type { ICompositionLine, IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
@@ -224,18 +225,24 @@ function Maquina() {
             <table className="w-full overflow-auto max-h-[470px]">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                    Nome do Molde
-                  </th>
+                  {!hideMoldFields && (
+                    <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                      Nome do Molde
+                    </th>
+                  )}
                   <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                     Produto
                   </th>
-                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                    Total de Cavidades
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                    Cavidades Abertas
-                  </th>
+                  {!hideMoldFields && (
+                    <>
+                      <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                        Total de Cavidades
+                      </th>
+                      <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                        Cavidades Abertas
+                      </th>
+                    </>
+                  )}
                   <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                     Tempo pós-injeção (s)
                   </th>
@@ -250,9 +257,11 @@ function Maquina() {
                   <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                     % Refugo
                   </th>
-                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                    % Absorver riscos de cav. fechadas
-                  </th>
+                  {!hideMoldFields && (
+                    <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                      % Absorver riscos de cav. fechadas
+                    </th>
+                  )}
                   <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                     Ações
                   </th>
@@ -264,18 +273,24 @@ function Maquina() {
                     key={cp.id}
                     className="border-b border-gray-200 last:border-b-0"
                   >
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                      {cp.mold_name}
-                    </td>
+                    {!hideMoldFields && (
+                      <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                        {cp.mold_name}
+                      </td>
+                    )}
                     <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                       {cp.product_name}
                     </td>
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                      {cp.mold.total_cavities}
-                    </td>
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                      {cp.mold.open_cavities}
-                    </td>
+                    {!hideMoldFields && (
+                      <>
+                        <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                          {cp.mold.total_cavities}
+                        </td>
+                        <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                          {cp.mold.open_cavities}
+                        </td>
+                      </>
+                    )}
                     <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                       {cp.post_injection_cycle_time || "-"}
                     </td>
@@ -298,9 +313,11 @@ function Maquina() {
                     <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                       {cp.mold.scrap}
                     </td>
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                      {cp.mold.closed_cavity_risk}
-                    </td>
+                    {!hideMoldFields && (
+                      <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                        {cp.mold.closed_cavity_risk}
+                      </td>
+                    )}
                     <td className="px-6 py-4 text-right">
                       <div className="w-full flex justify-end gap-2">
                         <button

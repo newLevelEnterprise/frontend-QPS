@@ -19,7 +19,7 @@ function AuthGuard({ isPrivate = false }: AuthGuardProps) {
 
   return (
     <AuthProvider>
-      <Outlet />;
+      <Outlet />
     </AuthProvider>
   );
 }

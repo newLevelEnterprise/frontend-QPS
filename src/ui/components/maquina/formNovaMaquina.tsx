@@ -9,9 +9,14 @@ import {
   criarLinhasProdSchema,
   type ICriarLinhasProdBody,
 } from "../../../schemas/linhas";
+import { hideMoldFields } from "../../../config/featureFlags";
 import type { IMaquinasType } from "../../../types/Maquina";
 import type { IMoldes } from "../../../types/Moldes";
 import { apiClient } from "../../../utils/apiClient";
+import {
+  findMoldForProduct,
+  uniqueProductsFromMolds,
+} from "../../../utils/moldResolution";
 import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
 
@@ -64,15 +69,33 @@ function FormNovaMaquina({
   );
 
   const moldeSelecionadoId = watch("codMolde");
+  const produtoSelecionado = watch("produto");
 
   const moldeSelecionado = useMemo(
     () => moldes?.find((molde) => String(molde.id) === moldeSelecionadoId),
     [moldes, moldeSelecionadoId],
   );
 
+  const produtosDisponiveis = useMemo(
+    () =>
+      hideMoldFields
+        ? uniqueProductsFromMolds(moldes)
+        : moldeSelecionado?.products ?? [],
+    [moldes, moldeSelecionado],
+  );
+
   useEffect(() => {
+    if (hideMoldFields) return;
     setValue("produto", "");
   }, [moldeSelecionadoId, setValue]);
+
+  useEffect(() => {
+    if (!hideMoldFields) return;
+    const molde = findMoldForProduct(moldes, String(produtoSelecionado || ""));
+    if (molde) {
+      setValue("codMolde", String(molde.id), { shouldValidate: true });
+    }
+  }, [moldes, produtoSelecionado, setValue]);
 
   const onSubmit = async (data: ICriarLinhasProdBody) => {
     try {
@@ -109,40 +132,48 @@ function FormNovaMaquina({
       className="w-full flex flex-col gap-10 my-6"
     >
       <div className="w-full flex flex-col gap-3">
-        <label
-          htmlFor="codMolde"
-          className="text-[#212A4F] font-semibold truncate text-ellipsis"
-        >
-          Molde
-        </label>
-        <div className="flex gap-1">
-          <select
-            id="codMolde"
-            className="w-full outline-none border-b border-[#A4AABC]"
-            {...register("codMolde")}
-            disabled={isFetchingMoldes}
-            defaultValue=""
-          >
-            <option value="" disabled>
-              {isFetchingMoldes ? "Carregando moldes..." : "Selecione um molde"}
-            </option>
-            {moldes?.map((molde) => (
-              <option key={molde.id} value={String(molde.id)}>
-                {molde.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        {errors.codMolde && (
-          <ErrorMessage
-            errors={errors}
-            name="codMolde"
-            render={({ message }) => <FormErrorMessage message={message} />}
-          />
+        {!hideMoldFields ? (
+          <>
+            <label
+              htmlFor="codMolde"
+              className="text-[#212A4F] font-semibold truncate text-ellipsis"
+            >
+              Molde
+            </label>
+            <div className="flex gap-1">
+              <select
+                id="codMolde"
+                className="w-full outline-none border-b border-[#A4AABC]"
+                {...register("codMolde")}
+                disabled={isFetchingMoldes}
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  {isFetchingMoldes
+                    ? "Carregando moldes..."
+                    : "Selecione um molde"}
+                </option>
+                {moldes?.map((molde) => (
+                  <option key={molde.id} value={String(molde.id)}>
+                    {molde.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.codMolde && (
+              <ErrorMessage
+                errors={errors}
+                name="codMolde"
+                render={({ message }) => <FormErrorMessage message={message} />}
+              />
+            )}
+          </>
+        ) : (
+          <input type="hidden" {...register("codMolde")} />
         )}
       </div>
 
-      {moldeSelecionado && (
+      {(hideMoldFields || moldeSelecionado) && (
         <div className="w-full flex flex-col gap-3">
           <label
             htmlFor="produto"
@@ -160,7 +191,7 @@ function FormNovaMaquina({
               <option value="" disabled>
                 Selecione um produto
               </option>
-              {moldeSelecionado.products.map((produto) => (
+              {produtosDisponiveis.map((produto) => (
                 <option key={produto.id} value={String(produto.id)}>
                   {produto.name}
                 </option>

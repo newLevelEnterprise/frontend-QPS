@@ -16,7 +16,7 @@ function Produtos() {
   const [editarProduto, setEditarProduto] = useState<boolean>(false);
   const [busca, setBusca] = useState<string>("");
 
-  const [produto, setProduto] = useState<Pick<IProduto, "id" | "name">>({
+  const [produto, setProduto] = useState<IProduto>({
     id: 0,
     name: "",
   });
@@ -114,6 +114,9 @@ function Produtos() {
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                   Produto
                 </th>
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  Estrutura
+                </th>
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                   Ações
                 </th>
@@ -131,6 +134,13 @@ function Produtos() {
                   >
                     <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                       {item.name}
+                    </td>
+                    <td className="px-6 py-4 text-xs md:text-sm text-gray-600">
+                      {item.is_simple === false
+                        ? (item.structure_components || [])
+                            .map((component) => `${component.name} × ${component.quantity}`)
+                            .join(", ")
+                        : "Produto simples"}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="w-full flex justify-end gap-2">

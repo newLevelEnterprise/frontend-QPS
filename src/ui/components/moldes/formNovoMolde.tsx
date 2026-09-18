@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
 import { toast } from "react-toastify";
+import { hideMoldFields } from "../../../config/featureFlags";
 import {
   criarmoldesSchema,
   type ICriarMoldesBody,
@@ -27,6 +28,13 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
     formState: { errors, isSubmitting, isValid },
   } = useForm<ICriarMoldesBody>({
     resolver: zodResolver(criarmoldesSchema),
+    defaultValues: hideMoldFields
+      ? {
+          total_cavities: "1",
+          open_cavities: "1",
+          closed_cavity_risk: "0",
+        }
+      : undefined,
   });
 
   const { data: products, isFetching } = useQuery({
@@ -127,83 +135,128 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
             />
           )}
         </div>
-        <div className="flex gap-6">
-          <div className="w-full flex flex-col gap-3">
-            <label
-              htmlFor="closedCavityRisk"
-              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-            >
-              % Risco de Cavidade
-            </label>
-            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-              <input
-                id="closedCavityRisk"
-                placeholder="Risco de Cavidade"
-                type="number"
-                step={0.01}
-                className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("closed_cavity_risk")}
-              />
+        {hideMoldFields ? (
+          <>
+            <input type="hidden" {...register("closed_cavity_risk")} />
+            <input type="hidden" {...register("total_cavities")} />
+            <input type="hidden" {...register("open_cavities")} />
+          </>
+        ) : (
+          <>
+            <div className="flex gap-6">
+              <div className="w-full flex flex-col gap-3">
+                <label
+                  htmlFor="closedCavityRisk"
+                  className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+                >
+                  % Risco de Cavidade
+                </label>
+                <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+                  <input
+                    id="closedCavityRisk"
+                    placeholder="Risco de Cavidade"
+                    type="number"
+                    step={0.01}
+                    className="w-full outline-none border-b border-[#A4AABC]"
+                    {...register("closed_cavity_risk")}
+                  />
+                </div>
+                {errors.closed_cavity_risk && (
+                  <ErrorMessage
+                    errors={errors}
+                    name="closed_cavity_risk"
+                    render={({ message }) => (
+                      <FormErrorMessage message={message} />
+                    )}
+                  />
+                )}
+              </div>
+              <div className="w-full flex flex-col gap-3">
+                <label
+                  htmlFor="totalCavidades"
+                  className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+                >
+                  Total de Cavidades
+                </label>
+                <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+                  <input
+                    id="totalCavidades"
+                    placeholder="Total de Cavidades"
+                    type="number"
+                    className="w-full outline-none border-b border-[#A4AABC]"
+                    {...register("total_cavities")}
+                  />
+                </div>
+                {errors.total_cavities && (
+                  <ErrorMessage
+                    errors={errors}
+                    name="total_cavities"
+                    render={({ message }) => (
+                      <FormErrorMessage message={message} />
+                    )}
+                  />
+                )}
+              </div>
             </div>
-            {errors.closed_cavity_risk && (
-              <ErrorMessage
-                errors={errors}
-                name="closed_cavity_risk"
-                render={({ message }) => <FormErrorMessage message={message} />}
-              />
-            )}
-          </div>
-          <div className="w-full flex flex-col gap-3">
-            <label
-              htmlFor="totalCavidades"
-              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-            >
-              Total de Cavidades
-            </label>
-            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-              <input
-                id="totalCavidades"
-                placeholder="Total de Cavidades"
-                type="number"
-                className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("total_cavities")}
-              />
-            </div>
-            {errors.total_cavities && (
-              <ErrorMessage
-                errors={errors}
-                name="total_cavities"
-                render={({ message }) => <FormErrorMessage message={message} />}
-              />
-            )}
-          </div>
-        </div>
 
-        <div className="flex gap-6">
-          <div className="w-full flex flex-col gap-3">
-            <label
-              htmlFor="cavidadesAbertas"
-              className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
-            >
-              Cavidades Abertas
-            </label>
-            <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
-              <input
-                id="openCavities"
-                placeholder="Cavidades Abertas"
-                type="number"
-                className="w-full outline-none border-b border-[#A4AABC]"
-                {...register("open_cavities")}
-              />
+            <div className="flex gap-6">
+              <div className="w-full flex flex-col gap-3">
+                <label
+                  htmlFor="cavidadesAbertas"
+                  className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+                >
+                  Cavidades Abertas
+                </label>
+                <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+                  <input
+                    id="openCavities"
+                    placeholder="Cavidades Abertas"
+                    type="number"
+                    className="w-full outline-none border-b border-[#A4AABC]"
+                    {...register("open_cavities")}
+                  />
+                </div>
+                {errors.open_cavities && (
+                  <ErrorMessage
+                    errors={errors}
+                    name="open_cavities"
+                    render={({ message }) => (
+                      <FormErrorMessage message={message} />
+                    )}
+                  />
+                )}
+              </div>
+              <div className="w-full flex flex-col gap-3">
+                <label
+                  htmlFor="refugo"
+                  className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+                >
+                  % Refugo
+                </label>
+                <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+                  <input
+                    id="refugo"
+                    placeholder="Refugo"
+                    type="number"
+                    step={0.01}
+                    className="w-full outline-none border-b border-[#A4AABC]"
+                    {...register("scrap")}
+                  />
+                </div>
+                {errors.scrap && (
+                  <ErrorMessage
+                    errors={errors}
+                    name="scrap"
+                    render={({ message }) => (
+                      <FormErrorMessage message={message} />
+                    )}
+                  />
+                )}
+              </div>
             </div>
-            {errors.open_cavities && (
-              <ErrorMessage
-                errors={errors}
-                name="open_cavities"
-                render={({ message }) => <FormErrorMessage message={message} />}
-              />
-            )}
-          </div>
+          </>
+        )}
+        {hideMoldFields && (
           <div className="w-full flex flex-col gap-3">
             <label
               htmlFor="refugo"
@@ -229,7 +282,7 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
               />
             )}
           </div>
-        </div>
+        )}
       </div>
 
       <div className="w-full flex justify-end">
