@@ -1,3 +1,4 @@
+import { hiddenModeLabel } from "../../../../config/featureFlags";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -187,8 +188,14 @@ function Paradas() {
             status: "Status do pedido",
             numeroPedido: "Número do pedido",
             nome_cliente: "Nome do cliente",
-            tempoRestanteProdInjetora: "Tempo restante na injetora",
-            tempoRestanteProdPosInjetora: "Tempo restante pós injetora",
+            tempoRestanteProdInjetora: hiddenModeLabel(
+              "Tempo restante na injetora",
+              "Tempo restante na Maq. Gargalo",
+            ),
+            tempoRestanteProdPosInjetora: hiddenModeLabel(
+              "Tempo restante pós injetora",
+              "Tempo restante pós Maq. Gargalo",
+            ),
             demanda: "Demanda",
             valorAFAturar: "Valor a faturar",
             motivo: "Motivo da parada",

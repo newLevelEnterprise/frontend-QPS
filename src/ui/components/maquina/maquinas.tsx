@@ -3,7 +3,7 @@ import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { hideMoldFields } from "../../../config/featureFlags";
+import { hiddenModeLabel, hideMoldFields } from "../../../config/featureFlags";
 import type { ICompositionLine, IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
@@ -244,7 +244,10 @@ function Maquina() {
                     </>
                   )}
                   <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                    Tempo pós-injeção (s)
+                    {hiddenModeLabel(
+                      "Tempo pós-injeção (s)",
+                      "Tempo pós Maq. Gargalo (s)",
+                    )}
                   </th>
                   {machineColumns.map((machine) => (
                     <th

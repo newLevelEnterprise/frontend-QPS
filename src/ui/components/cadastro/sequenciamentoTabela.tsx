@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
-import { hideMoldFields } from "../../../config/featureFlags";
+import { hiddenModeLabel, hideMoldFields } from "../../../config/featureFlags";
 import type { IProductionSchedule } from "../../../types/ProductionSchedule";
 
 const formatDate = (date?: string | null, hour = false) => {
@@ -83,7 +83,10 @@ function SequenciamentoTabela({
                   Data Limite Faturamento
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data de Finalização na Injetora
+                  {hiddenModeLabel(
+                    "Data de Finalização na Injetora",
+                    "Data finalização Maq. Gargalo",
+                  )}
                 </th>
                 <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
                   Data Prevista Final Produção

@@ -10,7 +10,7 @@ import {
   criarLinhasProdSchema,
   type ICriarLinhasProdBody,
 } from "../../../schemas/linhas";
-import { hideMoldFields } from "../../../config/featureFlags";
+import { hiddenModeLabel, hideMoldFields } from "../../../config/featureFlags";
 import type { IMaquinas, IMaquinasType } from "../../../types/Maquina";
 import type { IMoldes } from "../../../types/Moldes";
 import { apiClient } from "../../../utils/apiClient";
@@ -378,12 +378,18 @@ function FormEditarMaquina({
           htmlFor="tempoPosInjecao"
           className="text-[#212A4F] font-semibold truncate text-ellipsis"
         >
-          Tempo pós injeção (s)
+          {hiddenModeLabel(
+            "Tempo pós injeção (s)",
+            "Tempo pós Maq. Gargalo (s)",
+          )}
         </label>
         <div className="flex gap-1">
           <input
             id="tempoPosInjecao"
-            placeholder="Tempo pós injeção"
+            placeholder={hiddenModeLabel(
+              "Tempo pós injeção",
+              "Tempo pós Maq. Gargalo",
+            )}
             type="number"
             min="0"
             step="0.01"

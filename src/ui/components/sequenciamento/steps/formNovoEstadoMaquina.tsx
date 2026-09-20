@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { hideMoldFields } from "../../../../config/featureFlags";
+import { hiddenModeLabel, hideMoldFields } from "../../../../config/featureFlags";
 import type { ICriaStepsSequenciamentoBody } from "../../../../schemas/steps";
 import type { IMaquinasType } from "../../../../types/Maquina";
 import type { IMoldes } from "../../../../types/Moldes";
@@ -343,7 +343,10 @@ function FormNovoEstado({
 
       <div className="flex flex-col gap-1">
         <label className="font-semibold text-sm">
-          Tempo restante na Injetora (min)
+          {hiddenModeLabel(
+            "Tempo restante na Injetora (min)",
+            "Tempo restante na Maq. Gargalo (min)",
+          )}
         </label>
         <input
           type="number"
@@ -355,7 +358,10 @@ function FormNovoEstado({
 
       <div className="flex flex-col gap-1">
         <label className="font-semibold text-sm">
-          Tempo restante pós Injetora (min)
+          {hiddenModeLabel(
+            "Tempo restante pós Injetora (min)",
+            "Tempo restante pós Maq. Gargalo (min)",
+          )}
         </label>
         <input
           type="number"

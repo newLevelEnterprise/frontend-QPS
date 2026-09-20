@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { BiPlus } from "react-icons/bi";
 import { toast } from "react-toastify";
-import { hideMoldFields } from "../../../../config/featureFlags";
+import { hiddenModeLabel, hideMoldFields } from "../../../../config/featureFlags";
 import { useSteps } from "../../../../hooks/useStep";
 import {
   criarStepsSequenciamentoschema,
@@ -67,8 +67,14 @@ function EstadoAtualMaquina() {
         status: "Status do pedido",
         numeroPedido: "Número do pedido",
         nome_cliente: "Nome do cliente",
-        tempoRestanteProdInjetora: "Tempo restante na injetora",
-        tempoRestanteProdPosInjetora: "Tempo restante pós injetora",
+        tempoRestanteProdInjetora: hiddenModeLabel(
+          "Tempo restante na injetora",
+          "Tempo restante na Maq. Gargalo",
+        ),
+        tempoRestanteProdPosInjetora: hiddenModeLabel(
+          "Tempo restante pós injetora",
+          "Tempo restante pós Maq. Gargalo",
+        ),
         demanda: "Demanda",
         valorAFAturar: "Valor a faturar",
         dataLimiteFaturamento: "Data limite de faturamento",
@@ -148,10 +154,16 @@ function EstadoAtualMaquina() {
                 </th>
                 <th className="px-2 py-2">Número do Pedido</th>
                 <th className="px-2 py-2">
-                  Tempo restantes de produção na Injetora (min)
+                  {hiddenModeLabel(
+                    "Tempo restantes de produção na Injetora (min)",
+                    "Tempo restantes de produção na Maq. Gargalo (min)",
+                  )}
                 </th>
                 <th className="px-2 py-2">
-                  Tempo restantes de produção pós Injetora (min)
+                  {hiddenModeLabel(
+                    "Tempo restantes de produção pós Injetora (min)",
+                    "Tempo restantes de produção pós Maq. Gargalo (min)",
+                  )}
                 </th>
                 <th className="px-2 py-2">Demanda</th>
                 <th className="px-2 py-2">Valor a ser Faturado</th>

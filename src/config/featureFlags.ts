@@ -56,3 +56,12 @@ export function getHideMoldFields() {
 }
 
 export const hideMoldFields = getHideMoldFields();
+
+export const MAQ_GARGALO_LABEL = "Maq. Gargalo";
+
+export function hiddenModeLabel(
+  fullLabel: string,
+  hiddenLabel = MAQ_GARGALO_LABEL,
+) {
+  return hideMoldFields ? hiddenLabel : fullLabel;
+}
