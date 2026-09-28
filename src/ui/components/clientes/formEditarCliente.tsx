@@ -1,5 +1,6 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -30,6 +31,7 @@ function FormEditarCliente({
   } = useForm<IEditarClienteBody>({
     resolver: zodResolver(editarClienteSchema),
     defaultValues: {
+      external_id: cliente.external_id ?? "",
       name: cliente.name,
       priority: cliente.priority.toString(),
     },
@@ -39,6 +41,7 @@ function FormEditarCliente({
   const onSubmit = async (data: any) => {
     try {
       await apiClient.put<ICliente>(`/clients/${cliente.id}`, {
+        external_id: data.external_id.trim() || null,
         name: data.name,
         priority: parseInt(data.priority),
       });
@@ -47,7 +50,12 @@ function FormEditarCliente({
       setEditarCliente(false);
     } catch (error) {
       console.error("Erro ao atualizar pedido:", error);
-      toast.error("Erro ao atualizar cliente. Tente novamente.");
+      const detail = error instanceof AxiosError ? error.response?.data?.detail : null;
+      toast.error(
+        typeof detail === "string"
+          ? detail
+          : "Erro ao atualizar cliente. Tente novamente.",
+      );
     }
   };
 
@@ -56,6 +64,30 @@ function FormEditarCliente({
       onSubmit={handleSubmit(onSubmit)}
       className="w-full flex flex-col gap-10 my-6"
     >
+      <div className="w-full flex flex-col gap-3">
+        <label
+          htmlFor="editar-cliente-id"
+          className="text-[#212A4F] font-semibold truncate text-ellipsis"
+        >
+          ID
+        </label>
+        <input
+          id="editar-cliente-id"
+          placeholder="ID do ERP"
+          type="text"
+          maxLength={120}
+          className="w-full outline-none border-b border-[#A4AABC]"
+          {...register("external_id")}
+        />
+        {errors.external_id && (
+          <ErrorMessage
+            errors={errors}
+            name="external_id"
+            render={({ message }) => <FormErrorMessage message={message} />}
+          />
+        )}
+      </div>
+
       <div className="w-full flex flex-col gap-3">
         <label
           htmlFor="nome"

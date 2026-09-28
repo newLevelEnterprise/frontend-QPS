@@ -4,6 +4,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import {
+  acceptedMoldsToStore,
   criarMaquinaSchema,
   type ICriarMaquinaBody,
 } from "../../../schemas/maquinas";
@@ -26,6 +27,9 @@ function FormNovaMaquina({
     formState: { errors, isSubmitting, isValid },
   } = useForm<ICriarMaquinaBody>({
     resolver: zodResolver(criarMaquinaSchema),
+    defaultValues: {
+      quantidadeMoldes: "0",
+    },
   });
 
   const onSubmit = async (data: ICriarMaquinaBody) => {
@@ -42,6 +46,7 @@ function FormNovaMaquina({
       await apiClient.post("/machines", {
         name: data.name,
         availability: parseFloat(data.disponibilidade),
+        accepted_molds: acceptedMoldsToStore(data.quantidadeMoldes),
       });
       toast.success("Máquina criada com sucesso!");
       setMaquina();
@@ -105,6 +110,35 @@ function FormNovaMaquina({
             <ErrorMessage
               errors={errors}
               name="disponibilidade"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="w-1/2">
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="nova-quantidade-moldes"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis"
+          >
+            Quantidade de moldes aceitos
+          </label>
+          <div className="flex gap-1">
+            <input
+              id="nova-quantidade-moldes"
+              placeholder="0"
+              type="number"
+              min={0}
+              step={1}
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("quantidadeMoldes")}
+            />
+          </div>
+          {errors.quantidadeMoldes && (
+            <ErrorMessage
+              errors={errors}
+              name="quantidadeMoldes"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}

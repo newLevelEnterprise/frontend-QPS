@@ -7,6 +7,7 @@ import type { IMoldes } from "../../../types/Moldes";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 import Modal from "../modal";
+import ComponentesSemMolde from "./componentesSemMolde";
 import FormEditarMolde from "./formEditarMolde";
 import FormNovoMolde from "./formNovoMolde";
 
@@ -37,6 +38,9 @@ function Moldes() {
       queryClient.invalidateQueries({
         queryKey: ["get", "all", "moldes"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["get", "products", "without-mold"],
+      });
       toast.success("Molde deletado com sucesso!");
     },
   });
@@ -50,7 +54,7 @@ function Moldes() {
   });
 
   return (
-    <div className="w-full bg-white rounded-md shadow p-4">
+    <div className="w-full h-full min-h-0 overflow-y-auto bg-white rounded-md shadow p-4">
       <Modal.Root isVisible={novoMolde}>
         <Modal.Container>
           <Modal.Header
@@ -58,11 +62,14 @@ function Moldes() {
             onClose={() => setNovoMolde(false)}
           />
           <FormNovoMolde
-            setMolde={() =>
+            setMolde={() => {
               queryClient.invalidateQueries({
                 queryKey: ["get", "all", "moldes"],
-              })
-            }
+              });
+              queryClient.invalidateQueries({
+                queryKey: ["get", "products", "without-mold"],
+              });
+            }}
             setNovoMolde={setNovoMolde}
           />
         </Modal.Container>
@@ -74,11 +81,14 @@ function Moldes() {
             onClose={() => setEditarMolde(false)}
           />
           <FormEditarMolde
-            setMolde={() =>
+            setMolde={() => {
               queryClient.invalidateQueries({
                 queryKey: ["get", "all", "moldes"],
-              })
-            }
+              });
+              queryClient.invalidateQueries({
+                queryKey: ["get", "products", "without-mold"],
+              });
+            }}
             setEditarMolde={setEditarMolde}
             molde={molde}
           />
@@ -95,7 +105,7 @@ function Moldes() {
                   Nome
                 </th>
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                  Produto
+                  Componente
                 </th>
                 {!hideMoldFields && (
                   <>
@@ -196,6 +206,7 @@ function Moldes() {
           Adicionar Novo Molde
         </button>
       </div>
+      <ComponentesSemMolde />
     </div>
   );
 }

@@ -10,6 +10,7 @@ export interface IMaquinasType {
   id: number;
   name: string;
   availability: string | number;
+  accepted_molds?: number;
   production_line: {
     id: number;
     name: string;
@@ -46,7 +47,6 @@ export interface ICompositionLine {
   production_line_id: number;
   mold_id: number;
   product_id: number;
-  post_injection_cycle_time?: number;
   mold_name: string;
   product_name: string;
   id: number;

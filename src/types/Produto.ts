@@ -1,5 +1,6 @@
 export interface IProductStructureComponent {
   id: number;
+  external_id?: string | null;
   name: string;
   quantity: number;
 }
@@ -7,6 +8,8 @@ export interface IProductStructureComponent {
 export interface IProduto {
   name: string;
   id: number;
+  external_id?: string | null;
+  post_injection_cycle_time?: number;
   scrap?: number;
   cycle?: number;
   bottleneck?: number;

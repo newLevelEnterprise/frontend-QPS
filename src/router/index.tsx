@@ -18,6 +18,7 @@ import ProdutosPage from "../ui/pages/produto";
 import ResetPasswordPage from "../ui/pages/ResetPassword";
 import Sequenciamento from "../ui/pages/Sequenciamento";
 import SignUpPage from "../ui/pages/SignUpPage";
+import TempoCicloPage from "../ui/pages/tempo-ciclo";
 import TurnosRegularesPage from "../ui/pages/turnosregulares";
 import AuthGuard from "./AuthGuard";
 
@@ -46,6 +47,10 @@ function Router() {
             <Route
               path="/cadastro/linhas-producao"
               element={<LinhaProducaoPage />}
+            />
+            <Route
+              path="/cadastro/tempo-de-ciclo"
+              element={<TempoCicloPage />}
             />
             <Route path="/historico" element={<HistoryPage />} />
 

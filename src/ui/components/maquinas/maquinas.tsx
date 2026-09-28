@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { toast } from "react-toastify";
+import { acceptedMoldsToDisplay } from "../../../schemas/maquinas";
 import type { IMaquinasType } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
@@ -96,6 +97,9 @@ function Maquinas() {
                 <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                   % Disponibilidade
                 </th>
+                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                  Moldes aceitos
+                </th>
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                   Ações
                 </th>
@@ -112,6 +116,9 @@ function Maquinas() {
                   </td>
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {maq.availability}
+                  </td>
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                    {acceptedMoldsToDisplay(maq.accepted_molds)}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="w-full flex justify-end gap-2">

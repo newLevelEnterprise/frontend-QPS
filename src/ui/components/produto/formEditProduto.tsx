@@ -1,26 +1,27 @@
-import { ErrorMessage } from "@hookform/error-message";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import type { Dispatch, SetStateAction } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import {
-  editarProdutoSchema,
-  type IEditarProdutoBody,
-} from "../../../schemas/produto";
+import type { ICriarProdutoBody } from "../../../schemas/produto";
 import type { IProduto } from "../../../types/Produto";
 import { apiClient } from "../../../utils/apiClient";
-import Button from "../Button";
-import FormErrorMessage from "../forms/FormErrorMessage";
-import ProductStructureFields, {
-  toProductStructurePayload,
-} from "./ProductStructureFields";
+import ProductCadastroForm from "./ProductCadastroForm";
+import { toProductStructurePayload } from "./ProductStructureFields";
 
 interface FormEditarProdutoProps {
   produto: IProduto;
   setEditarProduto: Dispatch<SetStateAction<boolean>>;
   setProducts: () => void;
+}
+
+function isSimpleProduct(produto: IProduto) {
+  return (
+    produto.is_simple ??
+    (!produto.structure_components?.length ||
+      (produto.structure_components.length === 1 &&
+        produto.structure_components[0].id === produto.id &&
+        produto.structure_components[0].quantity === 1))
+  );
 }
 
 function FormEditarProduto({
@@ -36,37 +37,23 @@ function FormEditarProduto({
     },
   });
 
-  const isSimple =
-    produto.is_simple ??
-    (!produto.structure_components?.length ||
-      (produto.structure_components.length === 1 &&
-        produto.structure_components[0].id === produto.id &&
-        produto.structure_components[0].quantity === 1));
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm<IEditarProdutoBody>({
-    resolver: zodResolver(editarProdutoSchema),
-    defaultValues: {
-      name: produto.name,
-      structureType: isSimple ? "simple" : "compound",
-      components: isSimple
-        ? []
-        : (produto.structure_components || []).map((component) => ({
-            component_product_id: String(component.id),
-            name: "",
-            quantity: String(component.quantity),
-          })),
-    },
-  });
+  const simple = isSimpleProduct(produto);
+  const knownNames = Object.fromEntries(
+    (produto.structure_components ?? []).map((component) => [
+      String(component.id),
+      component.name,
+    ]),
+  );
 
-  const onSubmit = async (data: IEditarProdutoBody) => {
+  const onSave = async (data: ICriarProdutoBody) => {
     try {
       await apiClient.put(`/products/${produto.id}`, {
+        external_id: data.external_id.trim() || null,
         name: data.name,
+        post_injection_cycle_time: Number.parseInt(
+          data.post_injection_cycle_time,
+          10,
+        ),
         components: toProductStructurePayload(data),
       });
       setProducts();
@@ -87,57 +74,28 @@ function FormEditarProduto({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full flex flex-col gap-8 my-6 max-h-[70vh] overflow-y-auto"
-    >
-      <div className="w-full flex flex-col gap-3">
-        <label
-          htmlFor="nome"
-          className="text-[#212A4F] font-semibold truncate text-ellipsis"
-        >
-          Nome do produto
-        </label>
-        <div className="flex gap-1">
-          <input
-            id="nome"
-            placeholder="Nome do Produto"
-            type="text"
-            className="w-full outline-none border-b border-[#A4AABC]"
-            {...register("name")}
-          />
-        </div>
-        {errors.name && (
-          <ErrorMessage
-            errors={errors}
-            name="name"
-            render={({ message }) => <FormErrorMessage message={message} />}
-          />
-        )}
-      </div>
-
-      <ProductStructureFields
-        register={register}
-        watch={watch}
-        setValue={setValue}
-        availableProducts={products}
-        excludeProductId={produto.id}
-      />
-      {errors.components && (
-        <FormErrorMessage
-          message={errors.components.message || "Estrutura inválida"}
-        />
-      )}
-
-      <div className="w-full flex justify-end">
-        <Button
-          title="Ok"
-          disable={isSubmitting}
-          isLoading={isSubmitting}
-          type="submit"
-        />
-      </div>
-    </form>
+    <ProductCadastroForm
+      idPrefix={`editar-produto-${produto.id}`}
+      products={products}
+      excludeProductId={produto.id}
+      knownNames={knownNames}
+      defaultValues={{
+        external_id: produto.external_id ?? "",
+        name: produto.name,
+        post_injection_cycle_time: String(produto.post_injection_cycle_time ?? 0),
+        structureType: simple ? "simple" : "compound",
+        components: simple
+          ? []
+          :             (produto.structure_components ?? []).map((component) => ({
+              component_product_id: String(component.id),
+              name: "",
+              external_id: component.external_id ?? "",
+              quantity: String(component.quantity),
+            })),
+      }}
+      onCancel={() => setEditarProduto(false)}
+      onSave={onSave}
+    />
   );
 }
 

@@ -19,8 +19,17 @@ function ProductStructureFields({
 }: ProductStructureFieldsProps) {
   const structureType = watch("structureType");
   const components = watch("components") || [];
+  const componentPieceIds = new Set<number>();
+  for (const product of availableProducts) {
+    for (const part of product.structure_components ?? []) {
+      if (part.id !== product.id) {
+        componentPieceIds.add(part.id);
+      }
+    }
+  }
   const selectableProducts = availableProducts.filter(
-    (product) => product.id !== excludeProductId && product.is_simple !== false,
+    (product) =>
+      product.id !== excludeProductId && componentPieceIds.has(product.id),
   );
 
   const structureTypeRegister = register("structureType", {
@@ -35,7 +44,7 @@ function ProductStructureFields({
 
   const addComponent = () => {
     setValue("components", [...components, { name: "", quantity: "1" }], {
-      shouldValidate: true,
+      shouldDirty: true,
     });
   };
 
@@ -147,20 +156,50 @@ function ProductStructureFields({
 
 export default ProductStructureFields;
 
+export function structureErrorMessage(error: unknown) {
+  if (!error || typeof error !== "object") {
+    return "Estrutura inválida";
+  }
+  const record = error as {
+    message?: string;
+    [key: string]: unknown;
+  };
+  if (typeof record.message === "string" && record.message) {
+    return record.message;
+  }
+  for (const value of Object.values(record)) {
+    if (!value || typeof value !== "object") {
+      continue;
+    }
+    const field = value as {
+      name?: { message?: string };
+      quantity?: { message?: string };
+    };
+    const message = field.name?.message || field.quantity?.message;
+    if (message) {
+      return message;
+    }
+  }
+  return "Estrutura inválida";
+}
+
 export function toProductStructurePayload(data: ICriarProdutoBody) {
   if (data.structureType === "simple") {
     return [];
   }
   return (data.components || []).map((component) => {
     const quantity = Number(component.quantity);
+    const externalId = (component.external_id || "").trim();
     if (component.component_product_id) {
       return {
         component_product_id: Number(component.component_product_id),
+        external_id: externalId || null,
         quantity,
       };
     }
     return {
       name: (component.name || "").trim(),
+      external_id: externalId || null,
       quantity,
     };
   });

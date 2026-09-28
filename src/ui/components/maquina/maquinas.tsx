@@ -3,7 +3,7 @@ import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { hiddenModeLabel, hideMoldFields } from "../../../config/featureFlags";
+import { hideMoldFields } from "../../../config/featureFlags";
 import type { ICompositionLine, IMaquinas } from "../../../types/Maquina";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
@@ -36,7 +36,6 @@ type IEditMaquinaState = IMaquinas & {
   mold_id?: number;
   product_id?: number;
   product_name?: string;
-  post_injection_cycle_time?: number | string;
   machines?: ICompositionLine["machines"];
 };
 
@@ -243,12 +242,6 @@ function Maquina() {
                       </th>
                     </>
                   )}
-                  <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                    {hiddenModeLabel(
-                      "Tempo pós-injeção (s)",
-                      "Tempo pós Maq. Gargalo (s)",
-                    )}
-                  </th>
                   {machineColumns.map((machine) => (
                     <th
                       key={machine.id}
@@ -294,9 +287,6 @@ function Maquina() {
                         </td>
                       </>
                     )}
-                    <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                      {cp.post_injection_cycle_time || "-"}
-                    </td>
                     {machineColumns.map((machine) => {
                       const machineInCompositionLine = cp.machines.find(
                         (item) => item.id === machine.id,
@@ -341,8 +331,6 @@ function Maquina() {
                               mold_id: cp.mold_id,
                               product_id: cp.product_id,
                               product_name: cp.product_name,
-                              post_injection_cycle_time:
-                                cp.post_injection_cycle_time,
                               machines: cp.machines,
                             });
                           }}

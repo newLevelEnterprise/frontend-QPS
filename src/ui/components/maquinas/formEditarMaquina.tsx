@@ -4,6 +4,8 @@ import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import {
+  acceptedMoldsToDisplay,
+  acceptedMoldsToStore,
   type IEditarMaquinaBody,
   editarMaquinaSchema,
 } from "../../../schemas/maquinas";
@@ -32,6 +34,7 @@ function FormEditarMaquina({
     defaultValues: {
       name: maquina.name,
       disponibilidade: maquina.availability.toString(),
+      quantidadeMoldes: String(acceptedMoldsToDisplay(maquina.accepted_molds)),
     },
   });
 
@@ -49,6 +52,7 @@ function FormEditarMaquina({
       await apiClient.put(`/machines/${maquina.id}`, {
         name: data.name,
         availability: parseFloat(data.disponibilidade),
+        accepted_molds: acceptedMoldsToStore(data.quantidadeMoldes),
       });
       setMaquina();
       toast.success("Máquina atualizada com sucesso!");
@@ -112,6 +116,35 @@ function FormEditarMaquina({
             <ErrorMessage
               errors={errors}
               name="disponibilidade"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="w-1/2">
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="editar-quantidade-moldes"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis"
+          >
+            Quantidade de moldes aceitos
+          </label>
+          <div className="flex gap-1">
+            <input
+              id="editar-quantidade-moldes"
+              placeholder="0"
+              type="number"
+              min={0}
+              step={1}
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("quantidadeMoldes")}
+            />
+          </div>
+          {errors.quantidadeMoldes && (
+            <ErrorMessage
+              errors={errors}
+              name="quantidadeMoldes"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}

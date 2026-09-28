@@ -11,6 +11,7 @@ import {
   type ICriarMoldesBody,
 } from "../../../schemas/moldes";
 import type { IMoldes } from "../../../types/Moldes";
+import type { IProduto } from "../../../types/Produto";
 import { apiClient } from "../../../utils/apiClient";
 import Button from "../Button";
 import FormErrorMessage from "../forms/FormErrorMessage";
@@ -40,9 +41,8 @@ function FormNovoMolde({ setNovoMolde, setMolde }: IFormNovoMoldeProps) {
   const { data: products, isFetching } = useQuery({
     queryKey: ["get", "all", "products"],
     queryFn: async () => {
-      const { data } =
-        await apiClient.get<{ id: number; name: string }[]>("/products/");
-      return data;
+      const { data } = await apiClient.get<IProduto[]>("/products/");
+      return data.filter((product) => product.is_simple !== false);
     },
   });
 

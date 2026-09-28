@@ -12,6 +12,7 @@ import { findMoldByProductName } from "../../../../utils/moldResolution";
 interface IProdutoComMoldes {
   name: string;
   id: number;
+  is_simple?: boolean;
   molds: Array<number | { id: number }>;
   raw_materials: unknown[];
   purchase_items: unknown[];
@@ -116,9 +117,10 @@ function FormNovoEstado({
   const camposBloqueadosPorConcluido = statusSelecionado === "Concluido";
 
   const produtosDoMoldeSelecionado = useMemo(() => {
+    const fabricaveis = produtos?.filter((produto) => produto.is_simple !== false);
     if (hideMoldFields) {
       return (
-        produtos?.filter((produto) =>
+        fabricaveis?.filter((produto) =>
           moldes?.some((molde) =>
             molde.products.some((item) => item.id === produto.id),
           ),
@@ -135,7 +137,7 @@ function FormNovoEstado({
       return [];
     }
     return (
-      produtos?.filter((produto) =>
+      fabricaveis?.filter((produto) =>
         produto.molds?.some((mold) => {
           const moldId = typeof mold === "number" ? mold : mold.id;
           return String(moldId) === String(moldeSelecionado.id);
