@@ -1,5 +1,6 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -15,6 +16,7 @@ import FormErrorMessage from "../forms/FormErrorMessage";
 interface IFormEditarInsumoProps {
   insumo: {
     id: number;
+    external_id?: string | null;
     nome: string;
     lead_time_medio_entrega: number;
     custo_medio: string;
@@ -35,6 +37,7 @@ function FormEditarInsumo({
   } = useForm<IEditarInsumosBody>({
     resolver: zodResolver(editarInsumosSchema),
     defaultValues: {
+      external_id: insumo.external_id ?? "",
       custoMedio: insumo.custo_medio,
       leadTimeEntrega: String(insumo.lead_time_medio_entrega) || "0",
       nome: insumo.nome,
@@ -44,6 +47,7 @@ function FormEditarInsumo({
   const onSubmit = async (data: IEditarInsumosBody) => {
     try {
       await apiClient.put<IInsumos>(`/raw-material/${insumo.id}`, {
+        external_id: data.external_id.trim() || null,
         nome: data.nome,
         lead_time_medio_entrega: Number(data.leadTimeEntrega),
         custo_medio: parseFloat(data.custoMedio),
@@ -53,7 +57,12 @@ function FormEditarInsumo({
       setEditarInsumo(false);
     } catch (error) {
       console.error("Erro ao atualizar insumo:", error);
-      toast.error("Erro ao atualizar insumo. Tente novamente.");
+      const detail = error instanceof AxiosError ? error.response?.data?.detail : null;
+      toast.error(
+        typeof detail === "string"
+          ? detail
+          : "Erro ao atualizar insumo. Tente novamente.",
+      );
     }
   };
 
@@ -63,6 +72,31 @@ function FormEditarInsumo({
       className="w-full flex flex-col gap-10 my-6"
     >
       <div className="flex gap-4">
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="editar-insumo-id"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+          >
+            ID
+          </label>
+          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+            <input
+              id="editar-insumo-id"
+              placeholder="ID do ERP"
+              type="text"
+              maxLength={120}
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("external_id")}
+            />
+          </div>
+          {errors.external_id && (
+            <ErrorMessage
+              errors={errors}
+              name="external_id"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
         <div className="w-full flex flex-col gap-3">
           <label
             htmlFor="nome"

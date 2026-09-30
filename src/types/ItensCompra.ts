@@ -4,4 +4,5 @@ export interface IItensCompra {
   cost: number;
   scrap: number;
   id: number;
+  external_id?: string | null;
 }

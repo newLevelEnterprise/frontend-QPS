@@ -16,6 +16,7 @@ function ItensCompras() {
 
   const [item, setItem] = useState<IItensCompra>({
     id: 0,
+    external_id: "",
     name: "",
     lead_time: 0,
     cost: 0,
@@ -88,6 +89,9 @@ function ItensCompras() {
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  ID
+                </th>
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                   Material
                 </th>
                 <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
@@ -110,6 +114,9 @@ function ItensCompras() {
                   key={item.id}
                   className="border-b border-gray-200 last:border-b-0"
                 >
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    {item.external_id || "—"}
+                  </td>
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                     {item.name}
                   </td>
@@ -155,6 +162,7 @@ function ItensCompras() {
               setNovoItem(true);
               setItem({
                 id: 0,
+                external_id: "",
                 name: "",
                 lead_time: 0,
                 cost: 0,

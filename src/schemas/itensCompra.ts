@@ -1,6 +1,9 @@
 import { z } from "zod";
 
 export const criarItensCompraSchema = z.object({
+  external_id: z
+    .string()
+    .max(120, "ID externo deve ter no máximo 120 caracteres"),
   item: z.string().min(1, "Nome é obrigatório"),
   leadTimeEntrega: z.string().min(1, "Lead time é obrigatório"),
   custoMedio: z.string().min(1, "Custo médio é obrigatório"),
@@ -8,6 +11,9 @@ export const criarItensCompraSchema = z.object({
 });
 
 export const editarItensCompraSchema = z.object({
+  external_id: z
+    .string()
+    .max(120, "ID externo deve ter no máximo 120 caracteres"),
   item: z.string().min(1, "Nome é obrigatório"),
   leadTimeEntrega: z.string().min(1, "Lead time é obrigatório"),
   custoMedio: z.string().min(1, "Custo médio é obrigatório"),

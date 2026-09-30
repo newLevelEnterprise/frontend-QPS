@@ -1,5 +1,6 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -24,11 +25,15 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
     formState: { errors, isSubmitting, isValid },
   } = useForm<ICriarInsumosBody>({
     resolver: zodResolver(criarInsumosSchema),
+    defaultValues: {
+      external_id: "",
+    },
   });
 
   const onSubmit = async (data: ICriarInsumosBody) => {
     try {
       const { data: res } = await apiClient.post<IInsumos>("/raw-material", {
+        external_id: data.external_id.trim() || null,
         nome: data.nome,
         lead_time_medio_entrega: Number(data.leadTimeEntrega),
         custo_medio: parseFloat(data.custoMedio),
@@ -39,7 +44,10 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
       console.log(res);
     } catch (error) {
       console.error("Erro ao criar insumo:", error);
-      toast.error("Erro ao criar insumo. Tente novamente.");
+      const detail = error instanceof AxiosError ? error.response?.data?.detail : null;
+      toast.error(
+        typeof detail === "string" ? detail : "Erro ao criar insumo. Tente novamente.",
+      );
     }
   };
 
@@ -49,6 +57,31 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
       className="w-full flex flex-col gap-10 my-6"
     >
       <div className="flex gap-4">
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="novo-insumo-id"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+          >
+            ID
+          </label>
+          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+            <input
+              id="novo-insumo-id"
+              placeholder="ID do ERP"
+              type="text"
+              maxLength={120}
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("external_id")}
+            />
+          </div>
+          {errors.external_id && (
+            <ErrorMessage
+              errors={errors}
+              name="external_id"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
         <div className="w-full flex flex-col gap-3">
           <label
             htmlFor="nome"

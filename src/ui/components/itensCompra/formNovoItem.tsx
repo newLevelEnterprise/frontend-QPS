@@ -1,5 +1,6 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
 import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -24,6 +25,9 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
     formState: { errors, isSubmitting, isValid },
   } = useForm<ICriarItensCompraBody>({
     resolver: zodResolver(criarItensCompraSchema),
+    defaultValues: {
+      external_id: "",
+    },
   });
 
   const onSubmit = async (data: ICriarItensCompraBody) => {
@@ -37,6 +41,7 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
         return;
       }
       const { data: res } = await apiClient.post<IInsumos>("/purchase-items", {
+        external_id: data.external_id.trim() || null,
         name: data.item,
         lead_time: Number(data.leadTimeEntrega),
         cost: parseFloat(data.custoMedio),
@@ -48,7 +53,10 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
       console.log(res);
     } catch (error) {
       console.error("Erro ao criar insumo:", error);
-      toast.error("Erro ao criar insumo. Tente novamente.");
+      const detail = error instanceof AxiosError ? error.response?.data?.detail : null;
+      toast.error(
+        typeof detail === "string" ? detail : "Erro ao criar insumo. Tente novamente.",
+      );
     }
   };
 
@@ -58,6 +66,31 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
       className="w-full flex flex-col gap-10 my-6"
     >
       <div className="flex flex-col gap-4">
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="novo-item-id"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+          >
+            ID
+          </label>
+          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+            <input
+              id="novo-item-id"
+              placeholder="ID do ERP"
+              type="text"
+              maxLength={120}
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("external_id")}
+            />
+          </div>
+          {errors.external_id && (
+            <ErrorMessage
+              errors={errors}
+              name="external_id"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
         <div className="w-full flex flex-col gap-3">
           <label
             htmlFor="nome"

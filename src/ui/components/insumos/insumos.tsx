@@ -16,10 +16,12 @@ function Insumos() {
   const [insumo, setInsumo] = useState<{
     nome: string;
     id: number;
+    external_id?: string | null;
     lead_time_medio_entrega: number;
     custo_medio: string;
   }>({
     id: 0,
+    external_id: "",
     nome: "",
     lead_time_medio_entrega: 0,
     custo_medio: "",
@@ -32,6 +34,7 @@ function Insumos() {
         {
           nome: string;
           id: number;
+          external_id?: string | null;
           lead_time_medio_entrega: number;
           custo_medio: string;
         }[]
@@ -101,6 +104,9 @@ function Insumos() {
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                  ID
+                </th>
+                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                   Material
                 </th>
                 <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
@@ -120,6 +126,9 @@ function Insumos() {
                   key={insumo.id}
                   className="border-b border-gray-200 last:border-b-0"
                 >
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                    {insumo.external_id || "—"}
+                  </td>
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
                     {insumo.nome}
                   </td>
@@ -162,6 +171,7 @@ function Insumos() {
             setNovoInsumo(true);
             setInsumo({
               id: 0,
+              external_id: "",
               nome: "",
               lead_time_medio_entrega: 0,
               custo_medio: "",
