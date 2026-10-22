@@ -36,6 +36,7 @@ function FormEditarItem({
       leadTimeEntrega: item.lead_time.toString(),
       item: item.name,
       refugo: item.scrap.toString(),
+      estoqueMinimo: String(item.minimum_stock ?? 0),
     },
   });
 
@@ -55,6 +56,7 @@ function FormEditarItem({
         lead_time: Number(data.leadTimeEntrega),
         cost: parseFloat(data.custoMedio),
         scrap: parseFloat(data.refugo),
+        minimum_stock: Number(data.estoqueMinimo),
       });
       setItem();
       toast.success("Item atualizado com sucesso!");
@@ -197,6 +199,32 @@ function FormEditarItem({
             <ErrorMessage
               errors={errors}
               name="refugo"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="editar-estoque-minimo"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+          >
+            Estoque Mínimo
+          </label>
+          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+            <input
+              id="editar-estoque-minimo"
+              placeholder="Estoque Mínimo"
+              type="number"
+              min={0}
+              step="any"
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("estoqueMinimo")}
+            />
+          </div>
+          {errors.estoqueMinimo && (
+            <ErrorMessage
+              errors={errors}
+              name="estoqueMinimo"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}

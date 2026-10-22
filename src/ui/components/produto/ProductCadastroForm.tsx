@@ -26,6 +26,17 @@ const inputClass =
 const auxiliaryButtonClass =
   "h-10 cursor-pointer whitespace-nowrap rounded-full border border-[#d6dbe4] bg-white px-4 text-sm font-semibold text-[#334155] disabled:cursor-not-allowed disabled:opacity-60";
 
+function componentExternalIdMessage(componentsError: unknown, index: number) {
+  if (!componentsError || typeof componentsError !== "object") {
+    return undefined;
+  }
+  const entry = (componentsError as Record<number, { external_id?: { message?: string } }>)[
+    index
+  ];
+  const message = entry?.external_id?.message;
+  return typeof message === "string" ? message : undefined;
+}
+
 function pieceIds(products: IProduto[]) {
   const ids = new Set<number>();
   for (const product of products) {
@@ -53,6 +64,7 @@ function ProductCadastroForm({
   const [selectedId, setSelectedId] = useState("");
   const [selectedQty, setSelectedQty] = useState("1");
   const [createSuccess, setCreateSuccess] = useState("");
+  const [newExternalIdError, setNewExternalIdError] = useState("");
   const [showCompoundValidation, setShowCompoundValidation] = useState(false);
 
   const {
@@ -64,6 +76,8 @@ function ProductCadastroForm({
     formState: { errors, isSubmitting },
   } = useForm<ICriarProdutoBody>({
     resolver: zodResolver(criarProdutoSchema),
+    mode: "onSubmit",
+    reValidateMode: "onChange",
     defaultValues,
   });
 
@@ -125,7 +139,13 @@ function ProductCadastroForm({
   };
 
   const addNewComponent = () => {
+    const externalId = newExternalId.trim();
     const name = newName.trim();
+    if (!externalId) {
+      setNewExternalIdError("ID externo é obrigatório");
+      return;
+    }
+    setNewExternalIdError("");
     if (!name) {
       return;
     }
@@ -138,7 +158,7 @@ function ProductCadastroForm({
     }
     setValue(
       "components",
-      [...components, { name, external_id: newExternalId.trim(), quantity }],
+      [...components, { name, external_id: externalId, quantity }],
       { shouldDirty: true },
     );
     setNewExternalId("");
@@ -188,13 +208,14 @@ function ProductCadastroForm({
   return (
     <form onSubmit={onFormSubmit} className="flex w-[min(580px,92vw)] flex-col">
       <div className="flex max-h-[70vh] flex-col gap-5 overflow-y-auto py-2">
-        <div className="grid grid-cols-1 items-start gap-3.5 sm:grid-cols-[120px_minmax(0,1fr)_150px]">
+        <div className="grid grid-cols-1 items-start gap-3.5 sm:grid-cols-[148px_minmax(0,1fr)_150px]">
           <div className="flex flex-col gap-2">
             <label
               htmlFor={`${idPrefix}-id`}
               className="text-sm font-semibold text-[#212A4F]"
             >
-              ID
+              ID externo
+              <span className="text-[#B90D0D]"> *</span>
             </label>
             <input
               id={`${idPrefix}-id`}
@@ -336,13 +357,14 @@ function ProductCadastroForm({
               <div className="mb-2 text-xs font-bold text-[#475569]">
                 Cadastrar novo componente
               </div>
-              <div className="grid grid-cols-1 items-end gap-2.5 sm:grid-cols-[110px_minmax(0,1fr)_78px_auto]">
+              <div className="grid grid-cols-1 items-end gap-2.5 sm:grid-cols-[140px_minmax(0,1fr)_78px_auto]">
                 <div>
                   <label
                     htmlFor={`${idPrefix}-new-id`}
                     className="mb-1.5 block text-xs font-semibold text-[#212A4F]"
                   >
-                    ID
+                    ID externo
+                    <span className="text-[#B90D0D]"> *</span>
                   </label>
                   <input
                     id={`${idPrefix}-new-id`}
@@ -351,8 +373,16 @@ function ProductCadastroForm({
                     maxLength={120}
                     className={inputClass}
                     value={newExternalId}
-                    onChange={(event) => setNewExternalId(event.target.value)}
+                    onChange={(event) => {
+                      setNewExternalId(event.target.value);
+                      if (event.target.value.trim()) {
+                        setNewExternalIdError("");
+                      }
+                    }}
                   />
+                  {newExternalIdError && (
+                    <p className="mt-1 text-xs text-[#B90D0D]">{newExternalIdError}</p>
+                  )}
                 </div>
                 <div>
                   <label
@@ -453,8 +483,10 @@ function ProductCadastroForm({
             </div>
 
             <div className="overflow-hidden rounded-lg border border-[#d6dbe4]">
-              <div className="grid grid-cols-[110px_minmax(0,1fr)_90px_32px] gap-2.5 border-b border-[#d6dbe4] bg-[#f8fafc] px-3 py-2.5 text-[11px] font-bold uppercase tracking-wide text-[#64748b]">
-                <div>ID</div>
+              <div className="grid grid-cols-[140px_minmax(0,1fr)_90px_32px] gap-2.5 border-b border-[#d6dbe4] bg-[#f8fafc] px-3 py-2.5 text-[11px] font-bold uppercase tracking-wide text-[#64748b]">
+                <div>
+                  ID externo <span className="text-[#B90D0D]">*</span>
+                </div>
                 <div>Componente</div>
                 <div>Qtd.</div>
                 <div />
@@ -468,23 +500,33 @@ function ProductCadastroForm({
                   components.map((component, index) => (
                     <div
                       key={`${component.component_product_id || component.name}-${index}`}
-                      className="grid grid-cols-[110px_minmax(0,1fr)_90px_32px] items-center gap-2.5 border-b border-[#eef0f4] px-3 py-2.5 text-sm last:border-b-0"
+                      className="grid grid-cols-[140px_minmax(0,1fr)_90px_32px] items-start gap-2.5 border-b border-[#eef0f4] px-3 py-2.5 text-sm last:border-b-0"
                     >
-                      <input
-                        type="text"
-                        maxLength={120}
-                        placeholder="ID do ERP"
-                        className={inputClass}
-                        value={component.external_id || ""}
-                        onChange={(event) => {
-                          const next = [...components];
-                          next[index] = {
-                            ...component,
-                            external_id: event.target.value,
-                          };
-                          setValue("components", next, { shouldDirty: true });
-                        }}
-                      />
+                      <div className="flex flex-col gap-1">
+                        <input
+                          type="text"
+                          maxLength={120}
+                          placeholder="ID do ERP"
+                          className={inputClass}
+                          value={component.external_id || ""}
+                          onChange={(event) => {
+                            const next = [...components];
+                            next[index] = {
+                              ...component,
+                              external_id: event.target.value,
+                            };
+                            setValue("components", next, {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                          }}
+                        />
+                        {componentExternalIdMessage(errors.components, index) && (
+                          <span className="text-xs text-[#B90D0D]">
+                            {componentExternalIdMessage(errors.components, index)}
+                          </span>
+                        )}
+                      </div>
                       <div className="truncate">{displayName(component)}</div>
                       <div>{component.quantity}</div>
                       <button

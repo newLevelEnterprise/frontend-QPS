@@ -98,10 +98,12 @@ function FormEditarMaquina({
     maquina.machines && maquina.machines.length > 0
       ? maquina.machines.map((m) => ({
           machineId: String(m.machine_id ?? m.id ?? ""),
+          tempoCiclo: String(m.tempo_ciclo ?? m.cycle_time ?? ""),
         }))
       : [
           {
             machineId: String(maquina.machine_id ?? maquina.id ?? ""),
+            tempoCiclo: String(maquina.tempo_ciclo ?? maquina.cycle_time ?? ""),
           },
         ];
 
@@ -215,6 +217,24 @@ function FormEditarMaquina({
       if (Number.isNaN(moldId) || Number.isNaN(productId)) {
         toast.error("Selecione molde e produto válidos para salvar.");
         return;
+      }
+
+      for (const item of data.maquinas) {
+        try {
+          await apiClient.post("/production-time", {
+            tempo_ciclo: parseFloat(item.tempoCiclo),
+            machine_id: parseInt(item.machineId),
+            product_id: productId,
+            mold_id: moldId,
+          });
+        } catch (error) {
+          const errorMessage = getApiErrorMessage(
+            error,
+            `Erro ao salvar tempo de ciclo da máquina ${item.machineId}.`,
+          );
+          toast.error(errorMessage);
+          return;
+        }
       }
 
       const payload = {
@@ -350,7 +370,7 @@ function FormEditarMaquina({
           </label>
           <button
             type="button"
-            onClick={() => append({ machineId: "" })}
+            onClick={() => append({ machineId: "", tempoCiclo: "" })}
             className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
           >
             + Adicionar máquina
@@ -386,6 +406,29 @@ function FormEditarMaquina({
               <ErrorMessage
                 errors={errors}
                 name={`maquinas.${index}.machineId`}
+                render={({ message }) => <FormErrorMessage message={message} />}
+              />
+            </div>
+
+            <div className="w-full flex flex-col gap-2">
+              <label
+                htmlFor={`maquina-ciclo-${field.id}`}
+                className="text-[#212A4F] font-semibold truncate text-ellipsis"
+              >
+                Tempo de ciclo (s)
+              </label>
+              <input
+                id={`maquina-ciclo-${field.id}`}
+                placeholder="Tempo de ciclo"
+                type="number"
+                min="0"
+                step="0.01"
+                className="w-full outline-none border-b border-[#A4AABC]"
+                {...register(`maquinas.${index}.tempoCiclo`)}
+              />
+              <ErrorMessage
+                errors={errors}
+                name={`maquinas.${index}.tempoCiclo`}
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             </div>

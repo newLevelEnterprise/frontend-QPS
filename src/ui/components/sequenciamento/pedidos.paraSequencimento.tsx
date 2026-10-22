@@ -1,17 +1,30 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { IoSearchSharp } from "react-icons/io5";
+import { IoClose, IoSearchSharp } from "react-icons/io5";
 import { useAuth } from "../../../hooks/useAuth";
 import type { IPedido } from "../../../types/Pedido";
+import {
+  formatarData,
+  formatarHora,
+  formatarNumero,
+  formatarValor,
+  nomeCliente,
+  nomeProduto,
+  numeroPedido,
+  pedidoCombinaBusca,
+  prioridadePedido,
+} from "./pedidoFormat";
 
 interface PedidosParaSequenciamentoProps {
   setStartSteps?: (value: boolean) => void;
+  pedidos: IPedido[];
+  onRemover: (pedido: IPedido) => void;
 }
 
 function PedidosParaSequenciamento({
   setStartSteps,
+  pedidos,
+  onRemover,
 }: PedidosParaSequenciamentoProps) {
-  const queryClient = useQueryClient();
   const [busca, setBusca] = useState<string>("");
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -67,43 +80,7 @@ function PedidosParaSequenciamento({
     };
   }, []);
 
-  const { data: pedidos } = useQuery({
-    queryKey: ["jobs", "para", "sequenciamento"],
-    queryFn: () => {
-      const jsonItens = localStorage.getItem("jobs_para_sequenciamento");
-      if (!jsonItens) {
-        return queryClient.getQueryData([
-          "jobs",
-          "para",
-          "sequenciamento",
-        ]) as IPedido[];
-      }
-      const jobsParaSequenciamento = JSON.parse(jsonItens) as IPedido[];
-
-      return jobsParaSequenciamento as IPedido[];
-    },
-  });
-
-  const handleVoltarPedido = (pedido: IPedido) => {
-    queryClient.setQueryData(["get", "jobs"], (actualData: IPedido[]) => {
-      if (!actualData) return actualData;
-      return [...actualData, pedido];
-    });
-    queryClient.setQueryData(
-      ["jobs", "para", "sequenciamento"],
-      (oldData: IPedido[]) => {
-        if (!oldData) return oldData;
-        const oldOrders = [...oldData];
-        const index = oldOrders.findIndex((p) => p.id === pedido.id);
-        oldOrders.splice(index, 1);
-        localStorage.setItem(
-          "jobs_para_sequenciamento",
-          JSON.stringify(oldOrders),
-        );
-        return oldOrders;
-      },
-    );
-  };
+  const lista = (pedidos ?? []).filter((pedido) => pedidoCombinaBusca(pedido, busca));
 
   return (
     <div className="max-w-full md:flex-1 flex flex-col justify-between bg-white rounded-md shadow p-4 overflow-y-auto overflow-x-auto">
@@ -125,7 +102,7 @@ function PedidosParaSequenciamento({
           />
         </div>
 
-        <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[300px] md:h-[300px] overflow-x-auto">
+        <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-[300px]">
           {!pedidos || pedidos.length === 0 ? (
             <div className="w-full h-full flex justify-center items-center">
               <h2 className="text-gray-500 font-semibold">
@@ -133,65 +110,42 @@ function PedidosParaSequenciamento({
               </h2>
             </div>
           ) : (
-            <table className="w-full overflow-x-auto">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
-                    Cliente
-                  </th>
-                  <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
-                    Produto
-                  </th>
-                  <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
-                    Demanda
-                  </th>
-                  <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
-                    Data Prometida
-                  </th>
-                  <th className="px-3 py-2 text-left text-xs text-gray-700 uppercase tracking-wider">
-                    Valor
-                  </th>
-                  <th className="sticky top-0 z-10 bg-gray-100 px-1 py-2 text-center text-xs text-gray-700 uppercase tracking-wider whitespace-nowrap">
-                    Prioridade
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200 overflow-y-auto overflow-x-scroll">
-                {pedidos
-                  .filter((p) => p.product_name.includes(busca))
-                  .map((pedido) => (
-                    <tr
-                      key={pedido.id}
-                      onClick={() => handleVoltarPedido(pedido)}
-                      className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
+            <ul className="divide-y divide-gray-200">
+              {lista.map((pedido) => (
+                <li key={pedido.id}>
+                  <div
+                    onClick={() => onRemover(pedido)}
+                    className="w-full text-left px-3 py-2 hover:bg-gray-50 cursor-pointer flex items-start justify-between gap-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        Pedido {numeroPedido(pedido)} · {nomeProduto(pedido)}
+                      </p>
+                      <p className="text-xs text-gray-600 truncate">{nomeCliente(pedido)}</p>
+                      <p className="text-xs text-gray-600">
+                        {formatarNumero(pedido.demand)} unidades · {formatarData(pedido.promised_date)}{" "}
+                        {formatarHora(pedido.promised_date)}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        R$ {formatarValor(pedido.product_value)} · Prioridade{" "}
+                        {prioridadePedido(pedido) ?? "—"}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label="Remover do sequenciamento"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onRemover(pedido);
+                      }}
+                      className="text-gray-500 hover:text-gray-800 cursor-pointer p-1"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                        {pedido.product_name.split(" - ")[0]}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                        {pedido.product_name.split(" - ")[1]}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                        {Intl.NumberFormat("pt-br").format(pedido.demand)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                        {Intl.DateTimeFormat("pt-BR", {
-                          dateStyle: "short",
-                        }).format(new Date(pedido.promised_date))}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs md:text-sm text-black truncate text-ellipsis">
-                        {Intl.NumberFormat("pt-br", {
-                          style: "currency",
-                          currency: "BRL",
-                        }).format(pedido.product_value)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-xs md:text-sm text-black truncate text-ellipsis">
-                        {pedido.client ? pedido.client.priority : "N/A"}
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+                      <IoClose size={18} />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>

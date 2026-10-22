@@ -25,9 +25,11 @@ function FormNovoCliente({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
   } = useForm<ICriarClienteBody>({
     resolver: zodResolver(criarClienteSchema),
+    mode: "onSubmit",
+    reValidateMode: "onChange",
     defaultValues: {
       external_id: "",
     },
@@ -37,7 +39,7 @@ function FormNovoCliente({
   const onSubmit = async (data: any) => {
     try {
       const { data: res } = await apiClient.post<ICliente>("/clients", {
-        external_id: data.external_id.trim() || null,
+        external_id: data.external_id.trim(),
         name: data.name,
         priority: parseInt(data.priority),
       });
@@ -64,7 +66,8 @@ function FormNovoCliente({
           htmlFor="novo-cliente-id"
           className="text-[#212A4F] font-semibold truncate text-ellipsis"
         >
-          ID
+          ID externo
+          <span className="text-[#B90D0D]"> *</span>
         </label>
         <input
           id="novo-cliente-id"
@@ -141,7 +144,7 @@ function FormNovoCliente({
       <div className="w-full flex justify-end">
         <Button
           title="Ok"
-          disable={isSubmitting || !isValid}
+          disable={isSubmitting}
           isLoading={isSubmitting}
           type="submit"
         />

@@ -27,6 +27,7 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
     resolver: zodResolver(criarItensCompraSchema),
     defaultValues: {
       external_id: "",
+      estoqueMinimo: "0",
     },
   });
 
@@ -46,6 +47,7 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
         lead_time: Number(data.leadTimeEntrega),
         cost: parseFloat(data.custoMedio),
         scrap: parseFloat(data.refugo),
+        minimum_stock: Number(data.estoqueMinimo),
       });
       toast.success("Insumo criado com sucesso!");
       setItem();
@@ -189,6 +191,32 @@ function FormNovoItem({ setNovoItem, setItem }: IFormNovoItemProps) {
             <ErrorMessage
               errors={errors}
               name="refugo"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="estoqueMinimo"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+          >
+            Estoque Mínimo
+          </label>
+          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+            <input
+              id="estoqueMinimo"
+              placeholder="Estoque Mínimo"
+              type="number"
+              min={0}
+              step="any"
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("estoqueMinimo")}
+            />
+          </div>
+          {errors.estoqueMinimo && (
+            <ErrorMessage
+              errors={errors}
+              name="estoqueMinimo"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}

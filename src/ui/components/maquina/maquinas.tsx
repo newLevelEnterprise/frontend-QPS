@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { useState } from "react";
 import { CiCirclePlus } from "react-icons/ci";
 import { useParams } from "react-router-dom";
@@ -9,6 +10,7 @@ import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 import Modal from "../modal";
 import XlsxUpload from "../XlsxUpload";
+import CalendarioLinha from "../linha-producao/calendarioLinha";
 import FormEditarMaquina from "./formEditarMaquina";
 import FormNovaMaquina from "./formNovaMaquina";
 import FormSetup from "./formSetup";
@@ -46,6 +48,8 @@ function Maquina() {
   const [editarMaquina, setEditarMaquina] = useState<boolean>(false);
   const [setup, setSetup] = useState<{ nome: string; id: number } | null>(null);
   const [setupUploadModal, setSetupUploadModal] = useState<boolean>(false);
+  const [isDownloadingSetup, setIsDownloadingSetup] = useState(false);
+  const [aba, setAba] = useState<"dados" | "calendario">("dados");
 
   const { data: linhaProd, isFetching } = useQuery({
     queryKey: ["get", "all", "linhaprod", linhaId],
@@ -93,6 +97,44 @@ function Maquina() {
     codMolde: "",
     produto: "",
   });
+
+  const downloadSetupMatrix = async () => {
+    if (!linhaId) return;
+    try {
+      setIsDownloadingSetup(true);
+      const response = await apiClient.get<Blob>(
+        `/template/setup-matrix/${linhaId}`,
+        { responseType: "blob" },
+      );
+      const disposition = String(response.headers["content-disposition"] ?? "");
+      const filename =
+        disposition.match(/filename="([^"]+)"/)?.[1] ||
+        `setup_matrix_linha_${linhaId}.xlsx`;
+      const url = URL.createObjectURL(response.data);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      let message = "Erro ao baixar a matriz de setup.";
+      if (axios.isAxiosError(error) && error.response?.data instanceof Blob) {
+        try {
+          const payload = JSON.parse(await error.response.data.text());
+          if (typeof payload.detail === "string" && payload.detail.trim()) {
+            message = payload.detail;
+          }
+        } catch {
+          message = "Erro ao baixar a matriz de setup.";
+        }
+      }
+      toast.error(message);
+    } finally {
+      setIsDownloadingSetup(false);
+    }
+  };
 
   const machineColumns = Array.from(
     new Map(
@@ -209,17 +251,45 @@ function Maquina() {
               >
                 Upload setup
               </button>
-              <a
-                target="_top"
-                href={`https://api-quant-production.up.railway.app/template/setup-matrix/${linhaId}`}
-                download
+              <button
+                type="button"
+                disabled={isDownloadingSetup || !linhaId}
+                onClick={downloadSetupMatrix}
+                className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <button className="px-4 py-1 bg-blue-300 hover:bg-blue-400 transition-colors duration-150 cursor-pointer text-white rounded-md">
-                  Download setup
-                </button>
-              </a>
+                {isDownloadingSetup ? "Baixando..." : "Download setup"}
+              </button>
             </div>
           </div>
+          <div className="flex gap-6 border-b border-gray-200 mt-4">
+            <button
+              type="button"
+              onClick={() => setAba("dados")}
+              className={`pb-2 text-sm md:text-base cursor-pointer ${
+                aba === "dados"
+                  ? "border-b-2 border-[#5B85D5] text-[#5B85D5] font-bold"
+                  : "text-gray-500"
+              }`}
+            >
+              Informações da Linha
+            </button>
+            <button
+              type="button"
+              onClick={() => setAba("calendario")}
+              className={`pb-2 text-sm md:text-base cursor-pointer ${
+                aba === "calendario"
+                  ? "border-b-2 border-[#5B85D5] text-[#5B85D5] font-bold"
+                  : "text-gray-500"
+              }`}
+            >
+              Calendário
+            </button>
+          </div>
+          {aba === "calendario" && linhaId && (
+            <CalendarioLinha linhaId={linhaId} linhaNome={linhaProd?.name} />
+          )}
+          {aba === "dados" && (
+          <>
           <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
             <table className="w-full overflow-auto max-h-[470px]">
               <thead>
@@ -380,6 +450,8 @@ function Maquina() {
               Adicionar Info. da Linha
             </button>
           </div>
+          </>
+          )}
         </>
       )}
     </div>

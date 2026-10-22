@@ -5,4 +5,5 @@ export interface IItensCompra {
   scrap: number;
   id: number;
   external_id?: string | null;
+  minimum_stock?: number;
 }

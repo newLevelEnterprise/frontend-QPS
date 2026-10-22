@@ -201,7 +201,7 @@ function Composicao() {
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                  Nome do Produto
+                  Componente
                 </th>
                 {rawMaterialColumns.map((rawMaterialColumn) => (
                   <th

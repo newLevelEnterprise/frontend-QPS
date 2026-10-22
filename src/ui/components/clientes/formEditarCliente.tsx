@@ -27,9 +27,11 @@ function FormEditarCliente({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
   } = useForm<IEditarClienteBody>({
     resolver: zodResolver(editarClienteSchema),
+    mode: "onSubmit",
+    reValidateMode: "onChange",
     defaultValues: {
       external_id: cliente.external_id ?? "",
       name: cliente.name,
@@ -41,7 +43,7 @@ function FormEditarCliente({
   const onSubmit = async (data: any) => {
     try {
       await apiClient.put<ICliente>(`/clients/${cliente.id}`, {
-        external_id: data.external_id.trim() || null,
+        external_id: data.external_id.trim(),
         name: data.name,
         priority: parseInt(data.priority),
       });
@@ -69,7 +71,8 @@ function FormEditarCliente({
           htmlFor="editar-cliente-id"
           className="text-[#212A4F] font-semibold truncate text-ellipsis"
         >
-          ID
+          ID externo
+          <span className="text-[#B90D0D]"> *</span>
         </label>
         <input
           id="editar-cliente-id"
@@ -146,7 +149,7 @@ function FormEditarCliente({
       <div className="w-full flex justify-end">
         <Button
           title="Ok"
-          disable={isSubmitting || !isValid}
+          disable={isSubmitting}
           isLoading={isSubmitting}
           type="submit"
         />

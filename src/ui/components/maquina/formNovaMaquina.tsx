@@ -1,7 +1,6 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useMemo } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -27,27 +26,6 @@ interface IFormNovaMaquinaProps {
   linhaId?: string;
 }
 
-function getApiErrorMessage(error: unknown, fallback: string) {
-  if (!axios.isAxiosError(error)) {
-    return fallback;
-  }
-
-  const responseData = error.response?.data;
-
-  if (typeof responseData === "string" && responseData.trim()) {
-    return responseData;
-  }
-
-  if (responseData && typeof responseData === "object") {
-    const data = responseData as { message?: string; error?: string; detail?: string };
-    if (typeof data.message === "string" && data.message.trim()) return data.message;
-    if (typeof data.error === "string" && data.error.trim()) return data.error;
-    if (typeof data.detail === "string" && data.detail.trim()) return data.detail;
-  }
-
-  return fallback;
-}
-
 function FormNovaMaquina({
   setNovaMaquina,
   setMaquina,
@@ -63,7 +41,7 @@ function FormNovaMaquina({
   } = useForm<ICriarLinhasProdBody>({
     resolver: zodResolver(criarLinhasProdSchema),
     defaultValues: {
-      maquinas: [{ machineId: "" }],
+      maquinas: [{ machineId: "", tempoCiclo: "" }],
     },
   });
   console.log(linhaId);
@@ -121,6 +99,15 @@ function FormNovaMaquina({
 
   const onSubmit = async (data: ICriarLinhasProdBody) => {
     try {
+      for (const maquina of data.maquinas) {
+        await apiClient.post("/production-time", {
+          tempo_ciclo: parseFloat(maquina.tempoCiclo),
+          machine_id: parseInt(maquina.machineId),
+          product_id: parseInt(data.produto),
+          mold_id: parseInt(data.codMolde),
+        });
+      }
+
       await apiClient.post("/composition-lines", {
         production_line_id: parseInt(linhaId || "0"),
         mold_id: parseInt(data.codMolde),
@@ -128,12 +115,13 @@ function FormNovaMaquina({
         machines: data.maquinas.map((m) => parseInt(m.machineId)),
       });
 
+      console.log("Dados do formulário:", data);
       toast.success("Máquinas criadas com sucesso!");
       setMaquina();
       setNovaMaquina(false);
     } catch (error) {
       console.error("Erro ao criar máquina:", error);
-      toast.error(getApiErrorMessage(error, "Erro ao criar máquina. Tente novamente."));
+      toast.error("Erro ao criar máquina. Tente novamente.");
     }
   };
 
@@ -226,7 +214,7 @@ function FormNovaMaquina({
           </label>
           <button
             type="button"
-            onClick={() => append({ machineId: "" })}
+            onClick={() => append({ machineId: "", tempoCiclo: "" })}
             className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
           >
             + Adicionar máquina
@@ -263,6 +251,29 @@ function FormNovaMaquina({
               <ErrorMessage
                 errors={errors}
                 name={`maquinas.${index}.machineId`}
+                render={({ message }) => <FormErrorMessage message={message} />}
+              />
+            </div>
+
+            <div className="w-full flex flex-col gap-2">
+              <label
+                htmlFor={`maquina-ciclo-${field.id}`}
+                className="text-[#212A4F] font-semibold truncate text-ellipsis"
+              >
+                Tempo de ciclo (s)
+              </label>
+              <input
+                id={`maquina-ciclo-${field.id}`}
+                placeholder="Tempo de ciclo"
+                type="number"
+                min="0"
+                step="0.01"
+                className="w-full outline-none border-b border-[#A4AABC]"
+                {...register(`maquinas.${index}.tempoCiclo`)}
+              />
+              <ErrorMessage
+                errors={errors}
+                name={`maquinas.${index}.tempoCiclo`}
                 render={({ message }) => <FormErrorMessage message={message} />}
               />
             </div>

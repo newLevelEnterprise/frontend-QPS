@@ -8,6 +8,10 @@ export interface IPedido {
     id: number;
     name: string;
   };
+  commercial_product?: {
+    id: number;
+    name: string;
+  } | null;
   mold: {
     id: number;
     name: string;
@@ -21,6 +25,7 @@ export interface IPedido {
   deadline_days: number;
   deadline_hours: number;
   product_value: number;
+  priority?: number | null;
   processed: number;
   fk_id_client: number;
   fk_id_product: number;

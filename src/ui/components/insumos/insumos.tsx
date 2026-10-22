@@ -19,12 +19,14 @@ function Insumos() {
     external_id?: string | null;
     lead_time_medio_entrega: number;
     custo_medio: string;
+    minimum_stock: number;
   }>({
     id: 0,
     external_id: "",
     nome: "",
     lead_time_medio_entrega: 0,
     custo_medio: "",
+    minimum_stock: 0,
   });
 
   const { data: insumos, isFetching } = useQuery({
@@ -37,6 +39,7 @@ function Insumos() {
           external_id?: string | null;
           lead_time_medio_entrega: number;
           custo_medio: string;
+          minimum_stock: number;
         }[]
       >("/raw-material/");
       return data;
@@ -115,6 +118,9 @@ function Insumos() {
                 <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
                   Custo Médio (R$/Kg)
                 </th>
+                <th className="px-6 py-4 text-xs md:text-sm font-medium text-gray-700 text-center">
+                  Estoque Mínimo
+                </th>
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                   Ações
                 </th>
@@ -137,6 +143,9 @@ function Insumos() {
                   </td>
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {insumo.custo_medio}
+                  </td>
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                    {insumo.minimum_stock ?? 0}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="w-full flex justify-end gap-2">
@@ -175,6 +184,7 @@ function Insumos() {
               nome: "",
               lead_time_medio_entrega: 0,
               custo_medio: "",
+              minimum_stock: 0,
             });
           }}
           className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

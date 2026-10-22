@@ -27,3 +27,36 @@ export const criarPedidoSchema = z.object({
 
 export type IPedidoBody = z.infer<typeof pedidoSchema>;
 export type ICriarPedidoBody = z.infer<typeof criarPedidoSchema>;
+
+export const JOB_PRIORITIES = ["1", "2", "3", "4", "9"] as const;
+
+export function parseBrDecimal(value: string): number | null {
+  const cleaned = value.trim().replace(/\s/g, "").replace(/^R\$/, "");
+  if (!cleaned) return null;
+  const normalized = cleaned.includes(",")
+    ? cleaned.replace(/\./g, "").replace(",", ".")
+    : cleaned;
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+export const jobManualSchema = z.object({
+  fk_id_client: z.string().min(1, "Cliente é obrigatório"),
+  fk_id_product: z.string().min(1, "Produto é obrigatório"),
+  demand: z.string().refine((value) => {
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0;
+  }, "Demanda deve ser um inteiro maior que zero"),
+  product_value: z
+    .string()
+    .min(1, "Valor é obrigatório")
+    .refine((value) => {
+      const parsed = parseBrDecimal(value);
+      return parsed !== null && parsed >= 0;
+    }, "Valor inválido"),
+  promised_date: z.string().min(1, "Data prometida é obrigatória"),
+  promised_hour: z.string().min(1, "Hora prometida é obrigatória"),
+  priority: z.enum(JOB_PRIORITIES, { message: "Prioridade deve ser 1, 2, 3, 4 ou 9" }),
+});
+
+export type IJobManualBody = z.infer<typeof jobManualSchema>;

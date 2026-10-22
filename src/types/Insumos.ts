@@ -4,4 +4,5 @@ export interface IInsumos {
   material: string;
   leadTimeEntrega: number;
   custoMedio: number;
+  minimum_stock?: number;
 }

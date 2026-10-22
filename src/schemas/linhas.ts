@@ -7,6 +7,10 @@ export const criarLinhasProdSchema = z.object({
     .array(
       z.object({
         machineId: z.string().min(1, "Máquina é obrigatória"),
+        tempoCiclo: z
+          .string()
+          .min(1, "Tempo de ciclo é obrigatório")
+          .regex(/^\d+(\.\d+)?$/, "Tempo de ciclo deve ser numérico"),
       }),
     )
     .min(1, "Adicione ao menos uma máquina"),

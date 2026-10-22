@@ -7,6 +7,7 @@ import Composicao from "../ui/pages/composicao";
 import FeriadosPage from "../ui/pages/feriados";
 import ForgotPasswordPage from "../ui/pages/ForgotPassword";
 import HistoryPage from "../ui/pages/historyPage";
+import EstoquePage from "../ui/pages/estoque";
 import ItensCompraPage from "../ui/pages/itensCompra";
 import LinhaProducaoPage from "../ui/pages/linha-producao";
 import LoginPage from "../ui/pages/LoginPage";
@@ -18,7 +19,6 @@ import ProdutosPage from "../ui/pages/produto";
 import ResetPasswordPage from "../ui/pages/ResetPassword";
 import Sequenciamento from "../ui/pages/Sequenciamento";
 import SignUpPage from "../ui/pages/SignUpPage";
-import TempoCicloPage from "../ui/pages/tempo-ciclo";
 import TurnosRegularesPage from "../ui/pages/turnosregulares";
 import AuthGuard from "./AuthGuard";
 
@@ -48,10 +48,6 @@ function Router() {
               path="/cadastro/linhas-producao"
               element={<LinhaProducaoPage />}
             />
-            <Route
-              path="/cadastro/tempo-de-ciclo"
-              element={<TempoCicloPage />}
-            />
             <Route path="/historico" element={<HistoryPage />} />
 
             <Route
@@ -60,6 +56,7 @@ function Router() {
             />
             <Route path="/insumos/materia-prima" element={<InsumosPage />} />
             <Route path="/insumos/itens-compra" element={<ItensCompraPage />} />
+            <Route path="/insumos/estoque" element={<EstoquePage />} />
             <Route path="/composicao" element={<Composicao />} />
             <Route path="/turnos-regulares" element={<TurnosRegularesPage />} />
             <Route path="/feriados" element={<FeriadosPage />} />

@@ -20,6 +20,7 @@ interface IFormEditarInsumoProps {
     nome: string;
     lead_time_medio_entrega: number;
     custo_medio: string;
+    minimum_stock?: number;
   };
   setEditarInsumo: Dispatch<SetStateAction<boolean>>;
   setInsumo: () => void;
@@ -41,6 +42,7 @@ function FormEditarInsumo({
       custoMedio: insumo.custo_medio,
       leadTimeEntrega: String(insumo.lead_time_medio_entrega) || "0",
       nome: insumo.nome,
+      estoqueMinimo: String(insumo.minimum_stock ?? 0),
     },
   });
 
@@ -51,6 +53,7 @@ function FormEditarInsumo({
         nome: data.nome,
         lead_time_medio_entrega: Number(data.leadTimeEntrega),
         custo_medio: parseFloat(data.custoMedio),
+        minimum_stock: Number(data.estoqueMinimo),
       });
       setInsumo();
       toast.success("Insumo atualizado com sucesso!");
@@ -167,6 +170,32 @@ function FormEditarInsumo({
             <ErrorMessage
               errors={errors}
               name="custoMedio"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+        <div className="w-full flex flex-col gap-3">
+          <label
+            htmlFor="editar-estoque-minimo"
+            className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
+          >
+            Estoque Mínimo
+          </label>
+          <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
+            <input
+              id="editar-estoque-minimo"
+              placeholder="Estoque Mínimo"
+              type="number"
+              min={0}
+              step="any"
+              className="w-full outline-none border-b border-[#A4AABC]"
+              {...register("estoqueMinimo")}
+            />
+          </div>
+          {errors.estoqueMinimo && (
+            <ErrorMessage
+              errors={errors}
+              name="estoqueMinimo"
               render={({ message }) => <FormErrorMessage message={message} />}
             />
           )}

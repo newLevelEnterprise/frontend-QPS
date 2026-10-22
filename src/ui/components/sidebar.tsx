@@ -8,15 +8,14 @@ import { IoChevronDown, IoClose } from "react-icons/io5";
 import { LiaIndustrySolid } from "react-icons/lia";
 import { LuShapes, LuSpline } from "react-icons/lu";
 import {
-  MdCalendarMonth,
   MdGradient,
   MdMenuBook,
   MdMessage,
-  MdOutlineAccessTime,
   MdOutlineHistory,
   MdOutlinePrecisionManufacturing,
   MdOutlineTimeline,
   MdOutlineViewComfyAlt,
+  MdInventory2,
   MdSupervisedUserCircle,
 } from "react-icons/md";
 import { RiFileList3Line } from "react-icons/ri";
@@ -75,11 +74,6 @@ const menuItems: MenuItem[] = [
             icon: LiaIndustrySolid,
             url: "/cadastro/linhas-producao",
           },
-          {
-            title: "Tempo de Produção",
-            icon: MdOutlineAccessTime,
-            url: "/cadastro/tempo-de-ciclo",
-          },
         ],
   },
   {
@@ -110,6 +104,11 @@ const menuItems: MenuItem[] = [
         icon: CiShoppingCart,
         url: "/insumos/itens-compra",
       },
+      {
+        title: "Estoque",
+        icon: MdInventory2,
+        url: "/insumos/estoque",
+      },
     ],
   },
   {
@@ -129,15 +128,6 @@ const menuItems: MenuItem[] = [
       </div>
     ),
     url: "/turnos-regulares",
-  },
-  {
-    title: "Feriados",
-    icon: (props) => (
-      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
-        <MdCalendarMonth className={props.className} />
-      </div>
-    ),
-    url: "/feriados",
   },
   {
     title: "Resultados",

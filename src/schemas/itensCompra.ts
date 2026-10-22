@@ -8,6 +8,13 @@ export const criarItensCompraSchema = z.object({
   leadTimeEntrega: z.string().min(1, "Lead time é obrigatório"),
   custoMedio: z.string().min(1, "Custo médio é obrigatório"),
   refugo: z.string().min(1, "Refugo é obrigatório"),
+  estoqueMinimo: z
+    .string()
+    .min(1, "Estoque mínimo é obrigatório")
+    .refine((value) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) && parsed >= 0;
+    }, "Estoque mínimo deve ser um número maior ou igual a zero"),
 });
 
 export const editarItensCompraSchema = z.object({
@@ -18,6 +25,13 @@ export const editarItensCompraSchema = z.object({
   leadTimeEntrega: z.string().min(1, "Lead time é obrigatório"),
   custoMedio: z.string().min(1, "Custo médio é obrigatório"),
   refugo: z.string().min(1, "Refugo é obrigatório"),
+  estoqueMinimo: z
+    .string()
+    .min(1, "Estoque mínimo é obrigatório")
+    .refine((value) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) && parsed >= 0;
+    }, "Estoque mínimo deve ser um número maior ou igual a zero"),
 });
 
 export type IEditarItensCompraBody = z.infer<typeof editarItensCompraSchema>;

@@ -17,6 +17,7 @@ export interface RawMaterial {
 export interface Product {
   id: number;
   name: string;
+  is_simple?: boolean;
 }
 
 export interface NovaComposicaoFormState {
@@ -115,6 +116,10 @@ function FormNovaComposicao({
     },
   );
 
+  const components = (products ?? []).filter(
+    (product) => product.is_simple !== false,
+  );
+
   const isGettingData =
     isFetching || isFetchingRawMaterials || isFetchingPurchaseItens;
 
@@ -128,22 +133,22 @@ function FormNovaComposicao({
         >
           <div className="w-full flex flex-col gap-3">
             <label
-              htmlFor="produto"
+              htmlFor="componente"
               className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
             >
-              Produto
+              Componente
             </label>
             <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
               <select
-                id="produto"
+                id="componente"
                 className="w-full outline-none border-b border-[#A4AABC]"
                 value={formState.productId}
                 onChange={(event) => handleProductChange(event.target.value)}
               >
                 <option value="" disabled>
-                  Selecione o produto
+                  Selecione o componente
                 </option>
-                {products?.map((product) => (
+                {components.map((product) => (
                   <option key={product.id} value={product.id}>
                     {product.name}
                   </option>

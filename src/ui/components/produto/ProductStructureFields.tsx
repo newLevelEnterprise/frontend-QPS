@@ -37,13 +37,13 @@ function ProductStructureFields({
       if (event.target.value === "simple") {
         setValue("components", []);
       } else if (!watch("components")?.length) {
-        setValue("components", [{ name: "", quantity: "1" }]);
+        setValue("components", [{ name: "", external_id: "", quantity: "1" }]);
       }
     },
   });
 
   const addComponent = () => {
-    setValue("components", [...components, { name: "", quantity: "1" }], {
+    setValue("components", [...components, { name: "", external_id: "", quantity: "1" }], {
       shouldDirty: true,
     });
   };
@@ -193,13 +193,13 @@ export function toProductStructurePayload(data: ICriarProdutoBody) {
     if (component.component_product_id) {
       return {
         component_product_id: Number(component.component_product_id),
-        external_id: externalId || null,
+        external_id: externalId,
         quantity,
       };
     }
     return {
       name: (component.name || "").trim(),
-      external_id: externalId || null,
+      external_id: externalId,
       quantity,
     };
   });

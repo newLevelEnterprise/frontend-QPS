@@ -2,7 +2,7 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-ARG VITE_BACKEND_URL=https://api-quant-production.up.railway.app
+ARG VITE_BACKEND_URL=https://qps-production.up.railway.app
 ARG VITE_HIDE_MOLD_FIELDS=false
 ARG VITE_RESTRICTED_HOSTS=
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL \

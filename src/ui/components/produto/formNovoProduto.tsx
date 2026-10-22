@@ -28,7 +28,7 @@ function FormNovoProduto({
   const onSave = async (data: ICriarProdutoBody) => {
     try {
       await apiClient.post("/products", {
-        external_id: data.external_id.trim() || null,
+        external_id: data.external_id.trim(),
         name: data.name,
         post_injection_cycle_time: Number.parseInt(
           data.post_injection_cycle_time,

@@ -7,6 +7,13 @@ export const criarInsumosSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
   leadTimeEntrega: z.string().min(1, "Lead time é obrigatório"),
   custoMedio: z.string().min(1, "Custo médio é obrigatório"),
+  estoqueMinimo: z
+    .string()
+    .min(1, "Estoque mínimo é obrigatório")
+    .refine((value) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) && parsed >= 0;
+    }, "Estoque mínimo deve ser um número maior ou igual a zero"),
 });
 
 export const editarInsumosSchema = z.object({
@@ -16,6 +23,13 @@ export const editarInsumosSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
   leadTimeEntrega: z.string().min(1, "Lead time é obrigatório"),
   custoMedio: z.string().min(1, "Custo médio é obrigatório"),
+  estoqueMinimo: z
+    .string()
+    .min(1, "Estoque mínimo é obrigatório")
+    .refine((value) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) && parsed >= 0;
+    }, "Estoque mínimo deve ser um número maior ou igual a zero"),
 });
 
 export type IEditarInsumosBody = z.infer<typeof editarInsumosSchema>;

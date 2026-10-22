@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { BiUpload } from "react-icons/bi";
@@ -13,6 +14,7 @@ interface XlsxUploadProps {
   mainDivClassName?: string;
   uploaderContainerClassName?: string;
   onClose?: () => void;
+  hint?: string;
 }
 
 function XlsxUpload({
@@ -21,6 +23,7 @@ function XlsxUpload({
   mainDivClassName,
   uploaderContainerClassName,
   onClose,
+  hint,
 }: XlsxUploadProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
@@ -36,13 +39,23 @@ function XlsxUpload({
   });
 
   const onUpload = async () => {
-    await apiClient.postForm(`/upload/${endpoint}`, {
+    const { data } = await apiClient.postForm(`/upload/${endpoint}`, {
       file: acceptedFiles[0],
     });
-    if (onRevalidate) {
+    const erros = Array.isArray(data?.erros)
+      ? data.erros.filter((item: unknown) => typeof item === "string" && item.trim())
+      : [];
+    if (onRevalidate && (erros.length === 0 || Number(data?.jobs_criados) > 0)) {
       onRevalidate();
     }
-    if (onClose) {
+    if (erros.length > 0) {
+      const extra = erros.length > 1 ? ` (+${erros.length - 1} linha(s))` : "";
+      const message = `${erros[0]}${extra}`;
+      toast.error(message.length > 280 ? `${message.slice(0, 277)}...` : message);
+    } else {
+      toast.success("Arquivo enviado com sucesso!");
+    }
+    if (onClose && erros.length === 0) {
       onClose();
     }
   };
@@ -51,10 +64,17 @@ function XlsxUpload({
     try {
       setIsUploading(true);
       await onUpload();
-      toast.success("Arquivo enviado com sucesso!");
     } catch (error) {
       console.log(error);
-      toast.error("Erro ao enviar o arquivo. Tente novamente.");
+      const detail = axios.isAxiosError(error) ? error.response?.data?.detail : null;
+      const message = typeof detail === "string" && detail.trim() ? detail : "";
+      toast.error(
+        message
+          ? message.length > 280
+            ? `${message.slice(0, 277)}...`
+            : message
+          : "Erro ao enviar o arquivo. Tente novamente.",
+      );
     } finally {
       setIsUploading(false);
     }
@@ -99,6 +119,11 @@ function XlsxUpload({
           className="self-start md:self-auto h-fit text-xs md:text-base"
         />
       </div>
+      {hint ? (
+        <p className="mt-3 max-w-3xl whitespace-normal text-xs leading-5 text-gray-600 md:text-sm">
+          {hint}
+        </p>
+      ) : null}
       <p className="mt-4 text-xs md:text-sm text-[#929191]">
         Apenas arquivos XLSX são aceitos
       </p>

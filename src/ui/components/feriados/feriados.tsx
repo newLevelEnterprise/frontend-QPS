@@ -1,59 +1,18 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { CiCirclePlus } from "react-icons/ci";
-import { toast } from "react-toastify";
-import type { ICriarFeriadoBody } from "../../../schemas/feriado";
-import { apiClient } from "../../../utils/apiClient";
-import Modal from "../modal";
-import FeriadosEstaduais from "./components/feriadosEstaduais";
-import FeriadosMunicipais from "./components/feriadosMunicipais";
-import FeriadosNacionais from "./components/feriadosNacionais";
-import FormCadastrarFeriado from "./formCadastrarFeriado";
+import { Link } from "react-router-dom";
 
 function Feriados() {
-  const queryClient = useQueryClient();
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const handleOpen = () => setModalOpen(true);
-  const handleClose = () => setModalOpen(false);
-
-  const handleSubmit = async (data: ICriarFeriadoBody) => {
-    try {
-      await apiClient.post(`/holidays`, data);
-      handleClose();
-      queryClient.invalidateQueries({ queryKey: ["get", "all", "feriados"] });
-    } catch (error) {
-      console.log("Erro ao cadastrar feriado:", error);
-      toast.error("Erro ao cadastrar feriado. Tente novamente mais tarde.");
-    }
-  };
-
   return (
-    <div className="w-full flex flex-col rounded-md shadow p-4 overflow-auto">
-      <h1 className="text-xl text-[#5B85D5] font-bold">Feriados</h1>
-      <div className="w-full flex justify-end items-center">
-        <button
-          className="flex gap-2 cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-150"
-          onClick={handleOpen}
-        >
-          <CiCirclePlus className="size-6" />
-          Adicionar Feriado
-        </button>
-      </div>
-      <div className="flex flex-wrap mt-10 gap-6">
-        <FeriadosNacionais />
-        <FeriadosEstaduais />
-        <FeriadosMunicipais />
-      </div>
-      <Modal.Root isVisible={modalOpen}>
-        <Modal.Container>
-          <Modal.Header title="Cadastrar Feriado" onClose={handleClose} />
-          <FormCadastrarFeriado
-            onSubmit={handleSubmit}
-            onCancel={handleClose}
-          />
-        </Modal.Container>
-      </Modal.Root>
+    <div className="w-full flex flex-col rounded-md shadow p-4 overflow-auto bg-white">
+      <h1 className="text-xl text-[#5B85D5] font-bold">Calendário</h1>
+      <p className="mt-4 text-gray-700 max-w-xl">
+        Indisponibilidades ficam em outra etapa do sistema. O calendário de cada linha mostra apenas os horários regulares de operação.
+      </p>
+      <Link
+        to="/cadastro/linhas-producao"
+        className="mt-6 inline-flex w-fit px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+      >
+        Ir para linhas de produção
+      </Link>
     </div>
   );
 }

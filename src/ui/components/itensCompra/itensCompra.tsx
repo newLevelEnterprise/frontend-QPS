@@ -21,6 +21,7 @@ function ItensCompras() {
     lead_time: 0,
     cost: 0,
     scrap: 0,
+    minimum_stock: 0,
   });
 
   const { mutateAsync, isPending } = useMutation({
@@ -103,6 +104,9 @@ function ItensCompras() {
                 <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
                   % Refugo
                 </th>
+                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                  Estoque Mínimo
+                </th>
                 <th className="px-6 py-4 text-right text-xs md:text-sm font-medium text-gray-700">
                   Ações
                 </th>
@@ -128,6 +132,9 @@ function ItensCompras() {
                   </td>
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
                     {item.scrap}
+                  </td>
+                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                    {item.minimum_stock ?? 0}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="w-full flex justify-end gap-2">
@@ -167,6 +174,7 @@ function ItensCompras() {
                 lead_time: 0,
                 cost: 0,
                 scrap: 0,
+                minimum_stock: 0,
               });
             }}
             className="cursor-pointer text-sm md:text-base inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
