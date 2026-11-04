@@ -223,14 +223,11 @@ function FormVincularComponente({
             <option value="">
               {isFetching ? "Carregando moldes..." : "Selecione um molde"}
             </option>
-            {(moldes ?? []).map((mold) => {
-              const components = mold.products.map((product) => product.name).join(", ");
-              return (
-                <option key={mold.id} value={mold.id}>
-                  {components ? `${mold.name} - ${components}` : mold.name}
-                </option>
-              );
-            })}
+            {(moldes ?? []).map((mold) => (
+              <option key={mold.id} value={mold.id}>
+                {mold.name}
+              </option>
+            ))}
           </select>
           <span className="text-xs font-normal text-gray-500">
             Escolha um molde existente para vincular o componente.
