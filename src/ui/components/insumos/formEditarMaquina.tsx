@@ -37,6 +37,7 @@ function FormEditarInsumo({
     formState: { errors, isSubmitting, isValid },
   } = useForm<IEditarInsumosBody>({
     resolver: zodResolver(editarInsumosSchema),
+    mode: "onChange",
     defaultValues: {
       external_id: insumo.external_id ?? "",
       custoMedio: insumo.custo_medio,

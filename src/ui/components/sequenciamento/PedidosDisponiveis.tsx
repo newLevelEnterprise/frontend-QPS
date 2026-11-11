@@ -364,6 +364,9 @@ function PedidosDisponiveis({
       </div>
       {materiasAbaixo.length > 0 && (
         <div className="mt-3 border border-amber-300 rounded-lg overflow-x-auto">
+          <h2 className="px-3 py-2 text-sm font-semibold text-amber-900 bg-amber-50 border-b border-amber-200">
+            Matérias-primas com estoque abaixo do mínimo
+          </h2>
           <table className="w-full">
             <thead>
               <tr className="bg-amber-50 border-b border-amber-200">

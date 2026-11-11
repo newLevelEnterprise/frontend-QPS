@@ -25,6 +25,7 @@ function FormNovoInsumo({ setNovoInsumo, setInsumo }: IFormNovoInsumoProps) {
     formState: { errors, isSubmitting, isValid },
   } = useForm<ICriarInsumosBody>({
     resolver: zodResolver(criarInsumosSchema),
+    mode: "onChange",
     defaultValues: {
       external_id: "",
       estoqueMinimo: "0",
