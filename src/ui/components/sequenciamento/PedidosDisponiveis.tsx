@@ -7,6 +7,7 @@ import { TbTrash } from "react-icons/tb";
 import { VscLoading } from "react-icons/vsc";
 import { toast } from "react-toastify";
 import { parseBrDecimal } from "../../../schemas/pedido";
+import type { IEstoqueInsumo } from "../../../types/Estoque";
 import type { IPedido } from "../../../types/Pedido";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
@@ -32,6 +33,65 @@ interface PedidosDisponiveisProps {
   onApagarSelecao: () => void;
 }
 
+interface ProdutoComMaterias {
+  id: number;
+  name: string;
+  raw_materials?: { id: number; nome: string }[];
+  structure_components?: { id: number }[];
+}
+
+interface LinhaMateriaAbaixo {
+  key: string;
+  produto: string;
+  materia: string;
+  atual: number;
+  minimo: number;
+}
+
+function linhasMateriaAbaixoDoMinimo(
+  jobs: IPedido[],
+  produtos: ProdutoComMaterias[],
+  estoque: IEstoqueInsumo[],
+): LinhaMateriaAbaixo[] {
+  const produtoPorId = new Map(produtos.map((produto) => [produto.id, produto]));
+  const estoquePorId = new Map(
+    estoque
+      .filter((item) => item.tipo === "materia_prima")
+      .map((item) => [item.id_insumo, item]),
+  );
+  const linhas: LinhaMateriaAbaixo[] = [];
+
+  for (const job of jobs) {
+    const productId = job.fk_id_product || job.product?.id;
+    const produto = produtoPorId.get(productId);
+    const nomeProduto = job.product?.name || job.product_name;
+    const materias = new Map<number, string>();
+    const coletar = (item?: ProdutoComMaterias) => {
+      for (const materia of item?.raw_materials ?? []) {
+        materias.set(materia.id, materia.nome);
+      }
+    };
+    coletar(produto);
+    for (const componente of produto?.structure_components ?? []) {
+      if (componente.id !== productId) {
+        coletar(produtoPorId.get(componente.id));
+      }
+    }
+    for (const [materiaId, nomeMateria] of materias) {
+      const saldo = estoquePorId.get(materiaId);
+      if (!saldo || saldo.quantidade_atual >= saldo.estoque_minimo) continue;
+      linhas.push({
+        key: `${job.id}-${materiaId}`,
+        produto: nomeProduto,
+        materia: saldo.codigo ? `${saldo.codigo} — ${saldo.nome}` : nomeMateria || saldo.nome,
+        atual: saldo.quantidade_atual,
+        minimo: saldo.estoque_minimo,
+      });
+    }
+  }
+  return linhas;
+}
+
 function PedidosDisponiveis({
   selecionados,
   onSelecionar,
@@ -54,6 +114,24 @@ function PedidosDisponiveis({
   useEffect(() => {
     if (jobs) onCatalogo(jobs);
   }, [jobs, onCatalogo]);
+
+  const { data: produtos } = useQuery({
+    queryKey: ["get", "all", "products"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<ProdutoComMaterias[]>("/products/");
+      return data;
+    },
+  });
+
+  const { data: estoque } = useQuery({
+    queryKey: ["get", "all", "inventory-stock"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IEstoqueInsumo[]>("/inventory-stock");
+      return data;
+    },
+  });
+
+  const materiasAbaixo = linhasMateriaAbaixoDoMinimo(jobs ?? [], produtos ?? [], estoque ?? []);
 
   const disponiveis = (jobs ?? []).filter(
     (pedido) => !selecionados.some((item) => item.id === pedido.id),
@@ -284,6 +362,35 @@ function PedidosDisponiveis({
           </table>
         )}
       </div>
+      {materiasAbaixo.length > 0 && (
+        <div className="mt-3 border border-amber-300 rounded-lg overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-amber-50 border-b border-amber-200">
+                {["Produto", "Matéria-prima", "Atual / mínimo"].map((coluna) => (
+                  <th
+                    key={coluna}
+                    className="px-3 py-2 text-left text-xs font-medium text-amber-900 whitespace-nowrap"
+                  >
+                    {coluna}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {materiasAbaixo.map((linha) => (
+                <tr key={linha.key} className="border-b border-amber-100 last:border-b-0">
+                  <td className="px-3 py-2 text-xs md:text-sm text-gray-900">{linha.produto}</td>
+                  <td className="px-3 py-2 text-xs md:text-sm text-gray-900">{linha.materia}</td>
+                  <td className="px-3 py-2 text-xs md:text-sm text-gray-900 whitespace-nowrap">
+                    {formatarNumero(linha.atual)} / {formatarNumero(linha.minimo)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
