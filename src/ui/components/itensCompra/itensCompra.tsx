@@ -90,7 +90,7 @@ function ItensCompras() {
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                  ID
+                  Código do Item Comprado
                 </th>
                 <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
                   Material

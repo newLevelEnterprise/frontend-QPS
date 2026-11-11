@@ -81,7 +81,7 @@ function FormEditarItem({
             htmlFor="editar-item-id"
             className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
           >
-            ID
+            Código do Item Comprado
           </label>
           <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
             <input

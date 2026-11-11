@@ -17,7 +17,9 @@ export interface RawMaterial {
 export interface Product {
   id: number;
   name: string;
+  external_id?: string | null;
   is_simple?: boolean;
+  structure_components?: { id: number; name?: string }[];
 }
 
 export interface NovaComposicaoFormState {
@@ -90,7 +92,7 @@ function FormNovaComposicao({
   };
 
   const { data: products, isFetching } = useQuery({
-    queryKey: ["get", "all", "products"],
+    queryKey: ["get", "fabricable", "products"],
     queryFn: async () => {
       const { data } = await apiClient.get<Product[]>("/products/");
       return data;
@@ -116,8 +118,11 @@ function FormNovaComposicao({
     },
   );
 
-  const components = (products ?? []).filter(
-    (product) => product.is_simple !== false,
+  const commercialProducts = [...(products ?? [])].sort((left, right) =>
+    (left.external_id || left.name).localeCompare(
+      right.external_id || right.name,
+      "pt-BR",
+    ),
   );
 
   const isGettingData =
@@ -133,26 +138,38 @@ function FormNovaComposicao({
         >
           <div className="w-full flex flex-col gap-3">
             <label
-              htmlFor="componente"
+              htmlFor="produto-comercial"
               className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
             >
-              Componente
+              Nome do Produto/Componente
             </label>
             <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
               <select
-                id="componente"
+                id="produto-comercial"
                 className="w-full outline-none border-b border-[#A4AABC]"
                 value={formState.productId}
                 onChange={(event) => handleProductChange(event.target.value)}
               >
                 <option value="" disabled>
-                  Selecione o componente
+                  Selecione o produto ou o componente
                 </option>
-                {components.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    {product.name}
-                  </option>
-                ))}
+                {commercialProducts
+                  .filter(
+                    (product) =>
+                      !(product.structure_components ?? []).some(
+                        (component) => component.id !== product.id,
+                      ),
+                  )
+                  .map((product) => {
+                    const base = product.external_id
+                      ? `${product.external_id} — ${product.name}`
+                      : product.name;
+                    return (
+                      <option key={product.id} value={product.id}>
+                        {base}
+                      </option>
+                    );
+                  })}
               </select>
             </div>
           </div>

@@ -1,9 +1,11 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import StepContextProvider from "../../contexts/StepContext";
 import { useSteps } from "../../hooks/useStep";
+import type { IEstoqueInsumo } from "../../types/Estoque";
 import type { IPedido } from "../../types/Pedido";
+import { apiClient } from "../../utils/apiClient";
 import XlsxUpload from "../components/XlsxUpload";
 import Modal from "../components/modal";
 import PedidosParaSequenciamento from "../components/sequenciamento/pedidos.paraSequencimento";
@@ -95,6 +97,7 @@ function Content() {
           />
         </Modal.Container>
       </Modal.Root>
+      <AlertaMateriaPrimaAbaixoDoMinimo />
       <div className="w-full flex flex-col md:flex-row gap-2 max-h-full overflow-y-auto lg:overflow-hidden max-w-full">
         {!startSteps && (
           <>
@@ -113,6 +116,32 @@ function Content() {
         )}
         {startSteps && <Steps />}
       </div>
+    </div>
+  );
+}
+
+function AlertaMateriaPrimaAbaixoDoMinimo() {
+  const { data } = useQuery({
+    queryKey: ["get", "all", "inventory-stock"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IEstoqueInsumo[]>("/inventory-stock");
+      return data;
+    },
+  });
+
+  const abaixo = (data ?? []).filter(
+    (item) =>
+      item.tipo === "materia_prima" && item.quantidade_atual < item.estoque_minimo,
+  );
+  if (abaixo.length === 0) return null;
+
+  const nomes = abaixo
+    .map((item) => (item.codigo ? `${item.codigo} — ${item.nome}` : item.nome))
+    .join(", ");
+
+  return (
+    <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      Matéria-prima abaixo do estoque mínimo: {nomes}
     </div>
   );
 }

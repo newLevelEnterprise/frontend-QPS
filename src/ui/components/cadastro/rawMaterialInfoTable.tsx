@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bar,
@@ -18,28 +19,46 @@ interface IRunOption {
 
 interface IProcurementEntry {
   name: string;
+  code?: string | null;
   quantity: number;
-  purchase_date: string;
-  cost: string;
+  consumption_kg?: number | null;
+  stock_available_kg?: number | null;
+  purchase_quantity?: number | null;
+  purchase_date?: string | null;
+  cost?: number | string | null;
+  consumption_cost?: number | string | null;
+  below_minimum?: boolean;
+  cost_missing?: boolean;
+  invalid_quantity?: boolean;
 }
 
 interface IProcurementsByJobItem {
   job_id: number;
   product_name: string;
+  parent_product_code?: string | null;
+  parent_product_name?: string | null;
   client_name: string;
   order_number: string;
   machine_name: string;
+  composition_missing?: boolean;
+  adjusted_demand_missing?: boolean;
   raw_materials: IProcurementEntry[];
   purchase_items: IProcurementEntry[];
-  total_cost: string;
+  total_cost: string | number;
 }
 
 interface IProcurementsByJobResponse {
   procurements_by_job: IProcurementsByJobItem[];
   resumo_total: {
     name: string;
+    code?: string | null;
     quantity: number;
-    total_cost: string;
+    purchase_quantity?: number | null;
+    stock_on_hand_kg?: number | null;
+    projected_stock_kg?: number | null;
+    below_minimum?: boolean;
+    total_cost: string | number;
+    cost_missing?: boolean;
   }[];
 }
 
@@ -73,20 +92,23 @@ const formatDate = (value?: string) => {
   }).format(parsed);
 };
 
-const formatCurrency = (value: string) => {
+const formatCurrency = (value?: string | number | null) => {
+  if (value === null || value === undefined || value === "") return "—";
   const parsed = Number(value);
-  if (Number.isNaN(parsed)) return value;
+  if (Number.isNaN(parsed)) return String(value);
   return Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
   }).format(parsed);
 };
 
-const formatToDecimal = (value: string) => {
+const formatToDecimal = (value?: string | number | null) => {
+  if (value === null || value === undefined || value === "") return "—";
   const parsed = Number(value);
-  if (Number.isNaN(parsed)) return value;
+  if (Number.isNaN(parsed)) return String(value);
   return Intl.NumberFormat("pt-BR", {
     style: "decimal",
+    maximumFractionDigits: 4,
   }).format(parsed);
 };
 
@@ -106,36 +128,48 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
     );
   }
 
-  const materiaPrima1Titulo = data.find((job) => job.raw_materials[0]?.name)
-    ?.raw_materials[0]?.name;
-  const materiaPrima2Titulo = data.find((job) => job.raw_materials[1]?.name)
-    ?.raw_materials[1]?.name;
-  const hasMateriaPrima1 = Boolean(materiaPrima1Titulo);
-  const hasMateriaPrima2 = Boolean(materiaPrima2Titulo);
-
-  const rows = data.map((job) => {
-    const materiaPrima1 = job.raw_materials[0];
-    const materiaPrima2 = job.raw_materials[1];
-
-    return {
-      key: `job-${job.job_id}-${job.order_number}`,
-      order_number: job.order_number,
-      client_name: job.client_name,
-      product_name: job.product_name,
-      machine_name: job.machine_name,
-      materia_prima_1_quantidade: materiaPrima1?.quantity,
-      materia_prima_1_data: formatDate(materiaPrima1?.purchase_date),
-      materia_prima_1_custo: materiaPrima1
-        ? formatCurrency(materiaPrima1.cost)
-        : "",
-      materia_prima_2_quantidade: materiaPrima2?.quantity,
-      materia_prima_2_data: formatDate(materiaPrima2?.purchase_date),
-      materia_prima_2_custo: materiaPrima2
-        ? formatCurrency(materiaPrima2.cost)
-        : "",
-      total_cost: formatCurrency(job.total_cost),
-    };
+  const columnNames: string[] = [];
+  data.forEach((job) => {
+    job.raw_materials.forEach((material) => {
+      if (columnNames.length < 2 && !columnNames.includes(material.name)) {
+        columnNames.push(material.name);
+      }
+    });
   });
+  while (columnNames.length < 2) {
+    columnNames.push("");
+  }
+
+  const materialCell = (
+    materials: IProcurementEntry[],
+    name: string,
+    field: "kg" | "date" | "cost",
+  ) => {
+    if (!name) return "—";
+    const material = materials.find((entry) => entry.name === name);
+    if (!material) return "—";
+    if (field === "kg") {
+      return material.invalid_quantity
+        ? "Quantidade inválida"
+        : formatToDecimal(material.consumption_kg ?? material.quantity);
+    }
+    if (field === "date") {
+      return formatDate(material.purchase_date || undefined) || "—";
+    }
+    return material.cost_missing
+      ? "Custo não cadastrado"
+      : formatCurrency(material.cost);
+  };
+
+  const rows = data.map((job) => ({
+    key: `job-${job.job_id}-${job.order_number}`,
+    order_number: job.order_number,
+    client_name: job.client_name,
+    parent_code: job.parent_product_code || "—",
+    parent_name: job.parent_product_name || job.product_name,
+    total_cost: formatCurrency(job.total_cost),
+    materials: job.raw_materials,
+  }));
 
   return (
     <div className="relative mx-auto max-h-[470px] overflow-y-auto overflow-x-auto rounded-md border border-gray-200">
@@ -149,41 +183,33 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
               Cliente
             </th>
             <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-              Produto
+              Código (pai)
             </th>
             <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-              Nome Máquina
+              Produto (pai)
             </th>
-            {hasMateriaPrima1 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                {materiaPrima1Titulo} (kg)
-              </th>
-            )}
-            {hasMateriaPrima1 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                {`Data compra ${materiaPrima1Titulo}`}
-              </th>
-            )}
-            {hasMateriaPrima1 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                {`Custo compra ${materiaPrima1Titulo}`}
-              </th>
-            )}
-            {hasMateriaPrima2 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                {materiaPrima2Titulo} (kg)
-              </th>
-            )}
-            {hasMateriaPrima2 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                {`Data compra ${materiaPrima2Titulo}`}
-              </th>
-            )}
-            {hasMateriaPrima2 && (
-              <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                {`Custo compra ${materiaPrima2Titulo}`}
-              </th>
-            )}
+            {columnNames.map((name, columnIndex) => (
+              <Fragment key={`material-column-${columnIndex}`}>
+                <th
+                  key={`kg-${columnIndex}`}
+                  className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap"
+                >
+                  {name ? `${name} (kg)` : "(kg)"}
+                </th>
+                <th
+                  key={`date-${columnIndex}`}
+                  className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap"
+                >
+                  {name ? `Data compra ${name}` : "Data compra"}
+                </th>
+                <th
+                  key={`cost-${columnIndex}`}
+                  className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap"
+                >
+                  {name ? `Custo compra ${name}` : "Custo compra"}
+                </th>
+              </Fragment>
+            ))}
             <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
               Custo Total
             </th>
@@ -202,49 +228,24 @@ function RawMaterialTable({ data, isFetching }: IRunOption) {
                 {item.client_name}
               </td>
               <td className="px-4 py-3 text-sm text-center text-gray-700">
-                {item.product_name}
+                {item.parent_code}
               </td>
               <td className="px-4 py-3 text-sm text-center text-gray-700">
-                {item.machine_name}
+                {item.parent_name}
               </td>
-              {hasMateriaPrima1 && (
-                <td className="px-4 py-3 text-sm text-center text-gray-700">
-                  {item.materia_prima_1_quantidade !== undefined
-                    ? formatToDecimal(
-                        item.materia_prima_1_quantidade.toString(),
-                      )
-                    : ""}
-                </td>
-              )}
-              {hasMateriaPrima1 && (
-                <td className="px-4 py-3 text-sm text-center text-gray-700">
-                  {item.materia_prima_1_data}
-                </td>
-              )}
-              {hasMateriaPrima1 && (
-                <td className="px-4 py-3 text-sm text-center text-gray-700">
-                  {item.materia_prima_1_custo}
-                </td>
-              )}
-              {hasMateriaPrima2 && (
-                <td className="px-4 py-3 text-sm text-center text-gray-700">
-                  {item.materia_prima_2_quantidade !== undefined
-                    ? formatToDecimal(
-                        item.materia_prima_2_quantidade.toString(),
-                      )
-                    : ""}
-                </td>
-              )}
-              {hasMateriaPrima2 && (
-                <td className="px-4 py-3 text-sm text-center text-gray-700">
-                  {item.materia_prima_2_data}
-                </td>
-              )}
-              {hasMateriaPrima2 && (
-                <td className="px-4 py-3 text-sm text-center text-gray-700">
-                  {item.materia_prima_2_custo}
-                </td>
-              )}
+              {columnNames.map((name, columnIndex) => (
+                <Fragment key={`${item.key}-${columnIndex}`}>
+                  <td className="px-4 py-3 text-sm text-center text-gray-700">
+                    {materialCell(item.materials, name, "kg")}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-center text-gray-700">
+                    {materialCell(item.materials, name, "date")}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-center text-gray-700">
+                    {materialCell(item.materials, name, "cost")}
+                  </td>
+                </Fragment>
+              ))}
               <td className="px-4 py-3 text-sm text-center text-gray-700">
                 {item.total_cost}
               </td>
@@ -283,26 +284,35 @@ function RawMaterialSummaryTable({
         <thead className="bg-gray-50 text-left">
           <tr>
             <th className="px-3 py-2 font-medium text-center">Descrição</th>
-            <th className="px-3 py-2 font-medium text-center">Quantidade</th>
+            <th className="px-3 py-2 font-medium text-center">Consumo (kg)</th>
+            <th className="px-3 py-2 font-medium text-center">A comprar (kg)</th>
             <th className="px-3 py-2 font-medium text-center">
-              Matéria Prima (R$)
+              Custo da compra
             </th>
           </tr>
         </thead>
         <tbody>
           {data.map((item) => (
             <tr key={item.name} className="border-t border-gray-200">
-              <td className="px-3 py-2 text-center">{item.name}</td>
               <td className="px-3 py-2 text-center">
-                {formatToDecimal(item.quantity.toString())}
+                {item.code ? `${item.code} — ${item.name}` : item.name}
               </td>
               <td className="px-3 py-2 text-center">
-                {formatCurrency(item.total_cost)}
+                {formatToDecimal(item.quantity)}
+              </td>
+              <td className="px-3 py-2 text-center">
+                {formatToDecimal(item.purchase_quantity)}
+              </td>
+              <td className="px-3 py-2 text-center">
+                {item.cost_missing
+                  ? "Custo não cadastrado"
+                  : formatCurrency(item.total_cost)}
               </td>
             </tr>
           ))}
           <tr className="border-t border-gray-300 bg-gray-50 font-semibold">
             <td className="px-3 py-2 text-center">Total</td>
+            <td className="px-3 py-2 text-center"></td>
             <td className="px-3 py-2 text-center"></td>
             <td className="px-3 py-2 text-center">
               {formatCurrency(totalCost.toString())}

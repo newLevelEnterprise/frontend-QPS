@@ -45,10 +45,26 @@ function XlsxUpload({
     const erros = Array.isArray(data?.erros)
       ? data.erros.filter((item: unknown) => typeof item === "string" && item.trim())
       : [];
-    if (onRevalidate && (erros.length === 0 || Number(data?.jobs_criados) > 0)) {
+    const produtosCriados = Number(data?.produtos_criados ?? 0);
+    const catalogo =
+      data?.produtos_comerciais_na_planilha !== undefined &&
+      typeof data?.message === "string";
+    if (
+      onRevalidate &&
+      (erros.length === 0 || produtosCriados > 0 || Number(data?.jobs_criados) > 0)
+    ) {
       onRevalidate();
     }
-    if (erros.length > 0) {
+    if (catalogo) {
+      const blocked = Number(data?.produtos_comerciais_bloqueados ?? 0);
+      const summary =
+        data.message.length > 280 ? `${data.message.slice(0, 277)}...` : data.message;
+      if (blocked > 0 || erros.length > 0) {
+        toast.warning(summary);
+      } else {
+        toast.success(summary);
+      }
+    } else if (erros.length > 0) {
       const extra = erros.length > 1 ? ` (+${erros.length - 1} linha(s))` : "";
       const message = `${erros[0]}${extra}`;
       toast.error(message.length > 280 ? `${message.slice(0, 277)}...` : message);

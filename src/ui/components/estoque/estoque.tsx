@@ -12,14 +12,6 @@ const TIPO_LABEL: Record<string, string> = {
   item_compra: "Item de Compra",
 };
 
-function formatUpdatedAt(value: string | null) {
-  if (!value) return "—";
-  const normalized = value.endsWith("Z") || value.includes("+") ? value : `${value}Z`;
-  const date = new Date(normalized);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleString("pt-BR");
-}
-
 function formatMissingIds(result: IEstoqueImportacao) {
   if (!result.ids_nao_encontrados.length) return "";
   return result.ids_nao_encontrados
@@ -30,6 +22,9 @@ function formatMissingIds(result: IEstoqueImportacao) {
 function Estoque() {
   const queryClient = useQueryClient();
   const [importar, setImportar] = useState(false);
+  const [manual, setManual] = useState(false);
+  const [materialId, setMaterialId] = useState("");
+  const [quantidadeManual, setQuantidadeManual] = useState("");
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [resumo, setResumo] = useState<IEstoqueImportacao | null>(null);
 
@@ -96,6 +91,31 @@ function Estoque() {
     },
   });
 
+  const adicionarManual = useMutation({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<IEstoqueImportacao>("/inventory-stock/manual", {
+        tipo: "materia_prima",
+        id_insumo: Number(materialId),
+        quantidade_atual: quantidadeManual,
+      });
+      return data;
+    },
+    onSuccess: (data) => {
+      if (data.linhas_com_erro > 0) {
+        toast.error(data.erros[0]?.motivo || "Não foi possível atualizar o estoque.");
+        return;
+      }
+      toast.success("Estoque atualizado.");
+      setManual(false);
+      setMaterialId("");
+      setQuantidadeManual("");
+      queryClient.invalidateQueries({ queryKey: ["get", "all", "inventory-stock"] });
+    },
+    onError: () => {
+      toast.error("Não foi possível atualizar o estoque.");
+    },
+  });
+
   const closeImport = () => {
     setImportar(false);
     setArquivo(null);
@@ -159,6 +179,13 @@ function Estoque() {
           </button>
           <button
             type="button"
+            onClick={() => setManual(true)}
+            className="cursor-pointer text-sm inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full"
+          >
+            Adicionar manualmente
+          </button>
+          <button
+            type="button"
             onClick={() => setImportar(true)}
             className="cursor-pointer text-sm inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full"
           >
@@ -175,60 +202,128 @@ function Estoque() {
         </div>
       </div>
 
+      <Modal.Root isVisible={manual}>
+        <Modal.Container>
+          <Modal.Header title="Adicionar manualmente" onClose={() => setManual(false)} />
+          <form
+            className="flex flex-col gap-4 my-6 min-w-[320px]"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!materialId || quantidadeManual === "") return;
+              adicionarManual.mutate();
+            }}
+          >
+            <label className="text-sm text-gray-700 flex flex-col gap-1">
+              Matéria Prima
+              <select
+                className="border border-gray-300 rounded-lg p-2"
+                value={materialId}
+                onChange={(event) => setMaterialId(event.target.value)}
+              >
+                <option value="">Selecione</option>
+                {estoque
+                  ?.filter((item) => item.tipo === "materia_prima")
+                  .map((item) => (
+                    <option key={item.id_insumo} value={item.id_insumo}>
+                      {item.codigo ? `${item.codigo} — ${item.nome}` : item.nome}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <label className="text-sm text-gray-700 flex flex-col gap-1">
+              Quantidade em estoque
+              <input
+                type="number"
+                step="0.0001"
+                min="0"
+                className="border border-gray-300 rounded-lg p-2"
+                value={quantidadeManual}
+                onChange={(event) => setQuantidadeManual(event.target.value)}
+              />
+            </label>
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={!materialId || quantidadeManual === "" || adicionarManual.isPending}
+                className="cursor-pointer text-sm inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-full"
+              >
+                {adicionarManual.isPending ? "Salvando..." : "Salvar"}
+              </button>
+            </div>
+          </form>
+        </Modal.Container>
+      </Modal.Root>
+
       {isFetching && <Loader message="Carregando estoque" />}
       {!isFetching && (
-        <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
-          <table className="w-full overflow-auto max-h-[470px]">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                  Tipo
-                </th>
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                  ID
-                </th>
-                <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
-                  Insumo
-                </th>
-                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                  Estoque Atual
-                </th>
-                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                  Estoque Mínimo
-                </th>
-                <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                  Última Atualização
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {estoque?.map((item) => (
-                <tr
-                  key={`${item.tipo}-${item.id_insumo}`}
-                  className="border-b border-gray-200 last:border-b-0"
-                >
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    {TIPO_LABEL[item.tipo] ?? item.tipo}
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
-                    {item.id_insumo}
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900">{item.nome}</td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                    {item.quantidade_atual}
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                    {item.estoque_minimo}
-                  </td>
-                  <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                    {formatUpdatedAt(item.ultima_atualizacao)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="flex flex-col gap-6">
+          <EstoqueTabela
+            titulo="Matéria Prima"
+            colunaNome="Matéria Prima"
+            itens={estoque?.filter((item) => item.tipo === "materia_prima") ?? []}
+          />
+          <EstoqueTabela
+            titulo="Item de Compra"
+            colunaNome="Item"
+            itens={estoque?.filter((item) => item.tipo === "item_compra") ?? []}
+          />
         </div>
       )}
+    </div>
+  );
+}
+
+function EstoqueTabela({
+  titulo,
+  colunaNome,
+  itens,
+}: {
+  titulo: string;
+  colunaNome: string;
+  itens: IEstoqueInsumo[];
+}) {
+  return (
+    <div>
+      <h2 className="text-sm font-semibold text-[#212A4F]">{titulo}</h2>
+      <div className="border border-gray-200 rounded-lg overflow-y-auto shadow-sm mt-2 h-fit max-h-[470px] overflow-x-auto">
+        <table className="w-full overflow-auto max-h-[470px]">
+          <thead>
+            <tr className="border-b border-gray-200">
+              <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                Código
+              </th>
+              <th className="px-6 py-4 text-left text-xs md:text-sm font-medium text-gray-700">
+                {colunaNome}
+              </th>
+              <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                Quantidade em estoque
+              </th>
+              <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
+                Estoque mínimo
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {itens.map((item) => (
+              <tr
+                key={`${item.tipo}-${item.id_insumo}`}
+                className="border-b border-gray-200 last:border-b-0"
+              >
+                <td className="px-6 py-4 text-xs md:text-sm text-gray-900">
+                  {item.codigo || "—"}
+                </td>
+                <td className="px-6 py-4 text-xs md:text-sm text-gray-900">{item.nome}</td>
+                <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                  {item.quantidade_atual}
+                </td>
+                <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
+                  {item.estoque_minimo}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

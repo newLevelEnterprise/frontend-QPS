@@ -211,14 +211,14 @@ function FormEditComposicao({
         >
           <div className="w-full flex flex-col gap-3">
             <label
-              htmlFor="componente"
+              htmlFor="produto-comercial"
               className="text-[#212A4F] font-semibold truncate text-ellipsis text-sm"
             >
-              Componente
+              Nome do Produto/Componente
             </label>
             <div className="flex gap-1 border border-gray-300 rounded-lg p-4">
               <input
-                id="componente"
+                id="produto-comercial"
                 className="w-full outline-none border-b border-[#A4AABC]"
                 value={formState.productId}
                 readOnly

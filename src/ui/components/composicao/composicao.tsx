@@ -15,6 +15,7 @@ interface ProductComposition {
   id: number;
   produto_id: number;
   produto_nome: string;
+  external_id?: string | null;
   raw_materials: {
     id: number;
     quantity: string;
@@ -201,7 +202,7 @@ function Composicao() {
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="px-6 py-4 text-center text-xs md:text-sm font-medium text-gray-700">
-                  Componente
+                  Nome do Produto/Componente
                 </th>
                 {rawMaterialColumns.map((rawMaterialColumn) => (
                   <th
@@ -231,7 +232,9 @@ function Composicao() {
                   className="border-b border-gray-200 last:border-b-0"
                 >
                   <td className="px-6 py-4 text-xs md:text-sm text-gray-900 text-center">
-                    {composicao.produto_nome}
+                    {composicao.external_id
+                      ? `${composicao.external_id} — ${composicao.produto_nome}`
+                      : composicao.produto_nome}
                   </td>
                   {rawMaterialColumns.map((rawMaterialColumn) => {
                     const rawMaterial = composicao.raw_materials.find(
