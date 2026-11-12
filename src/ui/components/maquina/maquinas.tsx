@@ -146,11 +146,7 @@ function Maquina() {
 
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
-      <Modal.Root
-        isVisible={
-          novaMaquina && (linhaProd?.composition_lines.length ?? 0) < 10
-        }
-      >
+      <Modal.Root isVisible={novaMaquina}>
         <Modal.Container>
           <Modal.Header
             title="Adicionar Nova Linha"
