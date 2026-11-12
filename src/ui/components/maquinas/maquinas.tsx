@@ -51,7 +51,7 @@ function Maquinas() {
 
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
-      <Modal.Root isVisible={novaMaquina && (maquinas?.length || 0) < 10}>
+      <Modal.Root isVisible={novaMaquina}>
         <Modal.Container className="w-1/2">
           <Modal.Header
             title="Adicionar Nova Máquina"
@@ -146,7 +146,7 @@ function Maquinas() {
           </table>
         </div>
       )}
-      {!isFetching && (maquinas?.length || 0) < 10 && (
+      {!isFetching && (
         <div className="flex flex-col gap-4 items-center justify-center mt-4">
           <button
             onClick={() => {
@@ -166,9 +166,6 @@ function Maquinas() {
             <CiCirclePlus className="w-4 h-4 md:h-6 md:w-6 mr-2" />
             Adicionar Nova Máquina
           </button>
-          <p className="text-gray-500 text-lg">
-            Pode ser cadastrada até 10 máquinas por linha.
-          </p>
         </div>
       )}
     </div>
