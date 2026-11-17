@@ -144,6 +144,13 @@ function Maquina() {
     ).values(),
   );
 
+  const compositionLines = [...(linhaProd?.composition_lines ?? [])].sort(
+    (a, b) =>
+      (a.mold_name ?? "").localeCompare(b.mold_name ?? "", "pt-BR", {
+        sensitivity: "base",
+      }),
+  );
+
   return (
     <div className="w-full bg-white rounded-md shadow p-4 overflow-auto">
       <Modal.Root isVisible={novaMaquina}>
@@ -330,7 +337,7 @@ function Maquina() {
                 </tr>
               </thead>
               <tbody>
-                {linhaProd?.composition_lines.map((cp) => (
+                {compositionLines.map((cp) => (
                   <tr
                     key={cp.id}
                     className="border-b border-gray-200 last:border-b-0"
