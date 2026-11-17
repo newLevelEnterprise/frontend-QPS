@@ -127,11 +127,15 @@ function FormSetup({
     );
   }, [setups]);
 
-  const setupProdutosFiltrados = setupProdutos.filter((produto) =>
-    `${produto.from_name} ${produto.to_name}`
-      .toLowerCase()
-      .includes(busca.toLowerCase()),
-  );
+  const setupProdutosFiltrados = setupProdutos
+    .filter((produto) =>
+      `${produto.from_name} ${produto.to_name}`
+        .toLowerCase()
+        .includes(busca.toLowerCase()),
+    )
+    .sort((a, b) =>
+      a.to_name.localeCompare(b.to_name, "pt-BR", { sensitivity: "base" }),
+    );
 
   return (
     <div className="w-[500px] flex flex-col gap-4 my-4 overflow-y-auto h-fit max-h-[500px]">
