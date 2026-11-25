@@ -1,9 +1,11 @@
 import { useSteps } from "../../../../hooks/useStep";
+import AjusteDemanda from "./ajusteDemandaStep";
 import EstadoAtualMaquina from "./estadoAtualMaquina";
 import Paradas from "./paradas";
 import SequenciamentoInfo from "./sequenciamentoInfo";
 
 const steps = [
+  { content: <AjusteDemanda /> },
   { content: <SequenciamentoInfo /> },
   { content: <EstadoAtualMaquina /> },
   { content: <Paradas /> },

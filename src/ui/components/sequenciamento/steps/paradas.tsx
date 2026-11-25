@@ -1,5 +1,6 @@
 import { hiddenModeLabel } from "../../../../config/featureFlags";
 import { useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -13,6 +14,7 @@ import type { IParadas } from "../../../../types/Paradas";
 import { apiClient } from "../../../../utils/apiClient";
 import Modal from "../../modal";
 import Loading from "../loading";
+import { mesmaSelecao, paraDemandAdjustments } from "./ajusteDemanda";
 import FormEditarParada from "./formEditarParada";
 import FormNovaParada from "./formNovaParada";
 
@@ -60,7 +62,7 @@ function Paradas() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { user_id } = useAuth();
-  const { resetSteps } = useSteps();
+  const { resetSteps, ajusteDemanda, setAjusteDemanda } = useSteps();
   const [processing, setProcessing] = useState<boolean>(false);
   const [modalCriarParada, setModalCriarParada] = useState<boolean>(false);
   const [modalEditarParada, setModalEditarParada] = useState<boolean>(false);
@@ -280,20 +282,27 @@ function Paradas() {
               }))
             : [],
         user_id: `${user_id}`,
+        demand_adjustments: mesmaSelecao(ajusteDemanda, jobs_ids || [])
+          ? paraDemandAdjustments(ajusteDemanda.pedidos)
+          : undefined,
       });
 
       localStorage.removeItem(SEQUENCIAMENTO_INFO_STORAGE_KEY);
       localStorage.removeItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
       localStorage.removeItem("jobs_ids");
       localStorage.removeItem("jobs_para_sequenciamento");
+      setAjusteDemanda(null);
       queryClient.setQueryData(["jobs", "para", "sequenciamento"], () => {
         return [];
       });
       setSequenciamentoFinalizado(true);
     } catch (error) {
       console.log(error);
+      const detail = isAxiosError(error) ? error.response?.data?.detail : null;
       toast.error(
-        "Ocorreu um erro ao iniciar o sequenciamento. Tente novamente.",
+        typeof detail === "string"
+          ? detail
+          : "Ocorreu um erro ao iniciar o sequenciamento. Tente novamente.",
       );
     } finally {
       setProcessing(false);

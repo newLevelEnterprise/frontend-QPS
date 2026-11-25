@@ -22,7 +22,7 @@ const defaultSequenciamentoInfo: ICriaStepsSequenciamentoBody["sequenciamento"] 
   };
 
 function SequenciamentoInfo() {
-  const { resetSteps } = useSteps();
+  const { prevStep } = useSteps();
   const [sequenciamentoInfo, setSequenciamentoInfo] = useState<
     ICriaStepsSequenciamentoBody["sequenciamento"]
   >(() => {
@@ -276,15 +276,10 @@ function SequenciamentoInfo() {
 
       <div className="flex justify-between mt-6">
         <button
-          onClick={() => {
-            localStorage.removeItem(SEQUENCIAMENTO_INFO_STORAGE_KEY);
-            localStorage.removeItem("estado_atual_maquina");
-            localStorage.removeItem("jobs_ids");
-            resetSteps();
-          }}
+          onClick={prevStep}
           className={`px-4 py-2 rounded bg-gray-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
         >
-          Cancelar Sequenciamento
+          Voltar
         </button>
         <button
           disabled={isFetching}
