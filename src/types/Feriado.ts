@@ -10,4 +10,6 @@ export interface IFeriadoType {
   date: string;
   level: string;
   id: number;
+  type?: string;
+  production_line_id?: number | null;
 }

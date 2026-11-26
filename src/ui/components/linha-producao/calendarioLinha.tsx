@@ -3,6 +3,7 @@ import axios from "axios";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { apiClient } from "../../../utils/apiClient";
+import FeriadosLinha from "./feriadosLinha";
 import Loader from "../Loader";
 import Modal from "../modal";
 
@@ -137,6 +138,7 @@ function CalendarioLinha({ linhaId, linhaNome }: CalendarioLinhaProps) {
   const queryClient = useQueryClient();
   const productionLineId = Number(linhaId);
   const [editing, setEditing] = useState(false);
+  const [holidaysOpen, setHolidaysOpen] = useState(false);
   const [draft, setDraft] = useState<CalendarDay[]>([]);
   const queryKey = ["get", "line-calendar", linhaId];
 
@@ -256,14 +258,23 @@ function CalendarioLinha({ linhaId, linhaNome }: CalendarioLinhaProps) {
             Horários de operação configurados para esta linha.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={openEdit}
-          disabled={isFetching || isError || days.length === 0}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-md cursor-pointer"
-        >
-          Editar calendário
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={openEdit}
+            disabled={isFetching || isError || days.length === 0}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-md cursor-pointer"
+          >
+            Editar calendário
+          </button>
+          <button
+            type="button"
+            onClick={() => setHolidaysOpen(true)}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md cursor-pointer"
+          >
+            Configurar feriados
+          </button>
+        </div>
       </div>
 
       {isFetching && <Loader message="Carregando o calendário da linha" />}
@@ -435,6 +446,12 @@ function CalendarioLinha({ linhaId, linhaNome }: CalendarioLinhaProps) {
           </div>
         </form>
       </Modal.Root>
+      <FeriadosLinha
+        open={holidaysOpen}
+        linhaId={linhaId}
+        linhaNome={linhaNome}
+        onClose={() => setHolidaysOpen(false)}
+      />
     </div>
   );
 }

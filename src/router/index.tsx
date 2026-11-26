@@ -4,7 +4,6 @@ import PageLayout from "../ui/layouts/PageLayout";
 import CadastroPage from "../ui/pages/cadastro";
 import ClientesPages from "../ui/pages/clientes";
 import Composicao from "../ui/pages/composicao";
-import FeriadosPage from "../ui/pages/feriados";
 import ForgotPasswordPage from "../ui/pages/ForgotPassword";
 import HistoryPage from "../ui/pages/historyPage";
 import EstoquePage from "../ui/pages/estoque";
@@ -59,7 +58,6 @@ function Router() {
             <Route path="/insumos/estoque" element={<EstoquePage />} />
             <Route path="/composicao" element={<Composicao />} />
             <Route path="/turnos-regulares" element={<TurnosRegularesPage />} />
-            <Route path="/feriados" element={<FeriadosPage />} />
 
             <Route
               path="/*"
