@@ -35,16 +35,14 @@ function CadastroPage() {
         <div className="w-[98%] md:w-1/6 bg-white rounded-md shadow">
           <Info dados={production.length > 0 ? production[0] : undefined} />
         </div>
-        <SequenciamentoTabela
-          dados={production.length > 0 ? production[0].results : []}
-        />
+        <SequenciamentoTabela dados={production[0]?.rows ?? []} />
       </div>
       <div className="flex-1 flex md:flex-row flex-col gap-6">
         <div className="w-[98%] md:w-1/5 flex flex-col justify-between gap-2">
           <HorasMaquina
             dados={production.length > 0 ? production[0].metrics : undefined}
           />
-          <Resumo dados={production.length > 0 ? production[0].results : []} />
+          <Resumo dados={production[0]?.rows ?? []} />
         </div>
 
         <div className="flex-1 overflow-x-auto">

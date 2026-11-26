@@ -1,51 +1,44 @@
 import { useMemo } from "react";
-import type {
-  IProductionSchedule,
-  Results,
-} from "../../../types/ProductionSchedule";
+import type { ResultRow } from "../../../types/ProductionSchedule";
 
-function Resumo({ dados }: { dados: IProductionSchedule["results"] }) {
+interface IResumoCliente {
+  client_name: string;
+  quantity: number;
+  revenue: number;
+}
+
+const pieces = (row: ResultRow) => row.production ?? row.demand ?? 0;
+
+function Resumo({ dados }: { dados: ResultRow[] }) {
+  const linhas = useMemo(() => dados.filter((row) => row.kind !== "stop"), [dados]);
+
   const total = useMemo(
     () =>
-      dados.reduce(
+      linhas.reduce(
         (acc, curr) => {
-          acc.quantity += curr.quantity;
+          acc.quantity += pieces(curr);
           acc.revenue_total += curr.expected_revenue;
-
           return acc;
         },
         { quantity: 0, revenue_total: 0 },
       ),
-    [dados],
+    [linhas],
   );
 
   const aggregateData = useMemo(() => {
-    return dados.reduce((acc, curr) => {
-      if (!acc.get(curr.client_name)) {
-        acc.set(curr.client_name, curr);
-        return acc;
-      }
-
-      if (acc.get(curr.client_name)) {
-        const { quantity, expected_revenue, ...data } = acc.get(
-          curr.client_name,
-        ) as Results;
-
-        const newQuantity = quantity + curr.quantity;
-        const newRevenue = expected_revenue + curr.expected_revenue;
-
-        acc.set(curr.client_name, {
-          ...data,
-          quantity: newQuantity,
-          expected_revenue: newRevenue,
-        });
-
-        return acc;
-      }
-
-      return acc;
-    }, new Map<string, Results>());
-  }, [dados]);
+    const porCliente = new Map<string, IResumoCliente>();
+    for (const row of linhas) {
+      const atual = porCliente.get(row.client_name) ?? {
+        client_name: row.client_name,
+        quantity: 0,
+        revenue: 0,
+      };
+      atual.quantity += pieces(row);
+      atual.revenue += row.expected_revenue;
+      porCliente.set(row.client_name, atual);
+    }
+    return porCliente;
+  }, [linhas]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 w-full relative overflow-hidden">
@@ -72,7 +65,7 @@ function Resumo({ dados }: { dados: IProductionSchedule["results"] }) {
                     {Intl.NumberFormat("pt-br", {
                       style: "currency",
                       currency: "BRL",
-                    }).format(item.expected_revenue)}
+                    }).format(item.revenue)}
                   </td>
                 </tr>
               ))}

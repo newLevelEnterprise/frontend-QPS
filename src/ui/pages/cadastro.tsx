@@ -61,16 +61,14 @@ function CadastroPage() {
             <Info dados={production ? production : undefined} />
           </div>
           <div className="min-w-0">
-            <SequenciamentoTabela
-              dados={production ? production.results : []}
-            />
+            <SequenciamentoTabela dados={production?.rows ?? []} />
           </div>
         </section>
 
         <section className="grid grid-cols-1 xl:grid-cols-[300px_minmax(0,1fr)] gap-4 items-stretch">
           <div className="min-w-0 flex flex-col gap-4">
             <HorasMaquina dados={production?.metrics || undefined} />
-            <Resumo dados={production ? production.results : []} />
+            <Resumo dados={production?.rows ?? []} />
           </div>
 
           <div className="min-w-0 overflow-x-auto">

@@ -10,6 +10,7 @@ export interface IProductionSchedule {
   id: number;
   created_at: string;
   results: Results[];
+  rows?: ResultRow[];
   revenue_forecast: {
     billing_date: string;
     revenue_total: number;
@@ -28,6 +29,7 @@ export interface Results {
   order_number: string;
   client_name: string;
   product_name: string;
+  product_code?: string | null;
   machine_name: string | null;
   mold_name: string | null;
   quantity: number;
@@ -37,6 +39,24 @@ export interface Results {
   completion_datetime: string | null;
   completion_injection_datetime: string | null;
   billing_date: string;
+  status: string;
+  expected_revenue: number;
+}
+
+export interface ResultRow {
+  order: number;
+  kind: "simple" | "compound" | "state" | "stop";
+  machine_name: string | null;
+  order_number: string;
+  client_name: string;
+  product_code: string | null;
+  product_name: string;
+  demand: number | null;
+  production: number | null;
+  scheduled_datetime: string | null;
+  completion_injection_datetime: string | null;
+  completion_datetime: string | null;
+  billing_date: string | null;
   status: string;
   expected_revenue: number;
 }

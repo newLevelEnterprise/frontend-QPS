@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IoSearchSharp } from "react-icons/io5";
-import { hiddenModeLabel, hideMoldFields } from "../../../config/featureFlags";
-import type { IProductionSchedule } from "../../../types/ProductionSchedule";
+import { hiddenModeLabel } from "../../../config/featureFlags";
+import type { ResultRow } from "../../../types/ProductionSchedule";
 
 const formatDate = (date?: string | null, hour = false) => {
   if (!date) return "-";
@@ -19,19 +19,19 @@ const formatDate = (date?: string | null, hour = false) => {
   return Intl.DateTimeFormat("pt-br", { timeZone: "UTC" }).format(parsedDate);
 };
 
-function SequenciamentoTabela({
-  dados,
-}: {
-  dados: IProductionSchedule["results"];
-}) {
+const formatQuantity = (value: number | null) =>
+  value === null || value === undefined ? "-" : Intl.NumberFormat("pt-br").format(value);
+
+const th =
+  "sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap";
+
+function SequenciamentoTabela({ dados }: { dados: ResultRow[] }) {
   const [busca, setBusca] = useState<string>("");
-  const dadosFiltrados = dados.filter(
-    (p) =>
-      p.client_name.toLowerCase().includes(busca.toLowerCase()) ||
-      p.product_name.toLowerCase().includes(busca.toLowerCase()) ||
-      (p.machine_name ?? "").toLowerCase().includes(busca.toLowerCase()) ||
-      (!hideMoldFields &&
-        (p.mold_name ?? "").toLowerCase().includes(busca.toLowerCase())),
+  const termo = busca.toLowerCase();
+  const dadosFiltrados = dados.filter((p) =>
+    [p.client_name, p.product_name, p.machine_name, p.product_code, p.order_number].some((valor) =>
+      (valor ?? "").toLowerCase().includes(termo),
+    ),
   );
 
   return (
@@ -56,95 +56,67 @@ function SequenciamentoTabela({
           <table className="w-full table-auto">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Ordem Seq.
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Maquina
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Pedido
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Cliente
-                </th>
-                {!hideMoldFields && (
-                  <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                    Molde
-                  </th>
-                )}
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Produto
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Demanda
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Limite Faturamento
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
+                <th className={th}>Ordem Seq.</th>
+                <th className={th}>Maquina</th>
+                <th className={th}>Pedido</th>
+                <th className={`${th} text-left`}>Cliente</th>
+                <th className={th}>Código</th>
+                <th className={th}>Produto</th>
+                <th className={th}>Demanda</th>
+                <th className={th}>Produção</th>
+                <th className={th}>Data Limite Faturamento</th>
+                <th className={th}>
                   {hiddenModeLabel(
                     "Data de Finalização na Injetora",
                     "Data finalização Maq. Gargalo",
                   )}
                 </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Prevista Final Produção
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Data Prevista Faturamento
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Status
-                </th>
-                <th className="sticky top-0 z-10 bg-gray-100 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                  Valor Faturado
-                </th>
+                <th className={th}>Data Prevista Final Produção</th>
+                <th className={th}>Data Prevista Faturamento</th>
+                <th className={th}>Status</th>
+                <th className={th}>Valor Faturado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {dadosFiltrados.map((order, index) => (
                 <tr
-                  key={order.id}
+                  key={`${order.order}-${order.order_number}`}
                   className={`${
                     index % 2 === 1 ? "bg-gray-50" : "bg-white"
                   } hover:bg-gray-100 transition-colors`}
                 >
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                    {order.order_index}
+                    {order.order}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {order.machine_name ?? "-"}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                    {order.order_number}
+                    {order.order_number || "-"}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-left whitespace-nowrap">
-                    {order.client_name}
+                    {order.client_name || "-"}
                   </td>
-                  {!hideMoldFields && (
-                    <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                      {order.mold_name ?? "-"}
-                    </td>
-                  )}
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                    {order.product_code || "-"}
+                  </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center whitespace-nowrap">
                     {order.product_name}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {Intl.NumberFormat("pt-br").format(order.quantity)}
+                    {formatQuantity(order.demand)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                    {formatQuantity(order.production)}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {formatDate(order.scheduled_datetime, true)}
                   </td>
                   <td className="px-4 py-3 text-sm  text-gray-900 text-center">
-                    {order.completion_injection_datetime
-                      ? formatDate(order.completion_injection_datetime, true)
-                      : "-"}
+                    {formatDate(order.completion_injection_datetime, true)}
                   </td>
                   <td className="px-4 py-3 text-sm  text-gray-900 text-center">
-                    {order.completion_datetime
-                      ? formatDate(order.completion_datetime, true)
-                      : "-"}
+                    {formatDate(order.completion_datetime, true)}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                     {formatDate(order.billing_date)}
