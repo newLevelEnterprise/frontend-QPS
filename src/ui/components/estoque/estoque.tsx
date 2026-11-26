@@ -91,16 +91,34 @@ function Estoque() {
 
   const exportarEstoque = useMutation({
     mutationFn: async () => {
-      const response = await apiClient.get("/inventory-stock/export", { responseType: "blob" });
+      const response = await apiClient.get<Blob>("/inventory-stock/export", {
+        responseType: "blob",
+      });
+      const disposition = String(response.headers["content-disposition"] ?? "");
+      const filename =
+        disposition.match(/filename="([^"]+)"/)?.[1] || "estoque_insumos.xlsx";
       const url = window.URL.createObjectURL(response.data);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "estoque_insumos.xlsx";
+      link.download = filename;
+      document.body.appendChild(link);
       link.click();
+      link.remove();
       window.URL.revokeObjectURL(url);
     },
-    onError: () => {
-      toast.error("Erro ao exportar o estoque.");
+    onError: async (error) => {
+      let message = "Erro ao exportar o estoque.";
+      if (axios.isAxiosError(error) && error.response?.data instanceof Blob) {
+        try {
+          const payload = JSON.parse(await error.response.data.text());
+          if (typeof payload.detail === "string" && payload.detail.trim()) {
+            message = payload.detail;
+          }
+        } catch {
+          message = "Erro ao exportar o estoque.";
+        }
+      }
+      toast.error(message);
     },
   });
 
