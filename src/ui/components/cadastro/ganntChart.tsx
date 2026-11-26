@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { hiddenModeLabel, hideMoldFields } from "../../../config/featureFlags";
 import { apiClient } from "../../../utils/apiClient";
 import Loader from "../Loader";
 
@@ -33,13 +34,25 @@ interface IGanttLine {
 
 interface IGanttLegendItem {
   index: number;
+  maquina: string;
   pedido: string;
   cliente: string;
   produto: string;
+  componente: string;
+  molde: string;
+  codigo_pai: string;
+  produto_pai: string;
   demanda: string;
+  demanda_original: string;
+  producao: string;
   inicio: string;
   finalizacao: string;
+  finalizacao_injetora: string;
 }
+
+const legendHeader =
+  "sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap";
+const legendCell = "px-4 py-3 text-sm text-gray-900 text-center";
 
 interface IGanttResponse {
   run_id: number;
@@ -145,26 +158,21 @@ function LegendTable({ legend }: { legend: IGanttLegendItem[] }) {
         <table className="w-full">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                #
+              <th className={legendHeader}>#</th>
+              <th className={legendHeader}>Máquina</th>
+              <th className={legendHeader}>Pedido</th>
+              <th className={legendHeader}>Cliente</th>
+              <th className={legendHeader}>Componente</th>
+              {!hideMoldFields && <th className={legendHeader}>Molde</th>}
+              <th className={legendHeader}>Código (pai)</th>
+              <th className={legendHeader}>Produto (pai)</th>
+              <th className={legendHeader}>Demanda (Original do Pedido)</th>
+              <th className={legendHeader}>Produção (Demanda Atualizada)</th>
+              <th className={legendHeader}>
+                {hiddenModeLabel("Data de Início na Injetora", "Data de Início na Maq. Gargalo")}
               </th>
-              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                Pedido
-              </th>
-              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                Cliente
-              </th>
-              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                Produto
-              </th>
-              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                Demanda
-              </th>
-              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                Início
-              </th>
-              <th className="sticky top-0 z-10 bg-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider whitespace-nowrap">
-                Finalização
+              <th className={legendHeader}>
+                {hiddenModeLabel("Data de Finalização na Injetora", "Data de Finalização na Maq. Gargalo")}
               </th>
             </tr>
           </thead>
@@ -176,26 +184,19 @@ function LegendTable({ legend }: { legend: IGanttLegendItem[] }) {
                   rowIndex % 2 === 0 ? "bg-gray-50" : "bg-white"
                 } hover:bg-gray-100 transition-colors`}
               >
-                <td className="px-4 py-3 text-sm text-gray-900 font-medium text-center">
-                  {item.index}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900 text-center">
-                  {item.pedido || "-"}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900 text-center">
-                  {item.cliente || "-"}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900 text-center">
-                  {item.produto || "-"}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900 text-center">
-                  {item.demanda || "-"}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap text-center">
-                  {item.inicio || "-"}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap text-center">
-                  {item.finalizacao || "-"}
+                <td className={`${legendCell} font-medium`}>{item.index}</td>
+                <td className={legendCell}>{item.maquina || "-"}</td>
+                <td className={legendCell}>{item.pedido || "-"}</td>
+                <td className={legendCell}>{item.cliente || "-"}</td>
+                <td className={legendCell}>{item.componente || item.produto || "-"}</td>
+                {!hideMoldFields && <td className={legendCell}>{item.molde || "-"}</td>}
+                <td className={legendCell}>{item.codigo_pai || "-"}</td>
+                <td className={legendCell}>{item.produto_pai || "-"}</td>
+                <td className={legendCell}>{item.demanda_original || "-"}</td>
+                <td className={legendCell}>{item.producao || "-"}</td>
+                <td className={`${legendCell} whitespace-nowrap`}>{item.inicio || "-"}</td>
+                <td className={`${legendCell} whitespace-nowrap`}>
+                  {item.finalizacao_injetora || "-"}
                 </td>
               </tr>
             ))}
