@@ -23,6 +23,24 @@ function itemJaCadastrado(item: IEstoqueInsumo) {
   return item.source != null || item.ultima_atualizacao != null;
 }
 
+function importErrorMessage(error: unknown) {
+  if (!axios.isAxiosError(error)) return "Erro ao importar a planilha.";
+  const detail = error.response?.data?.detail;
+  if (typeof detail === "string" && detail.trim()) return detail;
+  if (Array.isArray(detail)) {
+    const text = detail
+      .map((item) =>
+        item && typeof item === "object" && "msg" in item && typeof item.msg === "string"
+          ? item.msg
+          : "",
+      )
+      .filter(Boolean)
+      .join(" ");
+    if (text) return text;
+  }
+  return "Erro ao importar a planilha.";
+}
+
 function formatMissingIds(result: IEstoqueImportacao) {
   if (!result.ids_nao_encontrados.length) return "";
   return result.ids_nao_encontrados
@@ -64,9 +82,9 @@ function Estoque() {
 
   const importarPlanilha = useMutation({
     mutationFn: async (file: File) => {
-      const form = new FormData();
-      form.append("file", file);
-      const { data } = await apiClient.post<IEstoqueImportacao>("/inventory-stock/import", form);
+      const { data } = await apiClient.postForm<IEstoqueImportacao>("/inventory-stock/import", {
+        file,
+      });
       return data;
     },
     onSuccess: (data) => {
@@ -84,8 +102,7 @@ function Estoque() {
       }
     },
     onError: (error) => {
-      const detail = axios.isAxiosError(error) ? error.response?.data?.detail : null;
-      toast.error(typeof detail === "string" ? detail : "Erro ao importar a planilha.");
+      toast.error(importErrorMessage(error));
     },
   });
 
@@ -163,17 +180,24 @@ function Estoque() {
           <Modal.Header title="Importar Planilha" onClose={closeImport} />
           <div className="flex flex-col gap-4 my-6 min-w-[320px]">
             <p className="text-sm text-gray-600">
-              Colunas esperadas: tipo, id_insumo, quantidade_atual. O tipo pode ser
-              materia_prima, item_compra ou produto.
+              Use a planilha exportada. Ela aceita tipo, id_insumo ou codigo,
+              quantidade_atual e estoque_minimo. O tipo pode ser materia_prima,
+              item_compra ou produto.
             </p>
-            <input
-              type="file"
-              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              onChange={(event) => {
-                setArquivo(event.target.files?.[0] ?? null);
-                setResumo(null);
-              }}
-            />
+            <label className="text-sm text-gray-700 flex flex-col gap-2">
+              Planilha
+              <input
+                type="file"
+                accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                onChange={(event) => {
+                  setArquivo(event.target.files?.[0] ?? null);
+                  setResumo(null);
+                }}
+              />
+            </label>
+            {arquivo && (
+              <p className="text-sm text-gray-700">Arquivo selecionado: {arquivo.name}</p>
+            )}
             {resumo && (
               <div className="text-sm text-gray-700 flex flex-col gap-1">
                 <span>Linhas processadas: {resumo.linhas_processadas}</span>
