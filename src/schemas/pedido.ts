@@ -57,6 +57,7 @@ export const jobManualSchema = z.object({
   promised_date: z.string().min(1, "Data prometida é obrigatória"),
   promised_hour: z.string().min(1, "Hora prometida é obrigatória"),
   priority: z.enum(JOB_PRIORITIES, { message: "Prioridade deve ser 1, 2, 3, 4 ou 9" }),
+  order_number: z.string().trim().min(1, "Número do pedido é obrigatório"),
 });
 
 export type IJobManualBody = z.infer<typeof jobManualSchema>;

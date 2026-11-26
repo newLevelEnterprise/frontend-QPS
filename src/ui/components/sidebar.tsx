@@ -11,7 +11,6 @@ import {
   MdGradient,
   MdMenuBook,
   MdMessage,
-  MdOutlineHistory,
   MdOutlinePrecisionManufacturing,
   MdOutlineTimeline,
   MdOutlineViewComfyAlt,
@@ -119,15 +118,6 @@ const menuItems: MenuItem[] = [
       </div>
     ),
     url: "/composicao",
-  },
-  {
-    title: "Turnos Regulares",
-    icon: (props) => (
-      <div className="border border-gray-900 flex justify-center items-center rounded-full p-1">
-        <MdOutlineHistory className={props.className} />
-      </div>
-    ),
-    url: "/turnos-regulares",
   },
   {
     title: "Resultados",

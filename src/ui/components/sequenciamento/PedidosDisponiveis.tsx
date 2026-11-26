@@ -199,13 +199,13 @@ function PedidosDisponiveis({
     <div className="w-full md:w-[65%] bg-white rounded-md shadow p-4 overflow-x-auto">
       <Modal.Root isVisible={novoJob}>
         <Modal.Container>
-          <Modal.Header title="Adicionar job manualmente" onClose={() => setNovoJob(false)} />
+          <Modal.Header title="Adicionar pedido manualmente" onClose={() => setNovoJob(false)} />
           <FormJobManual onClose={() => setNovoJob(false)} />
         </Modal.Container>
       </Modal.Root>
       <Modal.Root isVisible={pedidoEditando !== null}>
         <Modal.Container>
-          <Modal.Header title="Editar job" onClose={() => setPedidoEditando(null)} />
+          <Modal.Header title="Editar pedido" onClose={() => setPedidoEditando(null)} />
           {pedidoEditando && (
             <FormJobManual pedido={pedidoEditando} onClose={() => setPedidoEditando(null)} />
           )}
@@ -234,7 +234,7 @@ function PedidosDisponiveis({
           onClick={() => setNovoJob(true)}
           className="cursor-pointer text-xs md:text-sm px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap"
         >
-          Adicionar job
+          Adicionar pedido
         </button>
         <button
           type="button"
@@ -342,7 +342,7 @@ function PedidosDisponiveis({
                         type="button"
                         onClick={() => setPedidoEditando(pedido)}
                         className="text-blue-600 cursor-pointer hover:text-blue-800"
-                        aria-label="Editar job"
+                        aria-label="Editar pedido"
                       >
                         <FiEdit2 className="w-4 h-4" />
                       </button>
@@ -350,7 +350,7 @@ function PedidosDisponiveis({
                         type="button"
                         onClick={() => deletarJob.mutate(pedido.id)}
                         className="text-red-500 cursor-pointer hover:text-red-700"
-                        aria-label="Excluir job"
+                        aria-label="Excluir pedido"
                       >
                         <TbTrash className="w-4 h-4 md:w-5 md:h-5" />
                       </button>
