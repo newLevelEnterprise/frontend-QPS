@@ -29,7 +29,7 @@ function SequenciamentoTabela({ dados }: { dados: ResultRow[] }) {
   const [busca, setBusca] = useState<string>("");
   const termo = busca.toLowerCase();
   const dadosFiltrados = dados.filter((p) =>
-    [p.client_name, p.product_name, p.machine_name, p.product_code, p.order_number].some((valor) =>
+    [p.client_name, p.product_name, p.product_code, p.order_number].some((valor) =>
       (valor ?? "").toLowerCase().includes(termo),
     ),
   );
@@ -57,7 +57,6 @@ function SequenciamentoTabela({ dados }: { dados: ResultRow[] }) {
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className={th}>Ordem Seq.</th>
-                <th className={th}>Maquina</th>
                 <th className={th}>Pedido</th>
                 <th className={`${th} text-left`}>Cliente</th>
                 <th className={th}>Código</th>
@@ -87,9 +86,6 @@ function SequenciamentoTabela({ dados }: { dados: ResultRow[] }) {
                 >
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                     {order.order}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                    {order.machine_name ?? "-"}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
                     {order.order_number || "-"}
