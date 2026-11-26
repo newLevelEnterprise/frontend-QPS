@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { hiddenModeLabel, hideMoldFields } from "../../../../config/featureFlags";
@@ -8,6 +8,8 @@ import type { IMaquinasType } from "../../../../types/Maquina";
 import type { IMoldes } from "../../../../types/Moldes";
 import { apiClient } from "../../../../utils/apiClient";
 import { findMoldByProductName } from "../../../../utils/moldResolution";
+import Loader from "../../Loader";
+import type { IMaquinaSequenciamento } from "./estadoMaquinas";
 
 interface IProdutoComMoldes {
   name: string;
@@ -43,13 +45,17 @@ const disabledFieldClassName =
   "disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-300 disabled:cursor-not-allowed";
 
 interface IFormNovoEstadoProps {
-  onAddEstadoAtualMaquina: (data: IEstadoAtualMaquinaItem) => void;
-  setIsModalNovoEstadoVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  maquina: IMaquinaSequenciamento;
+  estadoInicial: IEstadoAtualMaquinaItem | null;
+  onSalvar: (data: IEstadoAtualMaquinaItem) => void;
+  onCancelar: () => void;
 }
 
 function FormNovoEstado({
-  onAddEstadoAtualMaquina,
-  setIsModalNovoEstadoVisible,
+  maquina,
+  estadoInicial,
+  onSalvar,
+  onCancelar,
 }: IFormNovoEstadoProps) {
   const { data: moldes, isFetching: isFetchingMoldes } = useQuery({
     queryKey: ["get", "all", "moldes"],
@@ -63,14 +69,6 @@ function FormNovoEstado({
     queryKey: ["get", "all", "products"],
     queryFn: async () => {
       const { data } = await apiClient.get<IProdutoComMoldes[]>("/products/");
-      return data;
-    },
-  });
-
-  const { data: maquinas, isFetching: isFetchingMaquinas } = useQuery({
-    queryKey: ["get", "all", "machines"],
-    queryFn: async () => {
-      const { data } = await apiClient.get<IMaquinasType[]>("/machines/");
       return data;
     },
   });
@@ -101,12 +99,18 @@ function FormNovoEstado({
   const {
     register,
     handleSubmit,
-    reset,
     watch,
     setValue,
     formState: { isSubmitting },
   } = useForm<IEstadoAtualMaquinaItem>({
-    defaultValues: defaultNovoEstado,
+    defaultValues: estadoInicial ?? {
+      ...defaultNovoEstado,
+      maquina: String(maquina.id),
+      maquina_name: maquina.name,
+      production_line_id: maquina.production_line
+        ? String(maquina.production_line.id)
+        : "",
+    },
   });
 
   const maquinaSelecionada = watch("maquina");
@@ -146,21 +150,12 @@ function FormNovoEstado({
     );
   }, [produtos, moldeSelecionadoId, moldes]);
 
+  const moldeAnterior = useRef(moldeSelecionadoId);
   useEffect(() => {
-    if (hideMoldFields) return;
-    setValue("codMolde", "");
-    setValue("prodMaquinaInicioSequenciamento", "");
-  }, [maquinaSelecionada, setValue]);
-
-  useEffect(() => {
-    if (hideMoldFields) return;
+    if (hideMoldFields || moldeAnterior.current === moldeSelecionadoId) return;
+    moldeAnterior.current = moldeSelecionadoId;
     setValue("prodMaquinaInicioSequenciamento", "");
   }, [moldeSelecionadoId, setValue]);
-
-  useEffect(() => {
-    if (!hideMoldFields) return;
-    setValue("prodMaquinaInicioSequenciamento", "");
-  }, [maquinaSelecionada, setValue]);
 
   useEffect(() => {
     if (!hideMoldFields) return;
@@ -183,49 +178,39 @@ function FormNovoEstado({
     }
   }, [setValue, statusSelecionado]);
 
-  const adicionarEstadoAtualMaquina = (data: IEstadoAtualMaquinaItem) => {
-    const machineSelected = maquinas?.find(
-      (machine) => machine.id.toString() === data.maquina,
-    );
-    if (!machineSelected || !machineSelected.production_line) {
+  const salvarEstadoAtualMaquina = (data: IEstadoAtualMaquinaItem) => {
+    if (!maquina.production_line) {
       toast.error(
         "Não foi possível encontrar a linha de produção para o produto selecionado. Verifique se o produto está corretamente associado a uma linha de produção.",
       );
       return;
     }
-    data.production_line_id =
-      machineSelected.production_line.id.toString() || "";
 
-    onAddEstadoAtualMaquina({ ...data, maquina_name: machineSelected.name });
-    reset(defaultNovoEstado);
-    setIsModalNovoEstadoVisible(false);
+    onSalvar({
+      ...data,
+      maquina: String(maquina.id),
+      maquina_name: maquina.name,
+      production_line_id: String(maquina.production_line.id),
+    });
   };
+
+  if (!moldes || !produtos || !clientes) {
+    return <Loader message="Carregando" />;
+  }
 
   return (
     <form
-      onSubmit={handleSubmit(adicionarEstadoAtualMaquina)}
+      onSubmit={handleSubmit(salvarEstadoAtualMaquina)}
       className="grid grid-cols-1 md:grid-cols-2 gap-4"
     >
       <div className="flex flex-col gap-1">
         <label className="font-semibold text-sm">Máquina</label>
-        <select
+        <input
+          type="text"
           className={`border rounded px-2 py-1 ${disabledFieldClassName}`}
-          defaultValue=""
-          {...register("maquina", { required: true })}
-          disabled={isFetchingMaquinas}
-          // isFetchingCompositionLines
-        >
-          <option value="" disabled>
-            {isFetchingMaquinas
-              ? "Carregando máquinas..."
-              : "Selecione uma máquina"}
-          </option>
-          {maquinas?.map((maquina) => (
-            <option key={maquina.id} value={maquina.id}>
-              {maquina.name}
-            </option>
-          ))}
-        </select>
+          value={maquina.name}
+          disabled
+        />
       </div>
 
       {!hideMoldFields ? (
@@ -420,10 +405,7 @@ function FormNovoEstado({
       <div className="md:col-span-2 flex justify-end gap-2 mt-2">
         <button
           type="button"
-          onClick={() => {
-            reset(defaultNovoEstado);
-            setIsModalNovoEstadoVisible(false);
-          }}
+          onClick={onCancelar}
           className="px-4 py-2 rounded bg-gray-600 text-white cursor-pointer"
         >
           Cancelar

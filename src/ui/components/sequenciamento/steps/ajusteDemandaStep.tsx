@@ -133,6 +133,7 @@ function AjusteDemanda() {
     if (!window.confirm("Cancelar sequenciamento?")) return;
     localStorage.removeItem("sequenciamento_info");
     localStorage.removeItem("estado_atual_maquina");
+    localStorage.removeItem("maquinas_desmarcadas");
     localStorage.removeItem("jobs_ids");
     resetSteps();
   };

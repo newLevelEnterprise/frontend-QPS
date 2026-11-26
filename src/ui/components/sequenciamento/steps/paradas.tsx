@@ -15,11 +15,23 @@ import { apiClient } from "../../../../utils/apiClient";
 import Modal from "../../modal";
 import Loading from "../loading";
 import { mesmaSelecao, paraDemandAdjustments } from "./ajusteDemanda";
+import {
+  ESTADO_ATUAL_MAQUINA_STORAGE_KEY,
+  MAQUINAS_DESMARCADAS_STORAGE_KEY,
+  estadosUtilizados,
+  lerEstadosSalvos,
+  maquinasUtilizadas,
+  paradasUtilizadas,
+} from "./estadoMaquinas";
 import FormEditarParada from "./formEditarParada";
 import FormNovaParada from "./formNovaParada";
 
 const SEQUENCIAMENTO_INFO_STORAGE_KEY = "sequenciamento_info";
-const ESTADO_ATUAL_MAQUINA_STORAGE_KEY = "estado_atual_maquina";
+const LIMITE_PARADAS = 2;
+
+interface IPecaSemMaquina {
+  message: string;
+}
 
 const formatBillingDeadlineTime = (time: string) => {
   const value = (time || "").trim();
@@ -82,9 +94,15 @@ function Paradas() {
   });
 
   const [paradas, setParadas] = useState<IParadas[]>([]);
+  const [maquinasHabilitadas] = useState<number[]>(() =>
+    maquinasUtilizadas(
+      lerEstadosSalvos(localStorage.getItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY)),
+    ),
+  );
 
   const adicionarParada = (novaParada: Omit<IParadas, "id">) => {
     setParadas((prev) => {
+      if (prev.length >= LIMITE_PARADAS) return prev;
       const proximoId = prev.length
         ? Math.max(...prev.map((paradaAtual) => paradaAtual.id)) + 1
         : 1;
@@ -134,11 +152,12 @@ function Paradas() {
       const sequenciamento = safeParseStorage<
         ICriaStepsSequenciamentoBody["sequenciamento"]
       >(SEQUENCIAMENTO_INFO_STORAGE_KEY);
-      const estadoAtualMaquina = safeParseStorage<
-        ICriaStepsSequenciamentoBody["estadoAtualMaquina"]
-      >(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
+      const estadoAtualMaquina = estadosUtilizados(
+        lerEstadosSalvos(localStorage.getItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY)),
+      );
+      const enabledMachineIds = maquinasUtilizadas(estadoAtualMaquina);
 
-      if (!sequenciamento || !estadoAtualMaquina) {
+      if (!sequenciamento || estadoAtualMaquina.length === 0) {
         toast.error(
           "Não foi possível encontrar os dados dos passos anteriores. Volte e preencha novamente.",
         );
@@ -149,7 +168,7 @@ function Paradas() {
         sequenciamento,
         estadoAtualMaquina,
         paradasSequenciamento: incluirParadas
-          ? paradas.map((paradaAtual) => ({
+          ? paradasUtilizadas(paradas, enabledMachineIds).map((paradaAtual) => ({
               production_line_id: paradaAtual.product_line_id.toString(),
               motivo: paradaAtual.motivo,
               maquina: paradaAtual.maquina,
@@ -242,7 +261,9 @@ function Paradas() {
           : null,
       });
 
-      await apiClient.post("/solver/solver", {
+      const { data: resultado } = await apiClient.post<{
+        machine_selection?: { jobs_without_eligible_machine?: IPecaSemMaquina[] };
+      }>("/solver/solver", {
         job_ids: jobs_ids || [],
         sequencing_date: `${sequenciamento.dataInicio}T${sequenciamento.horarioInicio}:00`,
         next_saturday_is_working: sequenciamento.sabadoTrabalha,
@@ -285,10 +306,19 @@ function Paradas() {
         demand_adjustments: mesmaSelecao(ajusteDemanda, jobs_ids || [])
           ? paraDemandAdjustments(ajusteDemanda.pedidos)
           : undefined,
+        enabled_machine_ids: enabledMachineIds,
       });
+
+      const semMaquina = resultado?.machine_selection?.jobs_without_eligible_machine ?? [];
+      if (semMaquina.length > 0) {
+        toast.warning(
+          `Peças fora do sequenciamento:\n${semMaquina.map((item) => `• ${item.message}`).join("\n")}`,
+        );
+      }
 
       localStorage.removeItem(SEQUENCIAMENTO_INFO_STORAGE_KEY);
       localStorage.removeItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
+      localStorage.removeItem(MAQUINAS_DESMARCADAS_STORAGE_KEY);
       localStorage.removeItem("jobs_ids");
       localStorage.removeItem("jobs_para_sequenciamento");
       setAjusteDemanda(null);
@@ -360,7 +390,10 @@ function Paradas() {
             title="Adicionar Nova Parada"
             onClose={() => setModalCriarParada(false)}
           />
-          <FormNovaParada onCriarParada={adicionarParada} />
+          <FormNovaParada
+            onCriarParada={adicionarParada}
+            maquinasHabilitadas={maquinasHabilitadas}
+          />
         </Modal.Container>
       </Modal.Root>
       <Modal.Root isVisible={modalEditarParada}>
@@ -373,6 +406,7 @@ function Paradas() {
             setEditarParada={() => setModalEditarParada(false)}
             parada={parada}
             onEditarParada={editarParada}
+            maquinasHabilitadas={maquinasHabilitadas}
           />
         </Modal.Container>
       </Modal.Root>
@@ -403,13 +437,20 @@ function Paradas() {
             </label>
           </div>
         </div>
-        <button
-          disabled={!incluirParadas}
-          className={`flex items-center gap-2 bg-[#3573C9] hover:bg-[#285ca0] text-white font-medium rounded-lg p-2 text-xs cursor-pointer disabled:cursor-not-allowed ${!incluirParadas ? "opacity-50 cursor-not-allowed" : ""}`}
-          onClick={() => setModalCriarParada(true)}
-        >
-          <span>+</span> Adicionar nova parada
-        </button>
+        <div className="flex items-center gap-3">
+          {incluirParadas && paradas.length > 0 && (
+            <span className="text-sm text-gray-600">
+              {paradas.length}/{LIMITE_PARADAS}
+            </span>
+          )}
+          <button
+            disabled={!incluirParadas || paradas.length >= LIMITE_PARADAS}
+            className={`flex items-center gap-2 bg-[#3573C9] hover:bg-[#285ca0] text-white font-medium rounded-lg p-2 text-xs cursor-pointer disabled:cursor-not-allowed ${!incluirParadas || paradas.length >= LIMITE_PARADAS ? "opacity-50 cursor-not-allowed" : ""}`}
+            onClick={() => setModalCriarParada(true)}
+          >
+            <span>+</span> Adicionar nova parada
+          </button>
+        </div>
       </div>
       {incluirParadas && (
         <div className="overflow-auto">

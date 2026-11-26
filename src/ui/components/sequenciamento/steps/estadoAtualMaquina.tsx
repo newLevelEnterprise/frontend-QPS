@@ -1,261 +1,206 @@
-import { useState } from "react";
-import { BiPlus } from "react-icons/bi";
-import { toast } from "react-toastify";
-import { hiddenModeLabel, hideMoldFields } from "../../../../config/featureFlags";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { hiddenModeLabel } from "../../../../config/featureFlags";
 import { useSteps } from "../../../../hooks/useStep";
-import {
-  criarStepsSequenciamentoschema,
-  type ICriaStepsSequenciamentoBody,
-} from "../../../../schemas/steps";
+import { criarStepsSequenciamentoschema } from "../../../../schemas/steps";
+import type { IMaquinasType } from "../../../../types/Maquina";
+import { apiClient } from "../../../../utils/apiClient";
+import Loader from "../../Loader";
 import Modal from "../../modal";
+import {
+  ESTADO_ATUAL_MAQUINA_STORAGE_KEY,
+  MAQUINAS_DESMARCADAS_STORAGE_KEY,
+  lerDesmarcadas,
+  lerEstadosSalvos,
+  marcarUtilizacao,
+  montarLinhas,
+  salvarEstado,
+  validarLinhas,
+  type IEstadoMaquina,
+  type IMaquinaSequenciamento,
+} from "./estadoMaquinas";
 import FormNovoEstado from "./formNovoEstadoMaquina";
 
-const ESTADO_ATUAL_MAQUINA_STORAGE_KEY = "estado_atual_maquina";
+const th = "border-b border-gray-200 px-3 py-4 text-sm font-semibold text-gray-700";
+const td = "border-b border-gray-200 px-3 py-4 text-sm text-gray-900";
+
+const fieldLabels: Record<string, string> = {
+  maquina: "Máquina",
+  utilizacao: "Utilização",
+  codMolde: "Código do molde",
+  prodMaquinaInicioSequenciamento: "Produto na máquina",
+  status: "Status do pedido",
+  numeroPedido: "Número do pedido",
+  nome_cliente: "Nome do cliente",
+  tempoRestanteProdInjetora: hiddenModeLabel(
+    "Tempo restante na injetora",
+    "Tempo restante na Maq. Gargalo",
+  ),
+  tempoRestanteProdPosInjetora: hiddenModeLabel(
+    "Tempo restante pós injetora",
+    "Tempo restante pós Maq. Gargalo",
+  ),
+  demanda: "Demanda",
+  valorAFAturar: "Valor a faturar",
+  dataLimiteFaturamento: "Data limite de faturamento",
+  horarioLimiteFaturamento: "Horário limite de faturamento",
+};
 
 function EstadoAtualMaquina() {
-  const [isModalNovoEstadoVisible, setIsModalNovoEstadoVisible] =
-    useState(false);
+  const { nextStep, prevStep } = useSteps();
+  const [estados, setEstados] = useState<IEstadoMaquina[]>(() =>
+    lerEstadosSalvos(localStorage.getItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY)),
+  );
+  const [desmarcadas, setDesmarcadas] = useState<number[]>(() =>
+    lerDesmarcadas(localStorage.getItem(MAQUINAS_DESMARCADAS_STORAGE_KEY)),
+  );
+  const [emEdicao, setEmEdicao] = useState<IMaquinaSequenciamento | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
 
-  const [estadoAtualMaquina, setEstadoAtualMaquina] = useState<
-    ICriaStepsSequenciamentoBody["estadoAtualMaquina"]
-  >(() => {
-    const fromStorage = localStorage.getItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY);
-
-    if (!fromStorage) {
-      return [];
-    }
-
-    try {
-      const parsed = JSON.parse(fromStorage);
-      return Array.isArray(parsed)
-        ? (parsed as ICriaStepsSequenciamentoBody["estadoAtualMaquina"])
-        : [];
-    } catch {
-      return [];
-    }
+  const { data: maquinas, isFetching } = useQuery({
+    queryKey: ["get", "all", "machines"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<IMaquinasType[]>("/machines/");
+      return data;
+    },
   });
 
-  const { nextStep, prevStep } = useSteps();
+  useEffect(() => {
+    localStorage.setItem(ESTADO_ATUAL_MAQUINA_STORAGE_KEY, JSON.stringify(estados));
+  }, [estados]);
 
-  const adicionarEstadoAtualMaquina = (
-    data: ICriaStepsSequenciamentoBody["estadoAtualMaquina"][number],
-  ) => {
-    setEstadoAtualMaquina((prev) => [...prev, data]);
+  useEffect(() => {
+    localStorage.setItem(MAQUINAS_DESMARCADAS_STORAGE_KEY, JSON.stringify(desmarcadas));
+  }, [desmarcadas]);
+
+  const linhas = useMemo(
+    () => montarLinhas(maquinas ?? [], estados, desmarcadas),
+    [maquinas, estados, desmarcadas],
+  );
+
+  const alterarUtilizacao = (maquinaId: number, utilizar: boolean) => {
+    const proximo = marcarUtilizacao(estados, desmarcadas, maquinaId, utilizar);
+    setEstados(proximo.estados);
+    setDesmarcadas(proximo.desmarcadas);
+    setErro(null);
   };
 
-  const removerEstadoAtualMaquina = (index: number) => {
-    setEstadoAtualMaquina((prev) => prev.filter((_, idx) => idx !== index));
+  const salvar = (estado: IEstadoMaquina) => {
+    setEstados((atuais) => salvarEstado(atuais, estado));
+    setEmEdicao(null);
+    setErro(null);
   };
 
   const handleProsseguir = () => {
-    if (estadoAtualMaquina.length === 0) {
-      toast.error("Cadastre pelo menos uma máquina para prosseguir.");
+    const falha = validarLinhas(linhas);
+    if (falha) {
+      setErro(falha);
       return;
     }
 
-    const isValid =
-      criarStepsSequenciamentoschema.shape.estadoAtualMaquina.safeParse(
-        estadoAtualMaquina,
-      );
-
-    if (!isValid.success) {
-      const fieldLabels: Record<string, string> = {
-        maquina: "Máquina",
-        utilizacao: "Utilização",
-        codMolde: "Código do molde",
-        prodMaquinaInicioSequenciamento: "Produto na máquina",
-        status: "Status do pedido",
-        numeroPedido: "Número do pedido",
-        nome_cliente: "Nome do cliente",
-        tempoRestanteProdInjetora: hiddenModeLabel(
-          "Tempo restante na injetora",
-          "Tempo restante na Maq. Gargalo",
-        ),
-        tempoRestanteProdPosInjetora: hiddenModeLabel(
-          "Tempo restante pós injetora",
-          "Tempo restante pós Maq. Gargalo",
-        ),
-        demanda: "Demanda",
-        valorAFAturar: "Valor a faturar",
-        dataLimiteFaturamento: "Data limite de faturamento",
-        horarioLimiteFaturamento: "Horário limite de faturamento",
-      };
-
-      const detalhesErros = isValid.error.issues.map((issue) => {
-        const indexPath = issue.path[0];
-        const fieldPath = issue.path[1];
-
-        const linha =
-          typeof indexPath === "number"
-            ? `Máquina ${indexPath + 1}`
-            : "Registro";
-        const campoKey = String(fieldPath ?? "");
+    const selecionadas = linhas.filter((linha) => linha.utilizar);
+    for (const linha of selecionadas) {
+      const isValid =
+        criarStepsSequenciamentoschema.shape.estadoAtualMaquina.element.safeParse(
+          linha.estado,
+        );
+      if (!isValid.success) {
+        const issue = isValid.error.issues[0];
+        const campoKey = String(issue.path[0] ?? "");
         const campo = (fieldLabels[campoKey] ?? campoKey) || "Campo inválido";
-
-        return `• ${linha} - ${campo}: ${issue.message}`;
-      });
-
-      toast.error(
-        `Encontramos alguns campos inválidos:\n${detalhesErros.join("\n")}`,
-      );
-      return;
+        setErro(`Máquina ${linha.maquina.name} - ${campo}: ${issue.message}`);
+        return;
+      }
     }
 
-    localStorage.setItem(
-      ESTADO_ATUAL_MAQUINA_STORAGE_KEY,
-      JSON.stringify(estadoAtualMaquina),
-    );
-
+    setErro(null);
     nextStep();
   };
 
   return (
     <div className="bg-white w-full overflow-y-auto max-h-full rounded-lg p-4">
-      <Modal.Root isVisible={isModalNovoEstadoVisible}>
+      <Modal.Root isVisible={emEdicao !== null}>
         <Modal.Container className="w-1/2 mx-auto">
           <Modal.Header
-            title="Novo Estado da Máquina"
-            onClose={() => {
-              setIsModalNovoEstadoVisible(false);
-            }}
+            title="Editar estado atual da máquina"
+            onClose={() => setEmEdicao(null)}
           />
-          <FormNovoEstado
-            onAddEstadoAtualMaquina={adicionarEstadoAtualMaquina}
-            setIsModalNovoEstadoVisible={setIsModalNovoEstadoVisible}
-          />
+          {emEdicao && (
+            <FormNovoEstado
+              maquina={emEdicao}
+              estadoInicial={
+                linhas.find((linha) => linha.maquina.id === emEdicao.id)?.estado ?? null
+              }
+              onSalvar={salvar}
+              onCancelar={() => setEmEdicao(null)}
+            />
+          )}
         </Modal.Container>
       </Modal.Root>
 
-      <h2 className="text-xl text-[#5B85D5] font-bold mb-4">
-        Estado Atual da Máquina
-      </h2>
-      <div className="overflow-auto max-h-[370px] w-full max-w-[1000px]">
-        {estadoAtualMaquina.length === 0 && (
-          <p className="text-gray-500 text-center py-20">
-            Nenhuma máquina cadastrada no início do sequenciamento.
-          </p>
-        )}
-        {estadoAtualMaquina.length > 0 && (
-          <table className="text-xs min-w-full">
+      <h2 className="text-[#3573C9] text-lg font-bold mb-2">Estado Atual da Máquina</h2>
+
+      {isFetching && linhas.length === 0 ? (
+        <Loader message="Carregando máquinas" />
+      ) : (
+        <div className="overflow-auto">
+          <table className="w-full border-collapse text-left">
             <thead>
               <tr>
-                <th className="px-2 py-2">Máquinas Cadastradas</th>
-                <th className="px-2 py-2">Utilização</th>
-                {!hideMoldFields && (
-                  <th className="px-2 py-2">
-                    Código do Molde em Máquina no Início do Sequenciamento
-                  </th>
-                )}
-                <th className="px-2 py-2">
-                  Produto em Máquina no Início do Sequenciamento
-                </th>
-                <th className="px-2 py-2">
-                  Status do Pedido na Máquina no Início do Sequenciamento
-                </th>
-                <th className="px-2 py-2">Número do Pedido</th>
-                <th className="px-2 py-2">
-                  {hiddenModeLabel(
-                    "Tempo restantes de produção na Injetora (min)",
-                    "Tempo restantes de produção na Maq. Gargalo (min)",
-                  )}
-                </th>
-                <th className="px-2 py-2">
-                  {hiddenModeLabel(
-                    "Tempo restantes de produção pós Injetora (min)",
-                    "Tempo restantes de produção pós Maq. Gargalo (min)",
-                  )}
-                </th>
-                <th className="px-2 py-2">Demanda</th>
-                <th className="px-2 py-2">Valor a ser Faturado</th>
-                <th className="px-2 py-2">Data Limite de Faturamento</th>
-                <th className="px-2 py-2">Horário Limite de Faturamento</th>
-                <th className="px-2 py-2">Ação</th>
+                <th className={th}>Nome</th>
+                <th className={`${th} w-[120px] text-center`}>Utilizar</th>
+                <th className={`${th} w-[120px] text-right`}>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {estadoAtualMaquina.map((row, idx) => (
-                <tr key={idx} className="odd:bg-white even:bg-gray-50">
-                  <td className="px-2 py-2 border text-center">
-                    {row.maquina_name || row.maquina || "Máquina sem nome"}
+              {linhas.map(({ maquina, utilizar }) => (
+                <tr key={maquina.id}>
+                  <td className={td}>{maquina.name}</td>
+                  <td className={`${td} text-center`}>
+                    <input
+                      type="checkbox"
+                      aria-label={`Utilizar ${maquina.name}`}
+                      className="h-4 w-4 accent-[#3573C9]"
+                      checked={utilizar}
+                      onChange={(event) =>
+                        alterarUtilizacao(maquina.id, event.target.checked)
+                      }
+                    />
                   </td>
-                  <td className="px-2 py-2 border text-center">
-                    {row.utilizacao ? "Sim" : "Não"}
-                  </td>
-                  {!hideMoldFields && (
-                    <td className="px-2 py-2 border text-center">
-                      {row.codMolde}
-                    </td>
-                  )}
-                  <td className="px-2 py-2 border text-center">
-                    {row.prodMaquinaInicioSequenciamento}
-                  </td>
-                  <td className="px-2 py-2 border text-center">{row.status}</td>
-                  <td className="px-2 py-2 border text-center">
-                    {row.numeroPedido}
-                  </td>
-                  <td className="px-2 py-2 border text-center">
-                    {row.tempoRestanteProdInjetora || "-"}
-                  </td>
-                  <td className="px-2 py-2 border text-center">
-                    {row.tempoRestanteProdPosInjetora || "-"}
-                  </td>
-                  <td className="px-2 py-2 border text-center">
-                    {row.demanda
-                      ? Intl.NumberFormat("pt-BR", {
-                          style: "decimal",
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        }).format(Number(row.demanda))
-                      : "-"}
-                  </td>
-                  <td className="px-2 py-2 border text-center">
-                    {row.valorAFAturar
-                      ? Intl.NumberFormat("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        }).format(Number(row.valorAFAturar))
-                      : "-"}
-                  </td>
-                  <td className="px-2 py-2 border text-center">
-                    {row.dataLimiteFaturamento || "-"}
-                  </td>
-                  <td className="px-2 py-2 border text-center">
-                    {row.horarioLimiteFaturamento || "-"}
-                  </td>
-                  <td className="px-2 py-2 border text-center">
+                  <td className={`${td} text-right`}>
                     <button
-                      onClick={() => removerEstadoAtualMaquina(idx)}
-                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors cursor-pointer"
+                      type="button"
+                      disabled={!utilizar}
+                      onClick={() => setEmEdicao(maquina)}
+                      className="cursor-pointer text-sm font-medium text-blue-600 transition-colors duration-150 hover:text-blue-800 disabled:cursor-default disabled:opacity-40 disabled:hover:text-blue-600"
                     >
-                      Deletar
+                      Editar
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        )}
-      </div>
-      <div className="w-full  flex justify-center">
-        <button
-          onClick={() => setIsModalNovoEstadoVisible(true)}
-          className="cursor-pointer flex gap-2 items-center bg-gray-500 text-white hover:bg-gray-700 transition-colors duration-200 py-2 px-4 rounded-lg mt-4"
-        >
-          <BiPlus size={20} />
-          Adicionar
-        </button>
-      </div>
-      <div className="flex justify-end gap-2 mt-6">
+        </div>
+      )}
+
+      {erro && (
+        <div role="alert" className="mt-2 text-xs text-red-700">
+          {erro}
+        </div>
+      )}
+
+      <div className="flex justify-between mt-6">
         <button
           onClick={prevStep}
-          className={`px-4 py-2 rounded bg-gray-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
+          className="px-4 py-2 rounded bg-gray-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer"
         >
           Voltar
         </button>
         <button
           onClick={handleProsseguir}
-          disabled={estadoAtualMaquina.length === 0}
-          className={`px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer`}
+          disabled={isFetching && linhas.length === 0}
+          className="px-4 py-2 rounded bg-blue-600 text-white transition-colors disabled:bg-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer"
         >
           Prosseguir
         </button>

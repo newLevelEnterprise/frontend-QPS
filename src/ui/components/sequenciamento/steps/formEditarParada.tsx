@@ -18,12 +18,14 @@ interface FormEditarParadaProps {
   setEditarParada: Dispatch<SetStateAction<boolean>>;
   parada: IParadas;
   onEditarParada: (paradaAtualizada: IParadas) => void;
+  maquinasHabilitadas: number[];
 }
 
 function FormEditarParada({
   setEditarParada,
   parada,
   onEditarParada,
+  maquinasHabilitadas,
 }: FormEditarParadaProps) {
   const {
     register,
@@ -238,11 +240,13 @@ function FormEditarParada({
             className="w-full outline-none border-b border-[#A4AABC] bg-white"
             {...register("maquina")}
           >
-            {maquinas?.map((maquina) => (
-              <option key={maquina.id} value={maquina.id}>
-                {maquina.name}
-              </option>
-            ))}
+            {maquinas
+              ?.filter((maquina) => maquinasHabilitadas.includes(maquina.id))
+              .map((maquina) => (
+                <option key={maquina.id} value={maquina.id}>
+                  {maquina.name}
+                </option>
+              ))}
           </select>
         </div>
         {errors.maquina && (

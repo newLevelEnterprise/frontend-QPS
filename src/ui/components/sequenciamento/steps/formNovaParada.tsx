@@ -15,9 +15,10 @@ import FormErrorMessage from "../../forms/FormErrorMessage";
 
 interface FormNovaParadaProps {
   onCriarParada: (novaParada: Omit<IParadas, "id">) => void;
+  maquinasHabilitadas: number[];
 }
 
-function FormNovaParada({ onCriarParada }: FormNovaParadaProps) {
+function FormNovaParada({ onCriarParada, maquinasHabilitadas }: FormNovaParadaProps) {
   const {
     register,
     handleSubmit,
@@ -216,11 +217,13 @@ function FormNovaParada({ onCriarParada }: FormNovaParadaProps) {
             className="w-full outline-none border-b border-[#A4AABC] bg-white"
             {...register("maquina")}
           >
-            {maquinas?.map((maquina) => (
-              <option key={maquina.id} value={maquina.id}>
-                {maquina.name}
-              </option>
-            ))}
+            {maquinas
+              ?.filter((maquina) => maquinasHabilitadas.includes(maquina.id))
+              .map((maquina) => (
+                <option key={maquina.id} value={maquina.id}>
+                  {maquina.name}
+                </option>
+              ))}
             {/* Adicione mais opções conforme necessário */}
           </select>
         </div>
