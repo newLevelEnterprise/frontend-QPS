@@ -19,6 +19,10 @@ const TIPOS_ESTOQUE: IEstoqueInsumo["tipo"][] = [
   "produto",
 ];
 
+function itemJaCadastrado(item: IEstoqueInsumo) {
+  return item.source != null || item.ultima_atualizacao != null;
+}
+
 function formatMissingIds(result: IEstoqueImportacao) {
   if (!result.ids_nao_encontrados.length) return "";
   return result.ids_nao_encontrados
@@ -30,9 +34,10 @@ function Estoque() {
   const queryClient = useQueryClient();
   const [importar, setImportar] = useState(false);
   const [manual, setManual] = useState(false);
-  const [tipoManual, setTipoManual] = useState<IEstoqueInsumo["tipo"]>("materia_prima");
+  const [tipoManual, setTipoManual] = useState<IEstoqueInsumo["tipo"] | "">("");
   const [materialId, setMaterialId] = useState("");
   const [quantidadeManual, setQuantidadeManual] = useState("");
+  const [estoqueMinimoManual, setEstoqueMinimoManual] = useState("");
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [resumo, setResumo] = useState<IEstoqueImportacao | null>(null);
 
@@ -105,6 +110,7 @@ function Estoque() {
         tipo: tipoManual,
         id_insumo: Number(materialId),
         quantidade_atual: quantidadeManual,
+        estoque_minimo: estoqueMinimoManual,
       });
       return data;
     },
@@ -115,8 +121,10 @@ function Estoque() {
       }
       toast.success("Estoque atualizado.");
       setManual(false);
+      setTipoManual("");
       setMaterialId("");
       setQuantidadeManual("");
+      setEstoqueMinimoManual("");
       queryClient.invalidateQueries({ queryKey: ["get", "all", "inventory-stock"] });
     },
     onError: () => {
@@ -213,25 +221,41 @@ function Estoque() {
 
       <Modal.Root isVisible={manual}>
         <Modal.Container>
-          <Modal.Header title="Adicionar manualmente" onClose={() => setManual(false)} />
+          <Modal.Header
+            title="Adicionar manualmente"
+            onClose={() => {
+              setManual(false);
+              setTipoManual("");
+              setMaterialId("");
+              setQuantidadeManual("");
+              setEstoqueMinimoManual("");
+            }}
+          />
           <form
             className="flex flex-col gap-4 my-6 min-w-[320px]"
             onSubmit={(event) => {
               event.preventDefault();
-              if (!materialId || quantidadeManual === "") return;
+              if (!tipoManual || !materialId || quantidadeManual === "" || estoqueMinimoManual === "") {
+                return;
+              }
+              const escolhido = estoque?.find(
+                (item) => item.tipo === tipoManual && String(item.id_insumo) === materialId,
+              );
+              if (escolhido && itemJaCadastrado(escolhido)) return;
               adicionarManual.mutate();
             }}
           >
             <label className="text-sm text-gray-700 flex flex-col gap-1">
-              Tipo
+              Categoria
               <select
                 className="border border-gray-300 rounded-lg p-2"
                 value={tipoManual}
                 onChange={(event) => {
-                  setTipoManual(event.target.value as IEstoqueInsumo["tipo"]);
+                  setTipoManual(event.target.value as IEstoqueInsumo["tipo"] | "");
                   setMaterialId("");
                 }}
               >
+                <option value="">Selecione</option>
                 {TIPOS_ESTOQUE.map((tipo) => (
                   <option key={tipo} value={tipo}>
                     {TIPO_LABEL[tipo]}
@@ -240,20 +264,31 @@ function Estoque() {
               </select>
             </label>
             <label className="text-sm text-gray-700 flex flex-col gap-1">
-              {TIPO_LABEL[tipoManual]}
+              {tipoManual ? TIPO_LABEL[tipoManual] : "Item"}
               <select
-                className="border border-gray-300 rounded-lg p-2"
+                className="border border-gray-300 rounded-lg p-2 disabled:bg-gray-100"
                 value={materialId}
+                disabled={!tipoManual}
                 onChange={(event) => setMaterialId(event.target.value)}
               >
-                <option value="">Selecione</option>
+                <option value="">
+                  {tipoManual ? "Selecione" : "Selecione a categoria"}
+                </option>
                 {estoque
                   ?.filter((item) => item.tipo === tipoManual)
-                  .map((item) => (
-                    <option key={`${item.tipo}-${item.id_insumo}`} value={item.id_insumo}>
-                      {item.codigo ? `${item.codigo} — ${item.nome}` : item.nome}
-                    </option>
-                  ))}
+                  .map((item) => {
+                    const bloqueado = itemJaCadastrado(item);
+                    const nome = item.codigo ? `${item.codigo} — ${item.nome}` : item.nome;
+                    return (
+                      <option
+                        key={`${item.tipo}-${item.id_insumo}`}
+                        value={item.id_insumo}
+                        disabled={bloqueado}
+                      >
+                        {bloqueado ? `${nome} — já cadastrado` : nome}
+                      </option>
+                    );
+                  })}
               </select>
             </label>
             <label className="text-sm text-gray-700 flex flex-col gap-1">
@@ -267,10 +302,27 @@ function Estoque() {
                 onChange={(event) => setQuantidadeManual(event.target.value)}
               />
             </label>
+            <label className="text-sm text-gray-700 flex flex-col gap-1">
+              Estoque mínimo
+              <input
+                type="number"
+                step="0.0001"
+                min="0"
+                className="border border-gray-300 rounded-lg p-2"
+                value={estoqueMinimoManual}
+                onChange={(event) => setEstoqueMinimoManual(event.target.value)}
+              />
+            </label>
             <div className="flex justify-end">
               <button
                 type="submit"
-                disabled={!materialId || quantidadeManual === "" || adicionarManual.isPending}
+                disabled={
+                  !tipoManual ||
+                  !materialId ||
+                  quantidadeManual === "" ||
+                  estoqueMinimoManual === "" ||
+                  adicionarManual.isPending
+                }
                 className="cursor-pointer text-sm inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-full"
               >
                 {adicionarManual.isPending ? "Salvando..." : "Salvar"}
