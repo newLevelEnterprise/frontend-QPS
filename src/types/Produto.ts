@@ -10,6 +10,7 @@ export interface IProduto {
   id: number;
   external_id?: string | null;
   post_injection_cycle_time?: number;
+  minimum_stock?: number;
   scrap?: number;
   cycle?: number;
   bottleneck?: number;

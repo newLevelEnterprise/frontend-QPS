@@ -12,6 +12,13 @@ export const criarProdutoSchema = z
       .string()
       .min(1, "Tempo de pós-injeção é obrigatório")
       .regex(/^\d+$/, "Tempo de pós-injeção deve ser um inteiro em segundos"),
+    estoqueMinimo: z
+      .string()
+      .min(1, "Estoque mínimo é obrigatório")
+      .refine((value) => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed >= 0;
+      }, "Estoque mínimo deve ser um número maior ou igual a zero"),
     structureType: z.enum(["simple", "compound"]),
     components: z
       .array(

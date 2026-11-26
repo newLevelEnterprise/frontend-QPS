@@ -10,7 +10,14 @@ import Modal from "../modal";
 const TIPO_LABEL: Record<string, string> = {
   materia_prima: "Matéria-Prima",
   item_compra: "Item de Compra",
+  produto: "Produto",
 };
+
+const TIPOS_ESTOQUE: IEstoqueInsumo["tipo"][] = [
+  "materia_prima",
+  "item_compra",
+  "produto",
+];
 
 function formatMissingIds(result: IEstoqueImportacao) {
   if (!result.ids_nao_encontrados.length) return "";
@@ -23,6 +30,7 @@ function Estoque() {
   const queryClient = useQueryClient();
   const [importar, setImportar] = useState(false);
   const [manual, setManual] = useState(false);
+  const [tipoManual, setTipoManual] = useState<IEstoqueInsumo["tipo"]>("materia_prima");
   const [materialId, setMaterialId] = useState("");
   const [quantidadeManual, setQuantidadeManual] = useState("");
   const [arquivo, setArquivo] = useState<File | null>(null);
@@ -94,7 +102,7 @@ function Estoque() {
   const adicionarManual = useMutation({
     mutationFn: async () => {
       const { data } = await apiClient.post<IEstoqueImportacao>("/inventory-stock/manual", {
-        tipo: "materia_prima",
+        tipo: tipoManual,
         id_insumo: Number(materialId),
         quantidade_atual: quantidadeManual,
       });
@@ -129,7 +137,8 @@ function Estoque() {
           <Modal.Header title="Importar Planilha" onClose={closeImport} />
           <div className="flex flex-col gap-4 my-6 min-w-[320px]">
             <p className="text-sm text-gray-600">
-              Colunas esperadas: tipo, id_insumo, quantidade_atual.
+              Colunas esperadas: tipo, id_insumo, quantidade_atual. O tipo pode ser
+              materia_prima, item_compra ou produto.
             </p>
             <input
               type="file"
@@ -214,7 +223,24 @@ function Estoque() {
             }}
           >
             <label className="text-sm text-gray-700 flex flex-col gap-1">
-              Matéria Prima
+              Tipo
+              <select
+                className="border border-gray-300 rounded-lg p-2"
+                value={tipoManual}
+                onChange={(event) => {
+                  setTipoManual(event.target.value as IEstoqueInsumo["tipo"]);
+                  setMaterialId("");
+                }}
+              >
+                {TIPOS_ESTOQUE.map((tipo) => (
+                  <option key={tipo} value={tipo}>
+                    {TIPO_LABEL[tipo]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm text-gray-700 flex flex-col gap-1">
+              {TIPO_LABEL[tipoManual]}
               <select
                 className="border border-gray-300 rounded-lg p-2"
                 value={materialId}
@@ -222,9 +248,9 @@ function Estoque() {
               >
                 <option value="">Selecione</option>
                 {estoque
-                  ?.filter((item) => item.tipo === "materia_prima")
+                  ?.filter((item) => item.tipo === tipoManual)
                   .map((item) => (
-                    <option key={item.id_insumo} value={item.id_insumo}>
+                    <option key={`${item.tipo}-${item.id_insumo}`} value={item.id_insumo}>
                       {item.codigo ? `${item.codigo} — ${item.nome}` : item.nome}
                     </option>
                   ))}
@@ -266,6 +292,11 @@ function Estoque() {
             titulo="Item de Compra"
             colunaNome="Item"
             itens={estoque?.filter((item) => item.tipo === "item_compra") ?? []}
+          />
+          <EstoqueTabela
+            titulo="Produto"
+            colunaNome="Produto"
+            itens={estoque?.filter((item) => item.tipo === "produto") ?? []}
           />
         </div>
       )}

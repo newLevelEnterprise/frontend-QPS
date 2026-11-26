@@ -34,6 +34,7 @@ function FormNovoProduto({
           data.post_injection_cycle_time,
           10,
         ),
+        minimum_stock: Number(data.estoqueMinimo),
         components: toProductStructurePayload(data),
       });
       setProducts();
@@ -61,6 +62,7 @@ function FormNovoProduto({
         external_id: "",
         name: "",
         post_injection_cycle_time: "0",
+        estoqueMinimo: "0",
         structureType: "simple",
         components: [],
       }}

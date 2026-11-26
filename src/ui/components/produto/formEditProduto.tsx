@@ -54,6 +54,7 @@ function FormEditarProduto({
           data.post_injection_cycle_time,
           10,
         ),
+        minimum_stock: Number(data.estoqueMinimo),
         components: toProductStructurePayload(data),
       });
       setProducts();
@@ -83,6 +84,7 @@ function FormEditarProduto({
         external_id: produto.external_id ?? "",
         name: produto.name,
         post_injection_cycle_time: String(produto.post_injection_cycle_time ?? 0),
+        estoqueMinimo: String(produto.minimum_stock ?? 0),
         structureType: simple ? "simple" : "compound",
         components: simple
           ? []

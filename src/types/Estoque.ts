@@ -1,5 +1,5 @@
 export interface IEstoqueInsumo {
-  tipo: "materia_prima" | "item_compra";
+  tipo: "materia_prima" | "item_compra" | "produto";
   id_insumo: number;
   codigo?: string | null;
   nome: string;

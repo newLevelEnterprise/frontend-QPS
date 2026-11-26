@@ -288,6 +288,30 @@ function ProductCadastroForm({
           </div>
         </div>
 
+        <div className="flex max-w-[220px] flex-col gap-2">
+          <label
+            htmlFor={`${idPrefix}-estoque-minimo`}
+            className="text-sm font-semibold text-[#212A4F]"
+          >
+            Estoque mínimo
+          </label>
+          <input
+            id={`${idPrefix}-estoque-minimo`}
+            type="number"
+            min="0"
+            step="0.0001"
+            className={inputClass}
+            {...register("estoqueMinimo")}
+          />
+          {errors.estoqueMinimo && (
+            <ErrorMessage
+              errors={errors}
+              name="estoqueMinimo"
+              render={({ message }) => <FormErrorMessage message={message} />}
+            />
+          )}
+        </div>
+
         <div className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-[#212A4F]">
             Estrutura do produto
